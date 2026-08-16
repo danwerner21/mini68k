@@ -1,0 +1,468 @@
+#************************************************
+#						*
+#	CP/M-68k Basic Disk Operating System 	*
+#		Exception Handling Module	*
+#						*
+#	Version 0.0 -- July    21, 1982		*
+#	Version 0.1 -- July    25, 1982		*
+#	Version 0.2 -- October  6, 1982		*
+#	Version 0.3 -- December 21, 1982	*
+#						*
+#	Modified 2/15/84 sw for 68010 support	*
+#		 3/31/2016 jrc 68030 support	*
+#						*
+#************************************************
+
+
+	.globl	initexc
+	.globl	tpa_lp
+	.globl	tpa_hp
+	.globl	gouser				/*sw RTE routine */
+	.globl	retrobrew
+
+bgetseg = 18
+bsetexc	= 22		/* function call to set vector */
+buserr	= 2
+spurious = 24
+trap0	= 32
+trap2	= 34
+trap3	= 35
+
+pic_present	=	1		/* NS32202 icu present */
+
+excmask:
+.if RETAIL
+	.byte	0b00000011		/*  0..7  */
+	.byte	0b00000000		/*  8..15 */
+.else
+.if 1	/* for debug, send all to the debugger */
+	.byte	0b00010011		/*  0..7  */	/* illegal */
+	.byte	0b00000010		/*  8..15 */	/* trace */
+.else
+	.byte	0b11111111	/* 0..7 */
+	.byte	0b11111111	/* 8..15 */
+.endif
+.endif
+# reserve 8 vectors for the interrupt controller
+	.byte	0b11111111		/* 16..23   used by Interrupt Controller */
+# reserve the NMI vector
+	.byte	0b10000000		/* 24..31   auto vectored interrupts (NMI is 31) */   
+# reserve trap calls 2, 3, & 8
+	.byte	0b00001100		/* 32..39   TRAP calls are here */
+	.byte	0b00000001		/* 40..47   TRAP calls are here*/
+	.byte	0b00000000		/* 48..55 */
+	.byte	0b00000000		/* 56..63 */
+
+initexc:
+# Initialize Exception Vector Handlers
+# It has 1 passed parameter: the address of the exception vector array
+	link	%a6,#0
+	movem.l	%d2-%d4,-(%sp)
+
+	moveq.l	#bsetexc,%d0
+	moveq.l	#buserr,%d1		/* start at BUS ERROR trap vector */
+	move.l	#exchndl,%d2
+	lea	excmask(%pc),%a0
+init1:
+	move.l	%d1,%d3
+	lsr.w	#3,%d3			/* index into byte array */
+	btst.b	%d1,(%a0,%d3.w)		/* skip those marked */
+	bne	init2
+
+	movem.l	%d0-%d2,-(%sp)
+	trap	#3		/* BIOS call to set exception vector */
+	movem.l	(%sp)+,%d0-%d2
+
+init2:	addq.l	#1,%d1
+	add.l	#4,%d2
+.if 0
+	cmpi	#spurious,%d1
+	bne	init3
+	move	#trap0,%d1
+init3:	cmpi	#trap2,%d1
+	beq	init2		/* don't init trap 2 or trap 3 */
+	cmpi	#trap3,%d1
+	beq	init2
+.endif
+	cmpi.w	#endvec,%d1
+	blt	init1
+#				initialize the exception vector array
+
+	moveq.l	#bgetseg,%d0
+	trap	#3		/* get the original TPA limits */
+	movea.l	%d0,%a0
+	tst.w	(%a0)+
+	move.l	(%a0)+,%d1	/* %d1 = original low TPA limit */
+	move.l	%d1,%d2
+	add.l	(%a0),%d2		/* %d2 = original high TPA limit */
+	move.l	tpa_lp,%d3	/* %d3 = new low TPA limit */
+	move.l	tpa_hp,%d4	/* %d4 = new high TPA limit */
+/*	moveq.l	#17,%d0	 jrc */
+	moveq.l #n_evec_adr/4-1,%d0	/* do all of them */
+###	movea.l	4(%sp),%a0
+	movea.l	8(%a6),%a0	/* get &excvec[0] argument */
+	move.l	%a0,evec_adr	/* save exception vector address */
+init4:
+	cmp.l	(%a0),%d1
+	bhi	do_init		/* if old exception outside orig TPA, clear it */
+	cmp.l	(%a0),%d2
+	bls	do_init
+# current exception array entry is in original TPA
+	cmp.l	(%a0),%d3
+	bhi	dontinit	/* if old exception in old TPA but outside new */
+	cmp.l	(%a0),%d4		/*	TPA, don't clear it */
+	bls	dontinit
+do_init:
+	clr.l	(%a0)
+dontinit:
+	tst.l	(%a0)+
+	dbf	%d0,init4
+
+	movem.l	(%sp)+,%d2-%d4
+	unlk	%a6
+	rts
+
+	.page
+exchndl:	/* .equ	*  */
+# jrc .ifndef	M68010
+.if	M68000<68010 /* jrc */
+	bsr.w	except		/*  2	Buserr */
+excrtn0:
+	bsr.w	except		/*  3	Addressing error */
+	bsr.w	except		/*  4	Illegal Instruction */
+	.globl	m68000
+m68000:
+.else	/* jrc M68000>=68010  */
+.if M68000==68010
+	.globl	m68010		/*	Note case difference! */
+m68010:
+.endif
+.if M68000>=68020
+	.globl	m68020
+m68020:
+.endif
+	/*	For build process */
+	bsr.w	berr		/*  2	Buserr */
+excrtn0:
+	bsr.w	berr		/*  3	Addressing error */
+	bsr.w	except		/*  4	Illegal Instruction */
+.endif
+	bsr.w	except		/*  5 */
+	bsr.w	except		/*  6 */
+	bsr.w	except		/*  7 */
+# jrc .ifndef	M68010
+.if	M68000<68010 /* jrc */
+	bsr.w	except		/*  8 */
+.else				/* Privilege violation */
+	bsr.w	privviol	/*  8 */
+.endif
+	bsr.w	except		/*  9 */
+	bsr.w	except		/* 10 */
+	bsr.w	except		/* 11 */
+	bsr.w	except		/* 12 */
+	bsr.w	except		/* 13 */
+	bsr.w	except		/* 14 */
+	bsr.w	except		/* 15 */
+	bsr.w	except		/* 16 */
+	bsr.w	except		/* 17 */
+	bsr.w	except		/* 18 */
+	bsr.w	except		/* 19 */
+	bsr.w	except		/* 20 */
+	bsr.w	except		/* 21 */
+	bsr.w	except		/* 22 */
+	bsr.w	except		/* 23 */
+	bsr.w	except		/* 24 */
+	bsr.w	except		/* 25 */
+	bsr.w	except		/* 26 */
+	bsr.w	except		/* 27 */
+	bsr.w	except		/* 28 */
+	bsr.w	except		/* 29 */
+	bsr.w	except		/* 30 */
+	bsr.w	except		/* 31 */
+	bsr.w	except		/* 32 */
+	bsr.w	except		/* 33 */
+	bsr.w	except		/* 34 */
+	bsr.w	except		/* 35 */
+	bsr.w	except		/* 36 */
+	bsr.w	except		/* 37 */
+	bsr.w	except		/* 38 */
+	bsr.w	except		/* 39 */
+	bsr.w	except		/* 40 */
+	bsr.w	except		/* 41 */
+	bsr.w	except		/* 42 */
+	bsr.w	except		/* 43 */
+	bsr.w	except		/* 44 */
+	bsr.w	except		/* 45 */
+	bsr.w	except		/* 46 */
+	bsr.w	except		/* 47 */
+.if 0
+	bsr.w	except		/* 48 */
+	bsr.w	except		/* 49 */
+	bsr.w	except		/* 50 */
+	bsr.w	except		/* 51 */
+	bsr.w	except		/* 52 */
+	bsr.w	except		/* 53 */
+	bsr.w	except		/* 54 */
+	bsr.w	except		/* 55 */
+	bsr.w	except		/* 56 */
+	bsr.w	except		/* 57 */
+	bsr.w	except		/* 58 */
+	bsr.w	except		/* 59 */
+	bsr.w	except		/* 60 */
+	bsr.w	except		/* 61 */
+	bsr.w	except		/* 62 */
+	bsr.w	except		/* 63 */
+.endif
+endvec		=	(. - exchndl)/4 + 2
+	.page
+# jrc .ifdef	M68010
+.if M68000>=68010	/*  jrc  */
+#
+#	Here if the exception in question was a buserr/addressing error.
+#	We reformat the stack to look like a 68000.
+#
+#	Entered with a standard 68010 exception stack frame with a return
+#	address on top (at 0(%sp)).
+#
+berr:
+	move.l	0x0(%sp),0x2a(%sp)			/*	Move return address */
+	move.w	0x0c(%sp),0x2e(%sp)			/*	Move Status word */
+	andi.w	#7,0x2e(%sp)			/*	Clear all but FC0-2 */
+	move.l	0x0e(%sp),0x30(%sp)			/*	Copy Fault address */
+	move.w	0x1c(%sp),0x34(%sp)			/*	Move IR */
+	move.w	0x4(%sp),0x36(%sp)			/*	Move SR */
+	move.l	0x6(%sp),0x38(%sp)			/*	Move PC */
+	move.w	0x0a(%sp),0x3c(%sp)			/*	Move format word */
+	adda.l	#0x2a,%sp				/*	Make %sp -> new frame */
+	bra	except				/*	Merge */
+#*****************************************************************************
+#	Here we make up for a faux pas in the C compiler.  Change all        *
+#	move from SR instructions (0x40CX) to move from CCR (0x42CX).          *
+#	Precludes executing 68000 programs in ROM on a 68010.                *
+#                                                                            *
+#	Relies on the fact that the exception PC (Stack offset 0E below)     *
+#	points to the instruction on an illegal instruction exception.       *
+#*****************************************************************************
+privviol:
+	movem.l	%d0/%a0,-(%sp)			/*	Save some regs */
+	move.l	0x0e(%sp),%a0			/*	%A0 -> Instruction */
+	move.w	(%a0),%d0				/*	%d0 =  Instruction */
+	andi.w	#0xFFC0,%d0			/*	Mask off <EA> field */
+	cmpi.w	#0x40C0,%d0			/*	Move from SR? */
+	bne	notsr				/*	No, handle normally */
+	ori.w	#0x0200,(%a0)			/*	Change to move from CCR */
+	movem.l	(%sp)+,%d0/%a0			/*	Restore regs */
+	tst.l	(%sp)+				/*	Pop return address */
+	rte					/*	Try it again */
+notsr:	movem.l	(%sp)+,%d0/%a0			/*	Abandon hope, all ye .. */
+	.page
+.endif
+except:
+	clr.w	-(%sp)
+	movem.l	%a0/%d0,-(%sp)	/* 10 (11) words now on stack in following order */
+#				 _______________________________
+#				|____________%D0.L_______________|
+#				|____________%A0.L_______________|
+#				|____0000______|________________
+#				|_______Handler Return__________|
+#				If bus error, extra 2 longs are here
+#				 ______________
+#				|__Status Reg__|________________
+#				|_____Exception Return__________|
+#				|_(format word)|
+	move.l	10(%sp),%d0	/* get return address from above array */
+	sub.l	#excrtn0,%d0	/* %d0 now has 4 * (encoded excptn nmbr), where */
+#				  encoded excptn nmbr is in [0..21,22..37]
+#					      representing  [2..23,32..47]
+	cmpi	#36,%d0		/* if %d0/4 is in [0..9,22..29] then */
+	ble	chkredir	/*     the exception may be redirected */
+	cmpi	#88,%d0
+	blt	dfltexc
+	cmpi	#116,%d0
+	bgt	dfltexc
+#				in range of redirected exceptions
+	subi	#48,%d0		/* subtract 4*12 to normalize [0..9,22..29] */
+#							into [0..9,10..17]
+chkredir:
+	movea.l	evec_adr,%a0
+	adda	%d0,%a0		/* index into exception vector array */
+	tst.l	(%a0)		/* if 00000000, then not redirected */
+	bne	usrexc
+#				not redirected, do default handler
+supexc:				/* Here for supervisor state */
+	cmpi	#40,%d0
+	blt	dfltexc
+	addi	#48,%d0		/* add 4*12 that was sub'd above */
+dfltexc:
+	adda	#14,%sp		/* throw away 7 words that we added to stack */
+	asr	#2,%d0		/* divide %d0 by 4 */
+#				now %d0 is in [0..21,22..37]
+#				to represent [2..23,32..47]
+	cmpi	#2,%d0		/* bus or address error? */
+	bge	nobusexc
+	movem.l	(%sp)+,%a0-%a1	/* if yes, throw away 4 words from stack */
+nobusexc:
+	tst.w	(%sp)+		/* throw away stacked SR */
+	addi	#2,%d0
+	cmpi	#23,%d0		/* get back real excptn nmbr in [2..23,32..47] */
+	ble	lowexc
+	addi	#8,%d0
+lowexc:	move	%d0,-(%sp)	/* save excptn nmbr */
+	lea	excmsg1,%a0
+	bsr	print		/* print default exception message */
+	move	(%sp)+,%d0
+	bsr	prtbyte
+	lea	excmsg2, %a0
+	bsr	print
+	move.l	(%sp)+,%d0
+	bsr	prtlong
+	lea	excmsg3, %a0
+	bsr	print
+	clr.l	%d0
+	trap	#2		/* warm boot */
+	rte
+
+usrexc:
+# Call user exception handler
+# make sure exception information is on his stack
+	cmpi	#8,%d0		/* address or bus error? */
+	blt	addrexc		/* if yes, skip */
+	btst	#13,14(%sp)	/* exception occured in user state? */
+	bne	supexc		/*sw if no, go to supervisor handler */
+	move.l	(%a0),10(%sp)	/* put user handler address on our stack */
+	move.l	%usp,%a0		/* user stack pointer to %a0 */
+	move.l	16(%sp),-(%a0)	/* put exception return on user stack */
+	move.w	14(%sp),-(%a0)	/* put SR on user stack */
+	move.l	%a0,%usp		/* update user stack pointer */
+	movem.l	(%sp)+,%a0/%d0	/* restore regs */
+	move.l	2(%sp),8(%sp)	/* move address of user handler to excptn rtn */
+# jrc .ifdef	M68010
+.if M68000>=68010	/*  jrc  */
+	clr.w	12(%sp)		/*sw Clear out the format word */
+.endif
+	addq	#6,%sp		/* clear junk from stack */
+	andi	#0x7fff,(%sp)	/* clear trace bit */
+	rte			/* go to user handler */
+addrexc:
+	btst	#13,22(%sp)	/* exception occured in user state? */
+	bne	supexc		/*sw if no, go to supervisor handler */
+	move.l	(%a0),10(%sp)	/* put user handler address on our stack */
+	move.l	%usp,%a0		/* user stack pointer to %a0 */
+	move.l	24(%sp),-(%a0)	/* put exception return on user stack */
+	move.w	22(%sp),-(%a0)	/* put SR on user stack */
+	move.l	18(%sp),-(%a0)	/* put extra 2 longs on user stack */
+	move.l	14(%sp),-(%a0)
+	move.l	%a0,%usp		/* update user stack pointer */
+	movem.l	(%sp)+,%a0/%d0	/* restore regs */
+	move.l	2(%sp),16(%sp)	/* move address of user handler to excptn rtn */
+# jrc .ifdef	M68010
+.if M68000>=68010	/*  jrc  */
+	clr.w	20(%sp)		/*sw Clear format word */
+.endif
+	adda	#14,%sp		/* clear junk from stack */
+	andi	#0x7fff,(%sp)	/* clear trace bit */
+	rte			/* go to user handler */
+
+	.page
+#******************************************************************************
+#
+#	gouser routine.  This routine performs an RTE to go to the user program
+#			 User EPA is passed in %A0.L.
+#
+#******************************************************************************
+gouser:
+# jrc .ifdef	M68010
+.if M68000>=68010	/*  jrc  */
+	clr.w	-(%sp)			/*	Push format word */
+.endif
+	move.l	%a0,-(%sp)		/*	Push epa */
+	clr.w	-(%sp)			/*		  and SR */
+	rte				/*	Do it.  Into user program. */
+.page
+#
+#  Subroutines
+#
+
+print:
+	clr.l	%d1
+	move.b	(%a0)+, %d1
+	beq	prtdone
+	move	#2, %d0
+	trap	#2
+	bra	print
+prtdone:
+	rts
+
+prtlong:
+#  Print %d0.l in hex format
+	move	%d0,-(%sp)
+	swap	%d0
+	bsr	prtword
+	move	(%sp)+,%d0
+
+prtword:
+#  Print %d0.w in hex format
+	move	%d0,-(%sp)
+	lsr	#8,%d0
+	bsr	prtbyte
+	move	(%sp)+,%d0
+
+prtbyte:
+#  Print %d0.b in hex format
+	move	%d0,-(%sp)
+	lsr	#4,%d0
+	bsr	prtnib
+	move	(%sp)+,%d0
+
+prtnib:
+	andi	#0xf,%d0
+	cmpi	#10,%d0
+	blt	lt10
+	addi.b	#'A'-'9'-1,%d0
+lt10:
+	addi.b	#'0',%d0
+	move	%d0,%d1
+	move	#2,%d0
+	trap	#2
+	rts
+
+
+	.data
+
+excmsg1:
+	.asciz	"\r\n\nException 0x"
+
+excmsg2:
+	.asciz	" at user address 0x"
+
+excmsg3:
+	.asciz	".  Aborted."
+
+retrobrew:	
+	.ascii	"  Created for the RetroBrew "
+.if M68000<68010
+	.ascii	"Mini-M68k"
+.else
+.if M68000>=68020
+	.ascii	"KISS-68030"
+.else
+	.ascii	"MC680xx ??"
+.endif
+.endif
+	.ascii	" board on "
+.include "stamp.s"
+##########################################################################
+##########################################################################
+##########################################################################
+	.ascii	"\r\n\n"
+	.byte	0
+
+
+	.bss
+
+evec_adr:
+	.ds.l	48
+n_evec_adr	=	. - evec_adr 	
+
+	.end
+

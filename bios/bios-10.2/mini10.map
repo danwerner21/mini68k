@@ -1,0 +1,967 @@
+Archive member included because of file (symbol)
+
+bios.a(main68.o)              startup.o (main68)
+bios.a(serial.o)              startup.o (sio_init)
+bios.a(cprintf.o)             bios.a(main68.o) (putch)
+bios.a(pic202.o)              startup.o (interrupt_3_timer)
+bios.a(ns202.o)               startup.o (ns202_init2)
+bios.a(bios8.o)               startup.o (bios_trap_entry)
+bios.a(strtoul.o)             bios.a(main68.o) (strtoul)
+bios.a(wd37c65.o)             bios.a(pic202.o) (floppy_timeout)
+bios.a(setup.o)               bios.a(main68.o) (daytime_c)
+bios.a(ff.o)                  bios.a(main68.o) (f_chdrive)
+bios.a(prettydump.o)          bios.a(main68.o) (pretty_dump_memory)
+bios.a(diskio.o)              bios.a(ff.o) (disk_status)
+bios.a(uart2.o)               startup.o (_uart_find)
+bios.a(memtest3.o)            startup.o (DRAM_tests)
+bios.a(rtc.o)                 bios.a(setup.o) (get_rtc_date)
+bios.a(ds1302.o)              bios.a(setup.o) (rtc_get_loc)
+bios.a(ppide.o)               bios.a(setup.o) (ppide_info)
+bios.a(dualide.o)             bios.a(setup.o) (dide_reset)
+bios.a(malloc.o)              bios.a(setup.o) (malloc)
+bios.a(dualsd.o)              bios.a(setup.o) (dsd_reset)
+bios.a(bioscall.o)            bios.a(setup.o) (bios_call)
+bios.a(fdc8272.o)             bios.a(setup.o) (operation_docb_ptr)
+bios.a(floppy.o)              bios.a(setup.o) (fdc_parameters)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(ctype_.o)
+                              startup.o (_ctype_)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcmp.o)
+                              bios.a(main68.o) (memcmp)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcpy.o)
+                              bios.a(main68.o) (memcpy)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memmove.o)
+                              bios.a(main68.o) (memmove)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memset.o)
+                              bios.a(main68.o) (memset)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcasecmp.o)
+                              bios.a(main68.o) (strcasecmp)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcat.o)
+                              bios.a(main68.o) (strcat)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strchr.o)
+                              bios.a(setup.o) (strchr)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcpy.o)
+                              bios.a(main68.o) (strcpy)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+                              bios.a(main68.o) (strlen)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+                              bios.a(main68.o) (strncasecmp)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncat.o)
+                              bios.a(main68.o) (strncat)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncmp.o)
+                              bios.a(main68.o) (strncmp)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncpy.o)
+                              bios.a(setup.o) (strncpy)
+/usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+                              bios.a(main68.o) (__mulsi3)
+/usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+                              bios.a(cprintf.o) (__udivsi3)
+/usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+                              bios.a(setup.o) (__divsi3)
+/usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+                              bios.a(cprintf.o) (__umodsi3)
+/usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_modsi3.o)
+                              bios.a(setup.o) (__modsi3)
+
+Allocating common symbols
+Common symbol       size              file
+
+cmd_level           0x2               bios.a(main68.o)
+errno               0x4               bios.a(strtoul.o)
+drive_status        0x4               bios.a(diskio.o)
+julian_day          0x4               bios.a(pic202.o)
+debug               0x2               startup.o
+fat_fs_workarea     0x8a8             bios.a(main68.o)
+usermode            0x4               bios.a(main68.o)
+drive_ready         0x4               bios.a(wd37c65.o)
+h_m_a               0x4               startup.o
+mem_chain           0x4               startup.o
+nvram_valid         0x1               bios.a(setup.o)
+operation_docb_ptr  0x14              bios.a(fdc8272.o)
+timer_ticks         0x4               bios.a(pic202.o)
+cmd_buffer          0x104             bios.a(main68.o)
+disk_table          0x20              bios.a(wd37c65.o)
+uart_type           0x1               startup.o
+fdc_base_port       0x2               bios.a(wd37c65.o)
+timeout             0x2               bios.a(pic202.o)
+nvram               0x20              startup.o
+memmax              0x4               startup.o
+reset_code          0x4               startup.o
+cache_param         0x4               bios.a(fdc8272.o)
+wd_reg              0x2               bios.a(wd37c65.o)
+drive_status_change
+                    0x4               bios.a(wd37c65.o)
+auto_boot_time      0x4               bios.a(main68.o)
+
+Discarded input sections
+
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(ctype_.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(ctype_.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(ctype_.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(ctype_.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(ctype_.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcmp.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcmp.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcmp.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcmp.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcmp.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcmp.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcmp.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcmp.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcpy.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcpy.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcpy.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcpy.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcpy.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcpy.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcpy.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcpy.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memmove.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memmove.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memmove.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memmove.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memmove.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memmove.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memmove.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memmove.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memset.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memset.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memset.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memset.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memset.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memset.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memset.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memset.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcasecmp.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcasecmp.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcasecmp.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcasecmp.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcasecmp.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcasecmp.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcasecmp.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcasecmp.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcat.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcat.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcat.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcat.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcat.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcat.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcat.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcat.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strchr.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strchr.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strchr.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strchr.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strchr.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strchr.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strchr.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strchr.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcpy.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcpy.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcpy.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcpy.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcpy.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcpy.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcpy.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcpy.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+ .debug_ranges  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncat.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncat.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncat.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncat.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncat.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncat.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncat.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncat.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncmp.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncmp.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncmp.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncmp.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncmp.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncmp.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncmp.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncmp.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncpy.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncpy.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncpy.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncpy.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncpy.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncpy.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncpy.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncpy.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_modsi3.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_modsi3.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_modsi3.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_modsi3.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+Address of section .text set to 0xfff80000
+Address of section .data set to 0x100
+LOAD startup.o
+LOAD bios.a
+LOAD /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a
+LOAD /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a
+                0x80000000                PROVIDE (__executable_start, 0x80000000)
+                0x80000074                . = (0x80000000 + SIZEOF_HEADERS)
+
+.interp
+ *(.interp)
+
+.hash
+ *(.hash)
+
+.gnu.hash
+ *(.gnu.hash)
+
+.dynsym
+ *(.dynsym)
+
+.dynstr
+ *(.dynstr)
+
+.gnu.version
+ *(.gnu.version)
+
+.gnu.version_d
+ *(.gnu.version_d)
+
+.gnu.version_r
+ *(.gnu.version_r)
+
+.rel.dyn
+ *(.rel.init)
+ *(.rel.text .rel.text.* .rel.gnu.linkonce.t.*)
+ *(.rel.fini)
+ *(.rel.rodata .rel.rodata.* .rel.gnu.linkonce.r.*)
+ *(.rel.data.rel.ro* .rel.gnu.linkonce.d.rel.ro.*)
+ *(.rel.data .rel.data.* .rel.gnu.linkonce.d.*)
+ *(.rel.tdata .rel.tdata.* .rel.gnu.linkonce.td.*)
+ *(.rel.tbss .rel.tbss.* .rel.gnu.linkonce.tb.*)
+ *(.rel.ctors)
+ *(.rel.dtors)
+ *(.rel.got)
+ *(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*)
+
+.rela.dyn
+ *(.rela.init)
+ *(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)
+ *(.rela.fini)
+ *(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r.*)
+ *(.rela.data .rela.data.* .rela.gnu.linkonce.d.*)
+ *(.rela.tdata .rela.tdata.* .rela.gnu.linkonce.td.*)
+ *(.rela.tbss .rela.tbss.* .rela.gnu.linkonce.tb.*)
+ *(.rela.ctors)
+ *(.rela.dtors)
+ *(.rela.got)
+ *(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*)
+
+.rel.plt
+ *(.rel.plt)
+
+.rela.plt
+ *(.rela.plt)
+
+.init
+ *(.init)
+
+.plt
+ *(.plt)
+
+.text           0xfff80000     0x7d06
+ *(.text .stub .text.* .gnu.linkonce.t.*)
+ .text          0xfff80000      0x8c0 startup.o
+                0xfff8027e                crlf
+                0xfff80000                location_zero
+                0xfff802a0                nout
+                0xfff80294                wout
+                0xfff8070e                bswap
+                0xfff80286                adout
+                0xfff8028e                lout
+                0xfff802bc                woutD
+                0xfff8071a                wswap
+                0xfff802d4                data_cache_flush
+                0xfff80722                _run_us_mode
+                0xfff8028e                dout
+                0xfff802d8                _start
+                0xfff80276                space
+                0xfff802d6                cpu_cache_disable
+                0xfff807c2                _memtest
+                0xfff80766                stackdump
+                0xfff8079e                regdump
+                0xfff8029a                bout
+                0xfff80472                exit
+                0xfff80460                _exit
+ .text          0xfff808c0     0x1964 bios.a(main68.o)
+                0xfff81f90                rubout
+                0xfff81ebe                do_run_rom_cpm
+                0xfff812b8                load_coff_executable
+                0xfff80922                is_cmd_head
+                0xfff80c24                load_elf_executable
+                0xfff818f6                do_execute
+                0xfff81ca8                handle_any_command
+                0xfff818d4                do_cd
+                0xfff815ee                handle_cmd_builtin
+                0xfff80ac2                readline
+                0xfff81cf2                execute_cmd
+                0xfff80a2e                do_today
+                0xfff814e8                load_m68k_executable
+                0xfff81e4a                do_set_supv
+                0xfff81e0c                do_set_mode
+                0xfff81b04                handle_cmd_executable
+                0xfff81716                do_ls
+                0xfff81a6a                load_flat_executable
+                0xfff820bc                main68
+                0xfff81e7c                do_dump
+                0xfff80982                help
+                0xfff809f4                f_perror
+                0xfff81e62                do_set_user
+                0xfff80b3e                extend_filename
+                0xfff81954                do_writemem
+                0xfff81d88                load_command_file
+                0xfff81fba                getline
+                0xfff80bf4                run_program
+                0xfff8091a                do_remark
+ .text          0xfff82224       0xb2 bios.a(serial.o)
+                0xfff82224                sio_init
+                0xfff82276                sio_get
+                0xfff8229c                bios_siotst
+                0xfff82288                bios_sioget
+                0xfff822ae                put_string
+                0xfff822be                bios_siostr
+                0xfff82258                bios_sioput
+                0xfff82260                sio_put
+                0xfff82252                _con_out
+ *fill*         0xfff822d6        0x2 4e754e75
+ .text          0xfff822d8      0x2ce bios.a(cprintf.o)
+                0xfff82312                cprintf
+                0xfff822d8                putch
+ *fill*         0xfff825a6        0x2 4e754e75
+ .text          0xfff825a8       0xa4 bios.a(pic202.o)
+                0xfff825fa                usec_delay
+                0xfff8261a                usec16
+                0xfff82626                usec10
+                0xfff82612                usec20
+                0xfff82628                usec09
+                0xfff82622                usec12
+                0xfff825f0                spurious_return
+                0xfff825a8                interrupt_3_timer
+                0xfff825f2                end_of_interrupt
+                0xfff8262a                bios_daytime
+ .text          0xfff8264c       0xea bios.a(ns202.o)
+                0xfff82662                icu_outpw
+                0xfff8267a                ns202_init2
+                0xfff8264c                icu_inpw
+ *fill*         0xfff82736        0x2 4e754e75
+ .text          0xfff82738      0x134 bios.a(bios8.o)
+                0xfff827a4                bios_trap_entry
+                0xfff82760                bios_error_return
+                0xfff82738                bios_good_return
+ .text          0xfff8286c      0x1b4 bios.a(strtoul.o)
+                0xfff828b0                strtoul
+                0xfff82a0c                atoi
+ .text          0xfff82a20      0x176 bios.a(wd37c65.o)
+                0xfff82a20                wd_set_ldor
+                0xfff82a84                wd_set_ldcr
+                0xfff82b38                wd_select
+                0xfff82aee                wait_for
+                0xfff82a50                wd_clear_ldor
+                0xfff82adc                floppy_timeout
+                0xfff82ab2                set_PCAT_mode
+ *fill*         0xfff82b96        0x2 4e754e75
+ .text          0xfff82b98     0x1674 bios.a(setup.o)
+                0xfff831e8                probe_IDE_disk
+                0xfff82dd2                long_time
+                0xfff836f2                set_autoboot
+                0xfff83dd6                set_battery
+                0xfff83404                configure
+                0xfff83b42                Date
+                0xfff8375e                set_serial
+                0xfff8309c                configure_floppy
+                0xfff83692                set_boot_order
+                0xfff82b98                idow
+                0xfff82cb8                calendar_date
+                0xfff83f6a                set_disk_boards
+                0xfff84094                setup
+                0xfff82e30                daytime_c
+                0xfff83898                set_dide_floppy
+                0xfff83988                Time
+                0xfff83394                get_nvram
+ .text          0xfff8420c     0x14e0 bios.a(ff.o)
+                0xfff84938                get_fat
+                0xfff84fd2                f_getcwd
+                0xfff85550                f_chdir
+                0xfff8444a                f_closedir
+                0xfff843e4                f_chdrive
+                0xfff84468                f_close
+                0xfff84bc6                f_read
+                0xfff84f54                f_readdir
+                0xfff848c2                f_mount
+                0xfff854b2                f_opendir
+                0xfff84a7e                f_lseek
+                0xfff8543c                f_stat
+                0xfff8420c                clust2sect
+                0xfff85600                f_open
+ .text          0xfff856ec      0x10a bios.a(prettydump.o)
+                0xfff856ec                pretty_dump_memory
+ *fill*         0xfff857f6        0x2 4e754e75
+ .text          0xfff857f8      0x2c4 bios.a(diskio.o)
+                0xfff8599c                disk_initialize
+                0xfff857f8                disk_status
+                0xfff85824                disk_ioctl
+                0xfff85a06                disk_write
+                0xfff858e6                disk_read
+ .text          0xfff85abc       0x94 bios.a(uart2.o)
+                0xfff85abc                _uart_find
+ .text          0xfff85b50      0x5da bios.a(memtest3.o)
+                0xfff85b52                _memtest0
+                0xfff85bb0                DRAM_tests
+                0xfff85b60                _memtest3
+ *fill*         0xfff8612a        0x2 4e754e75
+ .text          0xfff8612c      0x2a4 bios.a(rtc.o)
+                0xfff86202                get_rtc_date
+                0xfff8612c                julian_date
+                0xfff862e0                get_rtc_time
+ .text          0xfff863d0       0xcc bios.a(ds1302.o)
+                0xfff8640a                rtc_set_loc
+                0xfff863d0                rtc_get_loc
+ .text          0xfff8649c      0x302 bios.a(ppide.o)
+                0xfff864ea                ppide_read
+                0xfff865bc                ppide_reset
+                0xfff86580                ppide_write
+                0xfff8649c                ppide_info
+ *fill*         0xfff8679e        0x2 4e754e75
+ .text          0xfff867a0      0x264 bios.a(dualide.o)
+                0xfff8688e                dide_read
+                0xfff8690c                dide_write
+                0xfff867a0                dide_reset
+                0xfff869b0                bios_disk
+                0xfff868ce                dide_verify
+                0xfff8682e                dide_info
+ .text          0xfff86a04       0x36 bios.a(malloc.o)
+                0xfff86a04                malloc
+ *fill*         0xfff86a3a        0x2 4e754e75
+ .text          0xfff86a3c      0x38c bios.a(dualsd.o)
+                0xfff86aca                dsd_info
+                0xfff86a3c                dsd_reset
+                0xfff86b7a                dsd_write
+                0xfff86b3c                dsd_verify
+                0xfff86afc                dsd_read
+ .text          0xfff86dc8       0x34 bios.a(bioscall.o)
+                0xfff86dc8                bios_call
+ .text          0xfff86dfc      0x740 bios.a(fdc8272.o)
+                0xfff8706e                fdcint
+                0xfff86fa0                input_result_from_fdc
+                0xfff86ed0                fdc_info
+                0xfff86f70                input_byte_from_fdc
+                0xfff86ef4                operation_clean_up
+                0xfff87168                output_command_to_fdc
+                0xfff86f3c                fdc_ready_for_result
+                0xfff86e48                output_controls_to_dma
+                0xfff873d6                fdc_recalibrate
+                0xfff86e72                copy_int_result
+                0xfff86dfc                initialize_drivers
+                0xfff87012                fdc_ready_for_command
+                0xfff87042                output_byte_to_fdc
+                0xfff8736a                fdc_specify
+                0xfff8747e                fdc_seek
+                0xfff871cc                execute_docb
+ .text          0xfff8753c       0x62 bios.a(floppy.o)
+                0xfff87568                floppy_interrupt_1
+                0xfff8753c                fdc_parameters
+                0xfff8758e                floppy_read
+                0xfff8755c                enable
+                0xfff87562                disable
+                0xfff87592                floppy_verify
+                0xfff87596                floppy_write
+                0xfff8757c                floppy_reset
+                0xfff87580                floppy_info
+                0xfff8759a                floppy_format
+ *fill*         0xfff8759e        0x2 4e754e75
+ .text          0xfff875a0        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(ctype_.o)
+ .text          0xfff875a0       0x78 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcmp.o)
+                0xfff875a0                memcmp
+ .text          0xfff87618       0x84 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcpy.o)
+                0xfff87618                memcpy
+ .text          0xfff8769c       0xae /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memmove.o)
+                0xfff8769c                memmove
+ *fill*         0xfff8774a        0x2 4e754e75
+ .text          0xfff8774c       0x8a /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memset.o)
+                0xfff8774c                memset
+ *fill*         0xfff877d6        0x2 4e754e75
+ .text          0xfff877d8       0x7e /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcasecmp.o)
+                0xfff877d8                strcasecmp
+ *fill*         0xfff87856        0x2 4e754e75
+ .text          0xfff87858       0x50 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcat.o)
+                0xfff87858                strcat
+ .text          0xfff878a8       0x9e /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strchr.o)
+                0xfff878a8                strchr
+ *fill*         0xfff87946        0x2 4e754e75
+ .text          0xfff87948       0x20 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcpy.o)
+                0xfff87948                strcpy
+ .text          0xfff87968       0x1a /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+                0xfff87968                strlen
+ *fill*         0xfff87982        0x2 4e754e75
+ .text          0xfff87984       0xce /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+                0xfff87984                strncasecmp
+ *fill*         0xfff87a52        0x2 4e754e75
+ .text          0xfff87a54       0x70 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncat.o)
+                0xfff87a54                strncat
+ .text          0xfff87ac4       0x98 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncmp.o)
+                0xfff87ac4                strncmp
+ .text          0xfff87b5c       0x9c /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncpy.o)
+                0xfff87b5c                strncpy
+ .text          0xfff87bf8       0x22 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+                0xfff87bf8                __mulsi3
+ *fill*         0xfff87c1a        0x2 4e754e75
+ .text          0xfff87c1c       0x5c /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+                0xfff87c1c                __udivsi3
+ .text          0xfff87c78       0x2e /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+                0xfff87c78                __divsi3
+ *fill*         0xfff87ca6        0x2 4e754e75
+ .text          0xfff87ca8       0x2e /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+                0xfff87ca8                __umodsi3
+ *fill*         0xfff87cd6        0x2 4e754e75
+ .text          0xfff87cd8       0x2e /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_modsi3.o)
+                0xfff87cd8                __modsi3
+ *(.text.*personality*)
+ *(.gnu.warning)
+
+.fini
+ *(.fini)
+                0xfff87d06                PROVIDE (__etext, .)
+                0xfff87d06                PROVIDE (_etext, .)
+                0xfff87d06                PROVIDE (etext, .)
+
+.rodata         0xfff87d08     0x1ade
+ *(.rodata .rodata.* .gnu.linkonce.r.*)
+ .rodata.str1.1
+                0xfff87d08      0xc41 bios.a(main68.o)
+                                0xc59 (size before relaxing)
+ *fill*         0xfff88949        0x3 00
+ .rodata        0xfff8894c      0x4f4 bios.a(main68.o)
+                0xfff88dce                coff_header_bytes
+                0xfff88dd4                m68k_header_bytes
+                0xfff88c7a                cmd_table
+                0xfff8894c                msg_welcome
+                0xfff88dd0                elf_header_bytes
+                0xfff8898c                msg_GNU_license
+ .rodata        0xfff88e40       0x11 bios.a(cprintf.o)
+                0xfff88e40                nstring
+ .rodata.str1.1
+                0xfff88e51      0x518 bios.a(setup.o)
+                                0x51d (size before relaxing)
+ *fill*         0xfff89369        0x3 00
+ .rodata        0xfff8936c      0x218 bios.a(setup.o)
+                0xfff894c0                ppide_ops
+                0xfff894a8                floppy_ops
+                0xfff89508                dow
+                0xfff894d8                dide_ops
+                0xfff8946c                nvram0
+                0xfff8936c                table7
+                0xfff894f0                dualsd_ops
+                0xfff8948c                uart
+ .rodata.str1.1
+                0xfff89584       0x11 bios.a(ff.o)
+                                 0x17 (size before relaxing)
+ *fill*         0xfff89595        0x3 00
+ .rodata        0xfff89598       0x90 bios.a(ff.o)
+ .rodata.str1.1
+                0xfff89628       0x17 bios.a(prettydump.o)
+                                 0x26 (size before relaxing)
+ .rodata        0xfff8963f       0xa6 bios.a(fdc8272.o)
+                0xfff89669                HD144
+                0xfff8965b                DD720
+                0xfff8964d                HD1200
+                0xfff89677                HD128
+                0xfff8963f                DD360
+ .rodata        0xfff896e5      0x101 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(ctype_.o)
+                0xfff896e5                _ctype_
+
+.rodata1
+ *(.rodata1)
+
+.eh_frame_hdr
+ *(.eh_frame_hdr)
+
+.eh_frame
+ *(.eh_frame)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+                0xfff8b7e6                . = (ALIGN (0x2000) + (. & 0x1fff))
+
+.eh_frame
+ *(.eh_frame)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.tdata
+ *(.tdata .tdata.* .gnu.linkonce.td.*)
+
+.tbss
+ *(.tbss .tbss.* .gnu.linkonce.tb.*)
+ *(.tcommon)
+
+.preinit_array  0xfff8b7e6        0x0
+                0xfff8b7e6                PROVIDE (__preinit_array_start, .)
+ *(.preinit_array)
+                0xfff8b7e6                PROVIDE (__preinit_array_end, .)
+
+.init_array     0xfff8b7e6        0x0
+                0xfff8b7e6                PROVIDE (__init_array_start, .)
+ *(SORT(.init_array.*))
+ *(.init_array)
+                0xfff8b7e6                PROVIDE (__init_array_end, .)
+
+.fini_array     0xfff8b7e6        0x0
+                0xfff8b7e6                PROVIDE (__fini_array_start, .)
+ *(.fini_array)
+ *(SORT(.fini_array.*))
+                0xfff8b7e6                PROVIDE (__fini_array_end, .)
+
+.ctors
+ *crtbegin.o(.ctors)
+ *crtbegin?.o(.ctors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+ *(SORT(.ctors.*))
+ *(.ctors)
+
+.dtors
+ *crtbegin.o(.dtors)
+ *crtbegin?.o(.dtors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+ *(SORT(.dtors.*))
+ *(.dtors)
+
+.jcr
+ *(.jcr)
+
+.data.rel.ro
+ *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
+ *(.data.rel.ro* .gnu.linkonce.d.rel.ro.*)
+
+.dynamic
+ *(.dynamic)
+
+.got
+ *(.got.plt)
+ *(.got)
+
+.data           0x00000100        0x4
+ *(.data .data.* .gnu.linkonce.d.*)
+ .data          0x00000100        0x0 startup.o
+ .data          0x00000100        0x0 bios.a(main68.o)
+ .data          0x00000100        0x0 bios.a(serial.o)
+ .data          0x00000100        0x0 bios.a(cprintf.o)
+ .data          0x00000100        0x0 bios.a(pic202.o)
+ .data          0x00000100        0x0 bios.a(ns202.o)
+ .data          0x00000100        0x0 bios.a(bios8.o)
+ .data          0x00000100        0x0 bios.a(strtoul.o)
+ .data          0x00000100        0x0 bios.a(wd37c65.o)
+ .data          0x00000100        0x0 bios.a(setup.o)
+ .data          0x00000100        0x0 bios.a(ff.o)
+ .data          0x00000100        0x0 bios.a(prettydump.o)
+ .data          0x00000100        0x0 bios.a(diskio.o)
+ .data          0x00000100        0x0 bios.a(uart2.o)
+ .data          0x00000100        0x0 bios.a(memtest3.o)
+ .data          0x00000100        0x0 bios.a(rtc.o)
+ .data          0x00000100        0x0 bios.a(ds1302.o)
+ .data          0x00000100        0x0 bios.a(ppide.o)
+ .data          0x00000100        0x0 bios.a(dualide.o)
+ .data          0x00000100        0x0 bios.a(malloc.o)
+ .data          0x00000100        0x0 bios.a(dualsd.o)
+ .data          0x00000100        0x0 bios.a(bioscall.o)
+ .data          0x00000100        0x0 bios.a(fdc8272.o)
+ .data          0x00000100        0x0 bios.a(floppy.o)
+ .data          0x00000100        0x4 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(ctype_.o)
+                0x00000100                __ctype_ptr
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcmp.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcpy.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memmove.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memset.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcasecmp.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcat.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strchr.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcpy.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncat.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncmp.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncpy.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+ .data          0x00000104        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_modsi3.o)
+ *(.gnu.linkonce.d.*personality*)
+
+.data1
+ *(.data1)
+                0x00000104                _edata = .
+                0x00000104                PROVIDE (edata, .)
+                0x00000104                __bss_start = .
+
+.bss            0x00000110      0xaa8
+ *(.dynbss)
+ *(.bss .bss.* .gnu.linkonce.b.*)
+ .bss           0x00000110        0x0 startup.o
+ .bss           0x00000110        0x0 bios.a(main68.o)
+ .bss           0x00000110        0x0 bios.a(serial.o)
+ .bss           0x00000110        0x0 bios.a(cprintf.o)
+ .bss           0x00000110        0x0 bios.a(pic202.o)
+ .bss           0x00000110        0x0 bios.a(ns202.o)
+ .bss           0x00000110        0x0 bios.a(bios8.o)
+ .bss           0x00000110        0x0 bios.a(strtoul.o)
+ .bss           0x00000110        0x0 bios.a(wd37c65.o)
+ .bss           0x00000110        0x0 bios.a(setup.o)
+ .bss           0x00000110       0x13 bios.a(ff.o)
+ *fill*         0x00000123        0x1 00
+ .bss           0x00000124        0x0 bios.a(prettydump.o)
+ .bss           0x00000124        0x0 bios.a(diskio.o)
+ .bss           0x00000124        0x0 bios.a(uart2.o)
+ .bss           0x00000124        0x0 bios.a(memtest3.o)
+ .bss           0x00000124        0x0 bios.a(rtc.o)
+ .bss           0x00000124        0x0 bios.a(ds1302.o)
+ .bss           0x00000124        0x0 bios.a(ppide.o)
+ .bss           0x00000124        0x0 bios.a(dualide.o)
+ .bss           0x00000124        0x0 bios.a(malloc.o)
+ .bss           0x00000124        0x0 bios.a(dualsd.o)
+ .bss           0x00000124        0x0 bios.a(bioscall.o)
+ .bss           0x00000124       0x2d bios.a(fdc8272.o)
+ *fill*         0x00000151        0x3 00
+ .bss           0x00000154        0x0 bios.a(floppy.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(ctype_.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcmp.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcpy.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memmove.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memset.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcasecmp.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcat.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strchr.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcpy.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncat.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncmp.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncpy.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+ .bss           0x00000154        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_modsi3.o)
+ *(COMMON)
+ *fill*         0x00000154        0xc 00
+ COMMON         0x00000160       0x38 startup.o
+                0x00000160                debug
+                0x00000164                h_m_a
+                0x00000168                mem_chain
+                0x0000016c                uart_type
+                0x00000170                nvram
+                0x00000190                memmax
+                0x00000194                reset_code
+ COMMON         0x00000198      0x9b8 bios.a(main68.o)
+                0x00000198                cmd_level
+                0x0000019a                fat_fs_workarea
+                0x00000a44                usermode
+                0x00000a48                cmd_buffer
+                0x00000b4c                auto_boot_time
+ COMMON         0x00000b50        0xa bios.a(pic202.o)
+                0x00000b50                julian_day
+                0x00000b54                timer_ticks
+                0x00000b58                timeout
+ *fill*         0x00000b5a        0x2 00
+ COMMON         0x00000b5c        0x4 bios.a(strtoul.o)
+                0x00000b5c                errno
+ COMMON         0x00000b60       0x38 bios.a(wd37c65.o)
+                0x00000b60                drive_ready
+                0x00000b70                disk_table
+                0x00000b90                fdc_base_port
+                0x00000b92                wd_reg
+                0x00000b94                drive_status_change
+ COMMON         0x00000b98        0x1 bios.a(setup.o)
+                0x00000b98                nvram_valid
+ COMMON         0x00000b99        0x4 bios.a(diskio.o)
+                0x00000b99                drive_status
+ *fill*         0x00000b9d        0x3 00
+ COMMON         0x00000ba0       0x18 bios.a(fdc8272.o)
+                0x00000ba0                operation_docb_ptr
+                0x00000bb4                cache_param
+                0x00000bb8                . = ALIGN ((. != 0x0)?0x4:0x1)
+                0x00000bb8                . = ALIGN (0x4)
+                0x00000bb8                . = ALIGN (0x4)
+                0x00000bb8                _end = .
+                0x00000bb8                PROVIDE (end, .)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x00000000      0x1d4
+ *(.comment)
+ .comment       0x00000000       0x12 bios.a(main68.o)
+ .comment       0x00000012       0x12 bios.a(cprintf.o)
+ .comment       0x00000024       0x12 bios.a(ns202.o)
+ .comment       0x00000036       0x12 bios.a(strtoul.o)
+ .comment       0x00000048       0x12 bios.a(wd37c65.o)
+ .comment       0x0000005a       0x12 bios.a(setup.o)
+ .comment       0x0000006c       0x12 bios.a(ff.o)
+ .comment       0x0000007e       0x12 bios.a(prettydump.o)
+ .comment       0x00000090       0x12 bios.a(diskio.o)
+ .comment       0x000000a2       0x12 bios.a(rtc.o)
+ .comment       0x000000b4       0x12 bios.a(malloc.o)
+ .comment       0x000000c6       0x12 bios.a(fdc8272.o)
+ .comment       0x000000d8       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(ctype_.o)
+ .comment       0x000000ea       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcmp.o)
+ .comment       0x000000fc       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memcpy.o)
+ .comment       0x0000010e       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memmove.o)
+ .comment       0x00000120       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(memset.o)
+ .comment       0x00000132       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcasecmp.o)
+ .comment       0x00000144       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcat.o)
+ .comment       0x00000156       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strchr.o)
+ .comment       0x00000168       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strcpy.o)
+ .comment       0x0000017a       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .comment       0x0000018c       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncasecmp.o)
+ .comment       0x0000019e       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncat.o)
+ .comment       0x000001b0       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncmp.o)
+ .comment       0x000001c2       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strncpy.o)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges
+ *(.debug_aranges)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info
+ *(.debug_info .gnu.linkonce.wi.*)
+
+.debug_abbrev
+ *(.debug_abbrev)
+
+.debug_line
+ *(.debug_line)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str
+ *(.debug_str)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+/DISCARD/
+ *(.note.GNU-stack)
+OUTPUT(mini10.out elf32-m68k)
+
+.debug_ranges

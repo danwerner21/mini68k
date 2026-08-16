@@ -1,0 +1,7 @@
+era cpmlib
+$2ar68 rf $1 cpmlib ccpif.o except10.o ccpbdos.o ccpload.o ccp.o bdosif.o 
+$2ar68 rf $1 cpmlib conbdos.o bdosmisc.o dskutil.o fileio.o bdosrw.o bdosmain.o
+$2ar68 rf $1 cpmlib iosys.o pgmld.o except.o filetyps.o stack.o
+era *.o
+user 3!make $1 $2
+

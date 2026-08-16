@@ -1,0 +1,387 @@
+Archive member included       because of file (symbol)
+
+cpmlib.a(bdosif.o)            ccpif.o (_bios1)
+cpmlib.a(ccpload.o)           ccpif.o (load68k)
+cpmlib.a(filetyps.o)          ccpif.o (load_tbl)
+cpmlib.a(ccp.o)               ccpif.o (autorom)
+cpmlib.a(stack.o)             ccpif.o (stack)
+cpmlib.a(bdosmisc.o)          ccpif.o (bdosinit)
+cpmlib.a(n8bios3.o)           ccpif.o (_init)
+cpmlib.a(bdosmain.o)          cpmlib.a(bdosif.o) (__bdos)
+cpmlib.a(except.o)            cpmlib.a(bdosmisc.o) (initexc)
+cpmlib.a(conbdos.o)           cpmlib.a(bdosmain.o) (constat)
+cpmlib.a(dskutil.o)           cpmlib.a(bdosmisc.o) (dir_rd)
+cpmlib.a(fileio.o)            cpmlib.a(bdosmain.o) (seldsk)
+cpmlib.a(bdosrw.o)            cpmlib.a(fileio.o) (calcext)
+cpmlib.a(iosys.o)             cpmlib.a(dskutil.o) (do_phio)
+cpmlib.a(n8io.o)              cpmlib.a(n8bios3.o) (init_ramdisk)
+cpmlib.a(ccpbdos.o)           cpmlib.a(ccp.o) (bdos)
+cpmlib.a(pgmld.o)             cpmlib.a(bdosmain.o) (pgmld)
+cpmlib.a(n8iox.o)             cpmlib.a(n8io.o) (_read_sector)
+../../lib/libgcc.a(_udivsi3.o)
+                              cpmlib.a(n8io.o) (__udivsi3)
+
+Allocating common symbols
+Common symbol       size              file
+
+cur_disk            0x2               cpmlib.a(ccp.o)
+alv_rom_400k        0x1a              cpmlib.a(n8io.o)
+load_try            0x2               cpmlib.a(ccp.o)
+dma                 0x84              cpmlib.a(ccp.o)
+gbls                0xee              cpmlib.a(bdosmain.o)
+content             0x48              cpmlib.a(n8io.o)
+subcom              0x82              cpmlib.a(ccp.o)
+errno               0x4               cpmlib.a(n8io.o)
+autorom             0x2               cpmlib.a(ccp.o)
+DMA_address         0x4               cpmlib.a(n8io.o)
+crit_dsk            0x2               cpmlib.a(bdosmain.o)
+sub_user            0x2               cpmlib.a(ccp.o)
+sub_index           0x2               cpmlib.a(ccp.o)
+hma                 0x4               cpmlib.a(n8io.o)
+chain_sub           0x2               cpmlib.a(ccp.o)
+tpa_lp              0x4               cpmlib.a(bdosmain.o)
+cmdfcb              0x24              cpmlib.a(ccp.o)
+parm                0x78              cpmlib.a(ccp.o)
+user                0x2               cpmlib.a(ccp.o)
+chainp              0x4               cpmlib.a(ccp.o)
+dirflag             0x2               cpmlib.a(ccp.o)
+tpa_lt              0x4               cpmlib.a(bdosmain.o)
+tail                0x4               cpmlib.a(ccp.o)
+subprompt           0x2               cpmlib.a(ccp.o)
+log_dsk             0x2               cpmlib.a(bdosmain.o)
+common_dir_buffer   0x80              cpmlib.a(n8io.o)
+buffer              0x1800            cpmlib.a(n8io.o)
+current_track       0x2               cpmlib.a(n8io.o)
+subfcb              0x24              cpmlib.a(ccp.o)
+lru                 0xc               cpmlib.a(n8io.o)
+first_sub           0x2               cpmlib.a(ccp.o)
+index               0x2               cpmlib.a(ccp.o)
+tpa_hp              0x4               cpmlib.a(bdosmain.o)
+end_of_file         0x2               cpmlib.a(ccp.o)
+tpa_ht              0x4               cpmlib.a(bdosmain.o)
+ro_dsk              0x2               cpmlib.a(bdosmain.o)
+alv_RAM_1M          0x40              cpmlib.a(n8io.o)
+glb_index           0x4               cpmlib.a(ccp.o)
+subdma              0x80              cpmlib.a(ccp.o)
+save_sub            0x82              cpmlib.a(ccp.o)
+current_sector      0x2               cpmlib.a(n8io.o)
+user_ptr            0x4               cpmlib.a(ccp.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+Address of section .text set to 0xf0000
+LOAD ccpif.o
+LOAD cpmlib.a
+LOAD ../../lib/libc.a
+LOAD ../../lib/libgcc.a
+                0x00000000                PROVIDE (__stack, 0x0)
+
+.text           0x000f0000     0x5560
+ *(.text)
+ .text          0x000f0000      0x128 ccpif.o
+                0x000f0000                cpm
+                0x000f000c                copyright
+                0x000f0118                _ccp
+ .text          0x000f0128       0x86 cpmlib.a(bdosif.o)
+                0x000f0128                _trap2hnd
+                0x000f0168                _bios6
+                0x000f018c                bswap
+                0x000f0184                swap
+                0x000f0168                _bios4
+                0x000f0198                udiv
+                0x000f0168                _bios3
+                0x000f0168                _bios1
+                0x000f0168                _bios2
+                0x000f0168                _bios5
+ *fill*         0x000f01ae        0x2
+ .text          0x000f01b0       0xf6 cpmlib.a(ccpload.o)
+                0x000f01b0                load68k
+ *fill*         0x000f02a6        0x2
+ .text          0x000f02a8       0x52 cpmlib.a(filetyps.o)
+                0x000f02a8                init_tbl
+ *fill*         0x000f02fa        0x2
+ .text          0x000f02fc     0x1e1e cpmlib.a(ccp.o)
+                0x000f04dc                decode
+                0x000f035c                ccp_strcmp
+                0x000f083c                delim
+                0x000f10fc                era_cmd
+                0x000f0a4e                too_many
+                0x000f065c                get_cmd
+                0x000f08ac                fill_fcb
+                0x000f0e04                ren_cmd
+                0x000f1d74                execute_cmd
+                0x000f031e                cr_lf
+                0x000f0cf4                type_cmd
+                0x000f1a58                translate
+                0x000f0874                true_char
+                0x000f0a86                find_colon
+                0x000f0396                copy_cmd
+                0x000f1808                dollar
+                0x000f1964                comments
+                0x000f17de                sub_read
+                0x000f12bc                cmd_file
+                0x000f0abc                chk_colon
+                0x000f073c                scan_cmd
+                0x000f0346                cpy
+                0x000f046a                echo_cmd
+                0x000f1218                user_cmd
+                0x000f03e0                prompt
+                0x000f0b06                dir_cmd
+                0x000f1c86                submit_cmd
+                0x000f05e8                check_cmd
+                0x000f1ee2                ccp_main
+                0x000f0772                get_parms
+ *fill*         0x000f211a        0x2
+ .text          0x000f211c      0x564 cpmlib.a(bdosmisc.o)
+                0x000f2430                ro_err
+                0x000f231c                ext_err
+                0x000f21ae                warmboot
+                0x000f224a                prt_err
+                0x000f25d4                setexc
+                0x000f211c                bdosinit
+                0x000f2552                error
+                0x000f262e                set_tpa
+                0x000f2280                abrt_err
+ .text          0x000f2680      0x13e cpmlib.a(n8bios3.o)
+                0x000f26c0                bios3_trap_entry
+                0x000f2680                _init
+                0x000f2748                warm_boot
+ *fill*         0x000f27be        0x2
+ .text          0x000f27c0      0x48e cpmlib.a(bdosmain.o)
+                0x000f2c06                tmp_sel
+                0x000f27c0                __bdos
+ *fill*         0x000f2c4e        0x2
+ .text          0x000f2c50      0x2a2 cpmlib.a(except.o)
+                0x000f2e9c                gouser
+                0x000f2c58                initexc
+ *fill*         0x000f2ef2        0x2
+ .text          0x000f2ef4      0x520 cpmlib.a(conbdos.o)
+                0x000f30e4                conin
+                0x000f2fa0                conout
+                0x000f3262                readline
+                0x000f2f1a                conbrk
+                0x000f3166                prt_line
+                0x000f308a                getch
+                0x000f3122                rawconio
+                0x000f3044                cookdout
+                0x000f2ef4                constat
+                0x000f31d8                backsp
+                0x000f319c                newline
+                0x000f300c                tabout
+ .text          0x000f3414      0x3ce cpmlib.a(dskutil.o)
+                0x000f371e                chkaloc
+                0x000f36dc                clraloc
+                0x000f34d8                dir_wr
+                0x000f34b6                dir_rd
+                0x000f3762                getaloc
+                0x000f3530                dchksum
+                0x000f369c                setaloc
+                0x000f3414                rdwrt
+                0x000f355a                dirscan
+ *fill*         0x000f37e2        0x2
+ .text          0x000f37e4      0x8bc cpmlib.a(fileio.o)
+                0x000f3aa2                flushit
+                0x000f4016                free_sp
+                0x000f3c18                alltrue
+                0x000f37e4                alloc
+                0x000f3d5a                delete
+                0x000f3a3e                openfile
+                0x000f3c40                search
+                0x000f386a                seldsk
+                0x000f3f96                getsize
+                0x000f3e16                rename
+                0x000f39a2                move
+                0x000f3cda                create
+                0x000f3be0                close_fi
+                0x000f3c22                matchit
+                0x000f3f04                setran
+                0x000f39c4                match
+                0x000f3e86                set_attr
+                0x000f3f3c                fsize
+                0x000f3edc                extsize
+                0x000f3ae4                close
+ .text          0x000f40a0      0x4aa cpmlib.a(bdosrw.o)
+                0x000f4162                do_io
+                0x000f4118                setblk
+                0x000f430c                get_rc
+                0x000f42ac                calcext
+                0x000f40dc                blknum
+                0x000f40a0                blkindx
+                0x000f4346                bdosrw
+                0x000f41aa                new_ext
+ *fill*         0x000f454a        0x2
+ .text          0x000f454c      0x128 cpmlib.a(iosys.o)
+                0x000f454c                do_phio
+ .text          0x000f4674      0x8ce cpmlib.a(n8io.o)
+                0x000f4a0c                disk_set_sector
+                0x000f4af4                disk_write_sector
+                0x000f48a0                purge_to_disk
+                0x000f46d4                cpm_memcpy
+                0x000f4752                init_ramdisk
+                0x000f4836                disk_drive_select
+                0x000f486c                lru_update
+                0x000f4a1e                disk_set_DMA_address
+                0x000f4dbc                make_dph
+                0x000f4c7a                disk_home
+                0x000f4902                get_into_memory
+                0x000f4674                dpb_rom_400k
+                0x000f46a4                cpm_memset
+                0x000f4684                dpb_flpy_144m
+                0x000f49fa                disk_set_track
+                0x000f4694                dpb_flpy_720k
+                0x000f4ca2                disk_system_init
+                0x000f4702                cpm_malloc
+                0x000f4c44                disk_flush_buffers
+                0x000f4d92                log2
+                0x000f4a30                disk_read_sector
+ *fill*         0x000f4f42        0x2
+ .text          0x000f4f44        0xc cpmlib.a(ccpbdos.o)
+                0x000f4f44                bdos
+ .text          0x000f4f50      0x52c cpmlib.a(pgmld.o)
+                0x000f4f50                pgmld
+ .text          0x000f547c       0x76 cpmlib.a(n8iox.o)
+                0x000f54e8                _halloc
+                0x000f54e4                _get_hma
+                0x000f547c                _read_sector
+                0x000f549e                _write_sector
+                0x000f54d0                _disk_info
+                0x000f54c0                _disk_reset
+ *fill*         0x000f54f2        0x2
+ .text          0x000f54f4       0x5c ../../lib/libgcc.a(_udivsi3.o)
+                0x000f54f4                __udivsi3
+                0x000f5550                .=ALIGN(0x4)
+                0x000f5550                etext=.
+                0x000f5550                __CTOR_LIST__=.
+                0x000f5550        0x4 LONG 0x0 (((__CTOR_END__-__CTOR_LIST__)/0x4)-0x2)
+ *(.ctors)
+                0x000f5554        0x4 LONG 0x0
+                0x000f5558                __CTOR_END__=.
+                0x000f5558                __DTOR_LIST__=.
+                0x000f5558        0x4 LONG 0x0 (((__DTOR_END__-__DTOR_LIST__)/0x4)-0x2)
+ *(.dtors)
+                0x000f555c        0x4 LONG 0x0
+                0x000f5560                __DTOR_END__=.
+
+.data           0x000f5560      0x36c
+ *(.data)
+ .data          0x000f5560       0x10 cpmlib.a(filetyps.o)
+ .data          0x000f5570      0x1c0 cpmlib.a(ccp.o)
+                0x000f5690                msg13
+                0x000f571f                del
+                0x000f55cc                msg3
+                0x000f5605                msg6
+                0x000f56ea                lderr3
+                0x000f5642                msg9
+                0x000f5678                msg12
+                0x000f55a0                msg
+                0x000f5652                msg10
+                0x000f55ba                msg2
+                0x000f55f0                msg5
+                0x000f570b                lderror
+                0x000f5625                msg8
+                0x000f560e                msg7
+                0x000f5663                msg11
+                0x000f55de                msg4
+                0x000f56ce                lderr2
+                0x000f5570                cmd_tbl
+                0x000f56a6                lderr1
+ .data          0x000f5730        0x4 cpmlib.a(bdosmisc.o)
+                0x000f5730                warning
+ .data          0x000f5734        0xc cpmlib.a(n8bios3.o)
+ .data          0x000f5740       0x30 cpmlib.a(except.o)
+ .data          0x000f5770      0x156 cpmlib.a(n8io.o)
+                0x000f5770                dpb_RAM_1M
+                0x000f5780                dph_rom_400k
+                0x000f57b4                partition
+                0x000f58b4                RAM_partition
+                0x000f579a                dph_RAM_1M
+                0x000f58c4                current_drive
+ *fill*         0x000f58c6        0x2
+ .data          0x000f58c8        0x4 cpmlib.a(n8iox.o)
+                0x000f58c8                heap
+                0x000f58cc                edata=.
+
+.bss            0x000f58cc     0x282e
+                0x000f58cc                __bss_start=.
+ *(.bss)
+ .bss           0x000f58cc       0xee ccpif.o
+                0x000f5952                submit
+                0x000f5956                patch
+                0x000f58cd                usercmd
+                0x000f5954                morecmds
+                0x000f58cc                autost
+ *fill*         0x000f59ba        0x2
+ .bss           0x000f59bc       0x20 cpmlib.a(ccpload.o)
+                0x000f59d2                TPAB
+                0x000f59d0                flags
+ .bss           0x000f59dc       0x28 cpmlib.a(filetyps.o)
+                0x000f59dc                load_tbl
+ .bss           0x000f5a04      0x962 cpmlib.a(stack.o)
+                0x000f6364                stack
+ *fill*         0x000f6366        0x2
+ .bss           0x000f6368        0x4 cpmlib.a(except.o)
+ .bss           0x000f636c        0x2 cpmlib.a(iosys.o)
+ *fill*         0x000f636e        0x2
+ .bss           0x000f6370       0x44 cpmlib.a(pgmld.o)
+ *(COMMON)
+ COMMON         0x000f63b4      0x2fc cpmlib.a(ccp.o)
+                0x000f63b4                cur_disk
+                0x000f63b6                load_try
+                0x000f63b8                dma
+                0x000f643c                subcom
+                0x000f64be                autorom
+                0x000f64c0                sub_user
+                0x000f64c2                sub_index
+                0x000f64c4                chain_sub
+                0x000f64c8                cmdfcb
+                0x000f64ec                parm
+                0x000f6564                user
+                0x000f6568                chainp
+                0x000f656c                dirflag
+                0x000f6570                tail
+                0x000f6574                subprompt
+                0x000f6578                subfcb
+                0x000f659c                first_sub
+                0x000f659e                index
+                0x000f65a0                end_of_file
+                0x000f65a4                glb_index
+                0x000f65a8                subdma
+                0x000f6628                save_sub
+                0x000f66ac                user_ptr
+ COMMON         0x000f66b0      0x106 cpmlib.a(bdosmain.o)
+                0x000f66b0                gbls
+                0x000f679e                crit_dsk
+                0x000f67a0                tpa_lp
+                0x000f67a4                tpa_lt
+                0x000f67a8                log_dsk
+                0x000f67ac                tpa_hp
+                0x000f67b0                tpa_ht
+                0x000f67b4                ro_dsk
+ *fill*         0x000f67b6        0x2
+ COMMON         0x000f67b8     0x1942 cpmlib.a(n8io.o)
+                0x000f67b8                alv_rom_400k
+                0x000f67d4                content
+                0x000f681c                errno
+                0x000f6820                DMA_address
+                0x000f6824                hma
+                0x000f6828                common_dir_buffer
+                0x000f68a8                buffer
+                0x000f80a8                current_track
+                0x000f80ac                lru
+                0x000f80b8                alv_RAM_1M
+                0x000f80f8                current_sector
+                0x000f8100                end=ALIGN(0x8)
+                0x000f8100                _end=ALIGN(0x8)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+OUTPUT(cpm.out coff-m68k)
+                                

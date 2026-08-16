@@ -1,0 +1,88 @@
+$2cp68 bdosmain.c $1x.i
+$2c068 $1x.i $1x.1 $1x.2 $1x.3 -f
+era $1x.i
+$2c168 $1x.1 $1x.2 bdosmain.s
+era $1x.1
+era $1x.2
+$2as68 -s 0$1 -l -u -f $1 bdosmain.s
+era bdosmain.s
+
+$2cp68 bdosmisc.c $1x.i
+$2c068 $1x.i $1x.1 $1x.2 $1x.3 -f
+era $1x.i
+$2c168 $1x.1 $1x.2 bdosmisc.s
+era $1x.1
+era $1x.2
+$2as68 -s 0$1 -l -u -f $1 bdosmisc.s
+era bdosmisc.s
+
+$2cp68 bdosrw.c $1x.i
+$2c068 $1x.i $1x.1 $1x.2 $1x.3 -f
+era $1x.i
+$2c168 $1x.1 $1x.2 bdosrw.s
+era $1x.1
+era $1x.2
+$2as68 -s 0$1 -l -u -f $1 bdosrw.s
+era bdosrw.s
+
+$2cp68 conbdos.c $1x.i
+$2c068 $1x.i $1x.1 $1x.2 $1x.3 -f
+era $1x.i
+$2c168 $1x.1 $1x.2 conbdos.s
+era $1x.1
+era $1x.2
+$2as68 -s 0$1 -l -u -f $1 conbdos.s
+era conbdos.s
+
+$2cp68 dskutil.c $1x.i
+$2c068 $1x.i $1x.1 $1x.2 $1x.3 -f
+era $1x.i
+$2c168 $1x.1 $1x.2 dskutil.s
+era $1x.1
+era $1x.2
+$2as68 -s 0$1 -l -u -f $1 dskutil.s
+era dskutil.s
+
+$2cp68 fileio.c $1x.i
+$2c068 $1x.i $1x.1 $1x.2 $1x.3 -f
+era $1x.i
+$2c168 $1x.1 $1x.2 fileio.s
+era $1x.1
+era $1x.2
+$2as68 -s 0$1 -l -u -f $1 fileio.s
+era fileio.s
+
+$2cp68 iosys.c $1x.i
+$2c068 $1x.i $1x.1 $1x.2 $1x.3 -f
+era $1x.i
+$2c168 $1x.1 $1x.2 iosys.s
+era $1x.1
+era $1x.2
+$2as68 -s 0$1 -l -u -f $1 iosys.s
+era iosys.s
+
+$2cp68 ccp.c $1x.i
+$2c068 $1x.i $1x.1 $1x.2 $1x.3 -f
+era $1x.i
+$2c168 $1x.1 $1x.2 ccp.s
+era $1x.1
+era $1x.2
+$2as68 -s 0$1 -l -u -f $1 ccp.s
+era ccp.s
+
+$2as68 -s 0$1 -l -u -f $1 bdosif.s
+$2cp68 exceptn.s except.s
+$2as68 -s 0$1 -f $1 -l -n except.s
+era except.s
+$2cp68 -dm68010 exceptn.s except10.s
+$2as68 -s 0$1 -f $1 -l -n except10.s
+era except10.s
+$2as68 -s 0$1 -l -u -f $1 pgmld.s
+$2as68 -s 0$1 -l -u -f $1 ccpbdos.s
+$2as68 -s 0$1 -l -u -f $1 ccpif.s
+$2as68 -s 0$1 -l -u -f $1 ccpload.s
+$2as68 -s 0$1 -l -u -f $1 filetyps.s
+$2as68 -s 0$1 -l -u -f $1 stack.s
+
+rear $1 $2
+

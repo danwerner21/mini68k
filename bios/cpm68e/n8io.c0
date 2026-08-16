@@ -1,0 +1,741 @@
+/* n8io.c
+
+		Disk I/O as part of the Trap3 BIOS
+
+*/
+/**********************************************************************
+	Codes beginning "N8*.*" are affected by this notice.
+	Other codes are copyrighted by Digital Research Inc.
+***********************************************************************
+	Copyright (C) 2012 John R. Coffman.
+	Licensed for hobbyist use on the N8VEM mini-M68000 CPU board.
+***********************************************************************
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    in the file COPYING in the distribution directory along with this
+    program.  If not, see <http://www.gnu.org/licenses/>.
+
+**********************************************************************/
+#include "ccpdef.h"
+#include "bdosinc.h"
+#include "bdosdef.h"
+#include "biosdef.h"
+#include "n8io.h"
+#include "cprintf.h"
+
+int errno;
+EXTERN ULONG heap;
+ULONG hma;
+
+/* SECLEN = 128	defined in "bdosdef.h" */
+BYTE common_dir_buffer[SECLEN];		/* CP/M directory sector */
+
+/* Three parallel arrays */
+BYTE lru[MAXBUFFERS];					/* maintains LRU information */
+T_content content[MAXBUFFERS];		/* maitains buffer content information */
+T_buffer buffer[MAXBUFFERS];			/* the actual disk buffers */
+
+const
+struct dpb dpb_rom_400k = {
+		16,   /* SPT - sectors per track */
+		4,		/* BSH - block shift factor, 2048 byte allocation clusters */
+		15,		/* BLM - block mask */
+		1,		/* EXM - ??? */
+		0,		/* unused */
+		199,	/* DSM - disk size, highest allocation cluster number */
+		63,	/* DRM - highest directory entry number */
+		0x8000,	/* AL0 - initial DIR allocation */
+		0,		/* CKS - number of DIR sectors to checksum on removable disks */
+		0		/* OFS - track offset of first directory sector */
+	};
+
+
+const
+struct dpb dpb_flpy_144m = {
+		72,   /* SPT - sectors per track */
+		4,		/* BSH - block shift factor, 2048 byte allocation clusters */
+		15,	/* BLM - block mask */
+		0,		/* EXM - ??? */
+		0,		/* unused */
+		710,	/* DSM - disk size, highest allocation cluster number */
+		255,	/* DRM - highest directory entry number */
+		0xF000,	/* AL0 - initial DIR allocation */
+		64,	/* CKS - number of DIR sectors to checksum on removable disks */
+		2		/* OFS - track offset of first directory sector */
+	};
+
+
+const
+struct dpb dpb_flpy_720k = {
+		36,   /* SPT - sectors per track */
+		4,		/* BSH - block shift factor, 2048 byte allocation clusters */
+		15,	/* BLM - block mask */
+		0,		/* EXM - ??? */
+		0,		/* unused */
+		350,	/* DSM - disk size, highest allocation cluster number */
+		127,	/* DRM - highest directory entry number */
+		0xC000,	/* AL0 - initial DIR allocation */
+		32,	/* CKS - number of DIR sectors to checksum on removable disks */
+		4		/* OFS - track offset of first directory sector */
+	};
+
+
+
+struct dpb dpb_RAM_1M = {
+		16,   /* SPT - sectors per track */
+		4,		/* BSH - block shift factor, 2048 byte allocation clusters */
+		15,	/* BLM - block mask */
+		0,		/* EXM - ??? */
+		0,		/* unused */
+		511,	/* DSM - disk size, highest allocation cluster number */
+		511,	/* DRM - highest directory entry number */
+		0xFF00,	/* AL0 - initial DIR allocation */
+		0,		/* CKS - number of DIR sectors to checksum on removable disks */
+		0		/* OFS - track offset of first directory sector */
+	};
+
+#if 0
+struct dpb dpb_C = {
+		128,  /* SPT - sectors per track */
+		5,		/* BSH - block shift factor, 4096 byte allocation clusters */
+		31,	/* BLM - block mask */
+		1,		/* EXM - ??? */
+		0,		/* unused */
+		2043,	/* DSM - disk size, highest allocation cluster number */
+		511,	/* DRM - highest directory entry number */
+		0xF000,	/* AL0 - initial DIR allocation */
+		0,		/* CKS - number of DIR sectors to checksum on removable disks */
+		0		/* OFS - track offset of first directory sector */
+	};
+#endif
+
+
+
+
+
+EXTERN BYTE _end;			/* end of the .BSS load */
+	
+BYTE alv_rom_400k [ 400/2/8 ];
+BYTE alv_RAM_1M [ 512/8 ];
+
+struct dph dph_rom_400k = {
+		NULL,		/* XLT - pointer to sector translate table */
+		0,			/* HWM - high water mark */
+		0,			/* unused */
+		0,			/* unused */
+		common_dir_buffer,
+		(struct dpb *)&dpb_rom_400k,	/* DPB pointer */
+		NULL,		/* CSV - checksum vector, only for removable disks */
+		alv_rom_400k		/* allocation vector */
+	};
+
+struct dph dph_RAM_1M = {
+		NULL,		/* XLT - pointer to sector translate table */
+		0,			/* HWM - high water mark */
+		0,			/* unused */
+		0,			/* unused */
+		common_dir_buffer,
+		(struct dpb *)&dpb_RAM_1M,	/* DPB pointer */
+		NULL,		/* CSV - checksum vector, only for removable disks */
+		alv_RAM_1M		/* allocation vector */
+	};
+#if 0
+struct dph dph_8mb_hard_disk = {
+		NULL,		/* XLT - pointer to sector translate table */
+		0,			/* HWM - high water mark */
+		0,			/* unused */
+		0,			/* unused */
+		common_dir_buffer,
+		(struct dpb *)&dpb_C,	/* DPB pointer */
+		NULL,		/* CSV - checksum vector, only for removable disks */
+		alv_C		/* allocation vector */
+	};
+#endif
+
+
+T_partition partition[NO_OF_DRIVES] = {
+	{ 0, 0, NULL, 0, 512 },			/* CP/M drive A (floppy) */
+	{ 0, 0, NULL, 0, 512 },			/*  B, likely the 1M RAMdisk */
+/*	{ 32, 16352, &dph_8mb_hard_disk, 2, 512 },	 */		/*  C  partition */
+	{ 0, 0, NULL, 0, 512 },			/*  C  */
+	{ 0, 0, NULL, 0, 512 },			/*  D  */
+	{ 0, 0, NULL, 0, 512 },			/*  E  */
+	{ 0xFFF80000+48*1024, 400*1024/SECLEN, &dph_rom_400k, 101, SECLEN },	/*  F romdisk */
+	{ 0, 0, NULL, 0, 512 },			/*  G  */
+	{ 0, 0, NULL, 0, 512 },
+	{ 0, 0, NULL, 0, 512 },
+	{ 0, 0, NULL, 0, 512 },
+	{ 0, 0, NULL, 0, 512 },
+	{ 0, 0, NULL, 0, 512 },
+	{ 0, 0, NULL, 0, 512 },
+	{ 0, 0, NULL, 0, 512 },
+	{ 0, 0, NULL, 0, 512 },
+	{ 0, 0, NULL, 0, 512 }			/*  P  */
+	};
+
+T_partition RAM_partition =
+	{ 0x00100000, 1024*1024/SECLEN, &dph_RAM_1M, 100, SECLEN };  /* 1Mb ramdisk */
+
+WORD current_drive = -1;
+UWORD current_sector, current_track;
+BYTE *DMA_address;
+
+void *cpm_memset(void *to, int value, unsigned length)
+{
+	char *tp = to;
+	
+	while (length--) *tp++ = (char)value;
+
+	return to;
+}
+
+void *cpm_memcpy(void *to, void *from, unsigned nbytes)
+{
+	char *tp = to;
+
+	while (nbytes--) *tp++ = *(char*)from++;
+
+	return to;
+}
+
+/* malloc, but it zeroes the allocated area, too */
+void *cpm_malloc(ULONG nbytes)
+{
+	ULONG oldheap = heap;
+
+	nbytes = (nbytes+3) & ~3;	/* round upward to maintain alignment */
+	hma = _halloc(0);				/* find highest memory address */
+
+	if (oldheap+nbytes  >  hma) return NULL;
+
+	heap = oldheap+nbytes;
+
+	return cpm_memset((void*)oldheap, 0, nbytes);
+}
+
+
+
+void init_ramdisk(void)		/* called from '_init' as the final disk setup */
+{
+	long base = max(HIGH_MEMORY_BASE,(long)&_end);
+	long hma = _get_hma();
+	long avail = hma - base;
+	T_partition *partp = partition + 1;	/* start at partition B */
+	long block, nblock;
+	int i;
+	
+	if (avail < 500*1024L) return;	/* not enough is there */
+/*   Now find an empty partition for the RAMdisk */
+
+	for (i=1; i<NO_OF_DRIVES; i++, partp++) {
+		if (partp->length == 0 || partp->dphp == NULL) /* got a slot */ break;
+	}
+	if (i>=NO_OF_DRIVES) return;
+	
+	cpm_memcpy(partp, &RAM_partition, sizeof(T_partition));
+		/* get the blocksize for the RAMdisk */
+	block = SECLEN << partp->dphp->dpbp->bsh;
+		/* set the maximum allocation number */
+	partp->dphp->dpbp->dsm = udiv(avail, block-1, (UWORD*)&i);
+					  /*		avail/block - 1;   */
+		/* set the number of cpm_sectors on the disk */
+	partp->length = avail / SECLEN;	/* this would be hw_sectors for Hard disks */
+		/* get number of directory blocks */
+	block = partp->dphp->dpbp->drm + 1;
+		/* clear the directory area */
+	cpm_memset((char*)base, 0xE5, block*32);
+		/* the new RAMdisk is now ready for use */
+}
+
+
+struct dph *disk_drive_select(UBYTE drive, UBYTE logged_in)
+{
+	if (drive < MAXPARTITION) {
+		return partition[(current_drive = drive)].dphp;
+	} 
+	else  current_drive = -1;
+
+	return NULL;
+}
+
+void lru_update(WORD mru)
+{
+	BYTE *lp = &lru[mru];
+	BYTE ibuf = *lp;
+
+/*	while (mru--) *lp = lp[-1], lp--;*/
+/*  very few compilers can get this evaluation correct:   */
+	while (mru--) *lp-- = lp[-1];
+
+	lru[0] = ibuf;
+}
+
+
+int purge_to_disk(int ibuf)
+{
+	T_content *cp = &content[ibuf];
+
+	if ( (cp->flags & IN_USE) && (cp->flags & DIRTY_ANY) )  {
+		errno = _write_sector(cp->drive, cp->lba_address, buffer[ibuf]);
+		cp->flags &= ~DIRTY_ANY;
+	}
+	return 0;
+}
+
+
+/* force a h/w sector into memory, and return the buffer index */
+int get_into_memory(WORD drive, ULONG abs_lba, UWORD zapit)
+{
+	int ilru, ibuf;
+	T_content *cp;
+
+	for (ilru = 0; ilru < MAXBUFFERS; ilru++) {
+		ibuf = lru[ilru];
+		cp = content + ibuf;
+		if (	(cp->flags & IN_USE) &&
+				(cp->lba_address == abs_lba) &&
+				(cp->drive == drive) ) {
+			lru_update(ilru);
+			return ibuf;
+		} 
+	} /* for */
+/*		could not find the sector in the cache */
+	ilru = MAXBUFFERS-1;		/* pick the least recently used sector */
+	ibuf = lru[ilru];
+	cp = content + ibuf;
+#if 0
+	if ( (cp->flags & IN_USE) && (cp->flags & DIRTY_ANY) )
+	/* the above conditions are in 'purge_to_disk' anyhow */
+#endif
+		purge_to_disk(ibuf);
+
+	cp->flags = 0;		/* mark buffer unused */
+	if (!zapit) {
+		errno = _read_sector(drive, abs_lba, buffer[ibuf]);
+		if (errno) return -1;
+/*		good read  */
+	}
+	else {
+		errno = 0;
+		cpm_memset(buffer[ibuf], 0, SECTOR_SIZE);
+		cp->flags |= DIRTY_ANY;
+	}
+	cp->flags |= IN_USE;		/* buffer is used */
+	cp->drive = drive;
+	cp->lba_address = abs_lba;
+	lru_update(ilru);			/* make this the most recently use buffer */
+	return ibuf;
+}
+
+
+int disk_set_track(UWORD track)
+{
+	current_track = track;
+	return 0;
+}
+
+int disk_set_sector(UWORD sector)
+{
+	current_sector = sector;
+	return 0;
+}
+
+int disk_set_DMA_address(BYTE *ptr)
+{
+	DMA_address = ptr;
+	return 0;
+}
+
+int disk_read_sector(VOID)
+{
+	T_partition *pp = &partition[current_drive];
+	struct dph *dphp = pp->dphp;
+	struct dpb *dpbp = dphp->dpbp;
+	ULONG lba = current_track * dpbp->spt + current_sector;
+	int ibuf, imask, ioff;
+
+/*		Handle the RAM/ROM disks first */
+	if (pp->drive >= 100) {
+		if (lba < pp->length) {
+			cpm_memcpy(DMA_address, (BYTE*)pp->offset + lba*SECLEN, SECLEN);
+			return 0;
+		}
+		else return 1;
+	}
+
+/**********************************************************************/
+/*		Hard/Floppy I/O operations */
+/**********************************************************************/
+
+/*		convert CP/M lba to Hardware sector number and offset */
+	imask = pp->sec_size / SECLEN;
+	ioff = lba & (imask-1);
+	lba /= imask;
+
+/* 	validate LBA and convert to absolute LBA on the h/w disk */
+	if (lba >= pp->length) return 1;
+	lba += pp->offset;
+
+/* 	get the sector into any buffer */
+	ibuf = get_into_memory(pp->drive, lba, 0);
+	if (ibuf < 0) return 1;
+
+	cpm_memcpy(DMA_address,  buffer[ibuf] + ioff*SECLEN,  SECLEN);
+
+	return 0;
+}
+
+
+
+int disk_write_sector(UWORD wr_type)
+{
+	T_partition *pp = &partition[current_drive];
+	struct dph *dphp = pp->dphp;
+	struct dpb *dpbp = dphp->dpbp;
+	ULONG lba = current_track * dpbp->spt + current_sector;
+	int ibuf, imask, ioff;
+
+	if (pp->drive > 100)		return 1;		/* write protected */
+	if (pp->drive == 100) {
+		if (lba < pp->length) {
+			cpm_memcpy((BYTE*)pp->offset + lba*SECLEN, DMA_address, SECLEN);
+			return 0;
+		}
+		else return 1;
+	}
+
+/**********************************************************************/
+/*		Hard/Floppy I/O operations */
+/**********************************************************************/
+
+/*		convert CP/M lba to Hardware sector number and offset */
+	imask = pp->sec_size / SECLEN;
+	ioff = lba & (imask-1);
+	lba /= imask;
+	
+/* 	validate LBA and convert to absolute LBA on the h/w disk */
+	if (lba >= pp->length) return 1;
+	lba += pp->offset;
+
+/*		handle newly allocated Allocation Block */
+	if (wr_type == WR_FIRST) {
+		int nsec = 1 << (dpbp->bsh - 2);	/* number of sectors to zap */
+		if ( (MAXBUFFERS - nsec) >= 3) {
+			while (--nsec) get_into_memory(pp->drive, lba+nsec, 1);
+		}
+	}
+
+/* 	get the sector into any buffer */
+	ibuf = get_into_memory(pp->drive, lba, (wr_type==WR_FIRST) );
+	if (ibuf < 0) return 1;
+
+	content[ibuf].flags |= (DIRTY_0 << ioff);		/* mark it written */
+	cpm_memcpy(buffer[ibuf] + ioff*SECLEN,  DMA_address,  SECLEN);
+
+	if (wr_type == WR_DIRECTORY)  purge_to_disk(ibuf);
+
+	return 0;
+}
+
+int disk_flush_buffers(void)
+{
+	int ibuf, iret=0;
+
+	for (ibuf=0; ibuf<MAXBUFFERS; ibuf++) {
+		purge_to_disk(ibuf);
+		if (errno) iret |= (-1);
+	}
+
+/* return -1 if an error occurs */
+	return iret;
+}
+
+int disk_home(void)
+{
+	T_partition *pp = &partition[current_drive];
+
+	_disk_reset(pp->drive);
+
+	return 0;
+}
+
+#if !RETAIL
+void prline(UBYTE *buff)
+{	/* print a line of 16 byte values */
+	UWORD i, j;
+	UBYTE *buf = buff;
+	for (j=2; j--; ) {
+		for (i=8; i--; ) {
+			cprintf(" %02x", (int)(*buf++));
+		}
+		cprintf(" ");
+	}
+	cprintf(" ");
+	buf = buff;
+	for (i=16; i--; buf++) cprintf("%c", *buf>=' ' && *buf<0177 ? *buf : '.');
+}
+
+void prbuf(int addr, UBYTE *buf, int n)
+{
+	int i;
+	while (n>0) {
+		for (i=0; i<8 && n>0; i++) {
+			cprintf("\n%04x: ", addr);
+			prline(buf);
+			buf+=16;
+			addr+=16;
+			n-=16;
+		}
+		cprintf("\n");
+#if 0
+		if (n>0) {
+			int ch;
+			do ch = sio_get();
+			while (ch<0);
+		}
+#endif
+	}
+}
+#endif
+
+struct dph *make_dph(LONG cpm_sector_count);
+
+void disk_system_init(void)
+{
+	int i;
+	UWORD drive, device;
+
+/*		Initialize the LRU  */
+	for (i=0; i<MAXBUFFERS; i++) {
+		content[i].flags = 0;
+		lru[i] = i;
+	}
+
+/*  Create the pointer to the RAMdisk */
+	i = *(long*)((32 + 8)*sizeof(long));
+	i &= 512*1024;	/* isolate the 512K bit, 0x0008_0000 */
+	i |= 0xFFF7FFFF;   /* 512k bit is clear on the KISS-68030, set on the Mini-M68k */
+	partition['F'-'A'].offset &= i;
+
+/*		Search the physical devices for partitions to map to CPM drives */
+	drive = device = 2;	/* start at C> and C: */
+	while (drive < NO_OF_DRIVES) {
+		int ibuf;
+		T_pt_entry *ptp;
+
+		ibuf = get_into_memory(device, 0uL, 0);
+		if (ibuf < 0) break;
+
+		ptp = (void*)(buffer[ibuf] + 0x1BE);
+#if !RETAIL
+		cprintf("\n  Device %c:", (char)('A'+device) );
+		prbuf(0x1BE, (UBYTE*)ptp, 0x40);
+#endif
+		for (i=0; i<4; i++) {
+			if (ptp->p_type == 0x52) {		/* is it a CP/M partition */
+				for (; drive < NO_OF_DRIVES; drive++) {
+					if (partition[drive].length == 0) { /* got a slot */
+						partition[drive].offset = bswap(ptp->lba_begin);
+						partition[drive].length = bswap(ptp->lba_length);
+						partition[drive].sec_size = SECTOR_SIZE;
+						partition[drive].drive = device;
+						partition[drive].dphp = make_dph(partition[drive].length * (SECTOR_SIZE/SECLEN));
+#if !RETAIL
+						cprintf("Created drive %c> on device %c:\n",
+								(char)('A'+drive), (char)('A'+device) );
+						cprintf("  begin = %lu (%07lx)  length = %lu (%07lx)\n",
+							partition[drive].offset,
+							partition[drive].offset,
+							partition[drive].length,
+							partition[drive].length );
+#endif
+						break;
+					} /* if */
+				} /* for */
+			} /* if */
+			ptp++;
+		} /* for */
+
+		device++;
+	} /* while */
+#if !RETAIL
+	cprintf("\nEnd of 'disk_system_init'\n");
+#endif
+}
+
+/* logarithm to the base 2, rounded up */
+int log2(ULONG x)
+{
+	int z = -!(x&(x-1));
+
+	while (x) {
+		z++;
+		x >>= 1;
+	}
+
+	return z;
+}
+
+#define EXAMPLE 1
+#if 1
+/* make dph and dpb for a new drive */
+
+struct dph *make_dph(LONG cpm_sector_count)
+{
+	struct dph *dphp;
+	struct dpb *dpbp;
+	LONG log_disk_bytes, log_alloc_size, n_alloc_units, log_drm;
+	LONG bsh, dsm, exm, n;
+
+	dphp = cpm_malloc(sizeof(*dphp));
+	dphp->dpbp = dpbp = cpm_malloc(sizeof(*dpbp));
+	cpm_sector_count = min(cpm_sector_count, 512L*1024L*1024L/SECLEN);
+#if EXAMPLE
+	if (cpm_sector_count == 1440L*1024L/SECLEN) {
+		dpbp->spt = 18*(SECTOR_SIZE/SECLEN);
+		dpbp->trk_off = 2;
+	}
+	else if (cpm_sector_count == 720L*1024L/SECLEN) {
+		dpbp->spt = 9*(SECTOR_SIZE/SECLEN);
+		dpbp->trk_off = 4;
+	}
+	else if (cpm_sector_count == 1200L*1024L/SECLEN) {
+		dpbp->spt = 15*(SECTOR_SIZE/SECLEN);
+		dpbp->trk_off = 2;
+	}
+	else if (cpm_sector_count == 77*26) {
+		dpbp->spt = 26;
+		dpbp->trk_off = 8;
+	}
+	else if (cpm_sector_count == 77*26*2) {
+		dpbp->spt = 26*2;
+		dpbp->trk_off = 4;
+	}
+	else
+#endif
+	{
+		dpbp->spt = 128;
+		dpbp->trk_off = 0;
+	}
+	cpm_sector_count -= dpbp->spt * dpbp->trk_off;
+
+/* CP/M  SECLEN is 128, max disk size is 512Mb */
+	log_disk_bytes = min( 29, 7+log2(cpm_sector_count) );	/* up to 512M */
+ 	log_alloc_size = max((log_disk_bytes+1)>>1, 11);
+	if (log_disk_bytes <= 18) log_alloc_size--;
+	log_alloc_size = min(14, log_alloc_size);			/* max is 14 (16K) */
+	n_alloc_units = cpm_sector_count >> (bsh = log_alloc_size-7);
+	exm = (1 << (bsh-3) ) - 1;
+	dsm = n_alloc_units - 1;
+	if (dsm > 255) exm >>= 1;
+	log_drm = log2(n_alloc_units) - 2;	/* heuristic */
+
+/* DPH needs dbufp, dpbp, alv; all else are null or zero */
+	dphp->dbufp = common_dir_buffer;
+	dphp->alv = cpm_malloc((n_alloc_units+7)/8);
+
+/* DPB needs spt, bsh, blm, exm, dsm, drm, dir_al; all else are null or zero */
+	dpbp->bsh = bsh;
+	dpbp->blm = (1<<bsh)-1;
+	dpbp->dsm = dsm;
+	dpbp->drm = (1<<log_drm)-1;
+	dpbp->exm = exm;
+	n = max(1<<(log_drm + 5 - log_alloc_size), 1);
+	dpbp->dir_al = ~(0xFFFF >> n);
+#if !RETAIL
+	cprintf("spt=%hu bsh=%d blm=%d ", dpbp->spt, (int)dpbp->bsh, (int)dpbp->blm);
+	cprintf("exm=%d ", (int)dpbp->exm);
+	cprintf("dsm=%hu drm=%hu ", dpbp->dsm, dpbp->drm);
+	cprintf("dir_al=%04hx ", dpbp->dir_al);
+	cprintf("cks=%hu trk_off=%hu\n", dpbp->cks, dpbp->trk_off);
+	cprintf("There are %lu blocks of size %lu\n", (LONG)dpbp->dsm + 1, 128L<<dpbp->bsh);
+	cprintf("alv length is %d bytes\n", (n_alloc_units+7)/8);
+#endif
+
+
+	return dphp;
+}
+#else
+/* make dph and dpb for a new drive */
+
+struct dph *make_dph(LONG cpm_sector_count)
+{
+	struct dph *dphp;
+	struct dpb *dpbp;
+	LONG log_disk_bytes, log_alloc_size, n_alloc_units, log_drm;
+	LONG bsh, dsm, exm, n;
+
+	dphp = cpm_malloc(sizeof(*dphp));
+	dphp->dpbp = dpbp = cpm_malloc(sizeof(*dpbp));
+	cpm_sector_count = min(cpm_sector_count, 512L*1024L*1024L/SECLEN);
+#if EXAMPLE
+	if (cpm_sector_count == 1440L*1024L/SECLEN) {
+		dpbp->spt = 18*(SECTOR_SIZE/SECLEN);
+		dpbp->trk_off = 2;
+	}
+	else if (cpm_sector_count == 720L*1024L/SECLEN) {
+		dpbp->spt = 9*(SECTOR_SIZE/SECLEN);
+		dpbp->trk_off = 4;
+	}
+	else if (cpm_sector_count == 1200L*1024L/SECLEN) {
+		dpbp->spt = 15*(SECTOR_SIZE/SECLEN);
+		dpbp->trk_off = 2;
+	}
+	else 
+#endif
+	{
+		dpbp->spt = 128;
+		dpbp->trk_off = 0;
+	}
+	cpm_sector_count -= dpbp->spt * dpbp->trk_off;
+
+/* CP/M  SECLEN is 128, max disk size is 512Mb */
+	log_disk_bytes = min( 29, 7+log2(cpm_sector_count) );	/* up to 512M */
+	log_alloc_size = max((log_disk_bytes+1)>>1, 11);
+	log_alloc_size = min(14, log_alloc_size);			/* max is 14 (16K) */
+	n_alloc_units = cpm_sector_count >> (bsh = log_alloc_size-7);
+	exm = (1 << (bsh-3) ) - 1;
+	dsm = n_alloc_units - 1;
+	if (dsm > 255) exm >>= 1;
+	log_drm = log2(n_alloc_units) - 2;	/* heuristic */
+
+/* DPH needs dbufp, dpbp, alv; all else are null or zero */
+	dphp->dbufp = common_dir_buffer;
+	dphp->alv = cpm_malloc((n_alloc_units+7)/8);
+
+/* DPB needs spt, bsh, blm, exm, dsm, drm, dir_al; all else are null or zero */
+	dpbp->bsh = bsh;
+	dpbp->blm = (1<<bsh)-1;
+	dpbp->dsm = dsm;
+	dpbp->drm = (1<<log_drm)-1;
+	dpbp->exm = exm;
+	n = max(1<<(log_drm + 5 - log_alloc_size), 1);
+	dpbp->dir_al = ~(0xFFFF >> n);
+#if !RETAIL
+	cprintf("spt=%hu bsh=%d blm=%d ", dpbp->spt, (int)dpbp->bsh, (int)dpbp->blm);
+	cprintf("exm=%d ", (int)dpbp->exm);
+	cprintf("dsm=%hu drm=%hu ", dpbp->dsm, dpbp->drm);
+	cprintf("dir_al=%04hx ", dpbp->dir_al);
+	cprintf("cks=%hu trk_off=%hu\n", dpbp->cks, dpbp->trk_off);
+	cprintf("There are %lu blocks of size %lu\n", (LONG)dpbp->dsm + 1, 128L<<dpbp->bsh);
+	cprintf("alv length is %d bytes\n", (n_alloc_units+7)/8);
+#endif
+
+
+	return dphp;
+}
+#endif
+#undef EXAMPLE
+
+
+
