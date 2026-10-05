@@ -1,0 +1,171 @@
+68K GAS  iosys.s 			page 1
+
+
+   1               	#NO_APP
+   2               		.file	"iosys.c"
+   3               		.text
+   4               		.align	2
+   5               		.globl	do_phio
+   6               		.type	do_phio, @function
+   7               	do_phio:
+   8 0000 4E56 FFFC 		link.w %fp,#-4
+   9 0004 48E7 0038 		movm.l #0x38,-(%sp)
+  10 0008 286E 0008 		move.l 8(%fp),%a4
+  11 000c 1014      		move.b (%a4),%d0
+  12 000e 0C00 0002 		cmp.b #2,%d0
+  13 0012 6208      		jbhi .L6
+  14 0014 0C00 0001 		cmp.b #1,%d0
+  15 0018 6448      		jbcc .L4
+  16 001a 600E      		jbra .L13
+  17               	.L6:
+  18 001c 0C00 0003 		cmp.b #3,%d0
+  19 0020 6700 0128 		jbeq .L5
+  20 0024 4240      		clr.w %d0
+  21 0026 6000 0132 		jbra .L7
+  22               	.L13:
+  23 002a 7000      		moveq #0,%d0
+  24 002c 102C 0003 		move.b 3(%a4),%d0
+  25 0030 13C0 0000 		move.b %d0,last_dsk.1015
+  25      0000 
+  26 0036 7200      		moveq #0,%d1
+  27 0038 122C 0001 		move.b 1(%a4),%d1
+  28 003c 2F01      		move.l %d1,-(%sp)
+  29 003e 2F00      		move.l %d0,-(%sp)
+  30 0040 4878 0009 		pea 9.w
+  31 0044 4EB9 0000 		jbsr _bios4
+  31      0000 
+  32 004a 2200      		move.l %d0,%d1
+  33 004c 4241      		clr.w %d1
+  34 004e 4841      		swap %d1
+  35 0050 3941 000E 		move.w %d1,14(%a4)
+  36 0054 3940 0010 		move.w %d0,16(%a4)
+  37 0058 4240      		clr.w %d0
+  38 005a 4FEF 000C 		lea (12,%sp),%sp
+  39 005e 6000 00FA 		jbra .L7
+  40               	.L4:
+  41 0062 102C 0003 		move.b 3(%a4),%d0
+  42 0066 B039 0000 		cmp.b last_dsk.1015.l,%d0
+  42      0000 
+  43 006c 671E      		jbeq .L8
+  44 006e 13C0 0000 		move.b %d0,last_dsk.1015
+  44      0000 
+  45 0074 42A7      		clr.l -(%sp)
+  46 0076 0280 0000 		and.l #255,%d0
+  46      00FF 
+  47 007c 2F00      		move.l %d0,-(%sp)
+  48 007e 4878 0009 		pea 9.w
+  49 0082 4EB9 0000 		jbsr _bios4
+  49      0000 
+  50 0088 4FEF 000C 		lea (12,%sp),%sp
+  51               	.L8:
+68K GAS  iosys.s 			page 2
+
+
+  52 008c 322C 000E 		move.w 14(%a4),%d1
+  53 0090 3001      		move.w %d1,%d0
+  54 0092 4840      		swap %d0
+  55 0094 302C 0010 		mov.w 16(%a4),%d0
+  56 0098 2440      		move.l %d0,%a2
+  57 009a 322A 000E 		move.w 14(%a2),%d1
+  58 009e 3001      		move.w %d1,%d0
+  59 00a0 4840      		swap %d0
+  60 00a2 302A 0010 		mov.w 16(%a2),%d0
+  61 00a6 2640      		move.l %d0,%a3
+  62 00a8 486E FFFE 		pea -2(%fp)
+  63 00ac 7000      		moveq #0,%d0
+  64 00ae 3013      		move.w (%a3),%d0
+  65 00b0 2F00      		move.l %d0,-(%sp)
+  66 00b2 322C 0004 		move.w 4(%a4),%d1
+  67 00b6 3001      		move.w %d1,%d0
+  68 00b8 4840      		swap %d0
+  69 00ba 302C 0006 		mov.w 6(%a4),%d0
+  70 00be 2F00      		move.l %d0,-(%sp)
+  71 00c0 4EB9 0000 		jbsr udiv
+  71      0000 
+  72 00c6 0280 0000 		and.l #65535,%d0
+  72      FFFF 
+  73 00cc 7200      		moveq #0,%d1
+  74 00ce 322B 000E 		move.w 14(%a3),%d1
+  75 00d2 2040      		move.l %d0,%a0
+  76 00d4 4870 1800 		pea (%a0,%d1.l)
+  77 00d8 4878 000A 		pea 10.w
+  78 00dc 47F9 0000 		lea _bios2,%a3
+  78      0000 
+  79 00e2 4E93      		jbsr (%a3)
+  80 00e4 3212      		move.w (%a2),%d1
+  81 00e6 3001      		move.w %d1,%d0
+  82 00e8 4840      		swap %d0
+  83 00ea 302A 0002 		mov.w 2(%a2),%d0
+  84 00ee 2F00      		move.l %d0,-(%sp)
+  85 00f0 7000      		moveq #0,%d0
+  86 00f2 302E FFFE 		move.w -2(%fp),%d0
+  87 00f6 2F00      		move.l %d0,-(%sp)
+  88 00f8 4878 0010 		pea 16.w
+  89 00fc 4EB9 0000 		jbsr _bios5
+  89      0000 
+  90 0102 4FEF 0020 		lea (32,%sp),%sp
+  91 0106 3F00      		move.w %d0,-(%sp)
+  92 0108 4267      		clr.w -(%sp)
+  93 010a 4878 000B 		pea 11.w
+  94 010e 4E93      		jbsr (%a3)
+  95 0110 322C 000A 		move.w 10(%a4),%d1
+  96 0114 3001      		move.w %d1,%d0
+  97 0116 4840      		swap %d0
+  98 0118 302C 000C 		mov.w 12(%a4),%d0
+  99 011c 2F00      		move.l %d0,-(%sp)
+ 100 011e 4878 000C 		pea 12.w
+ 101 0122 4EB9 0000 		jbsr _bios3
+ 101      0000 
+ 102 0128 4FEF 0010 		lea (16,%sp),%sp
+ 103 012c 0C14 0001 		cmp.b #1,(%a4)
+68K GAS  iosys.s 			page 3
+
+
+ 104 0130 6606      		jbne .L10
+ 105 0132 4878 000D 		pea 13.w
+ 106 0136 6016      		jbra .L14
+ 107               	.L10:
+ 108 0138 7000      		moveq #0,%d0
+ 109 013a 102C 0001 		move.b 1(%a4),%d0
+ 110 013e 2F00      		move.l %d0,-(%sp)
+ 111 0140 4878 000E 		pea 14.w
+ 112 0144 4E93      		jbsr (%a3)
+ 113 0146 508F      		addq.l #8,%sp
+ 114 0148 6010      		jbra .L7
+ 115               	.L5:
+ 116 014a 4878 0015 		pea 21.w
+ 117               	.L14:
+ 118 014e 4EB9 0000 		jbsr _bios1
+ 118      0000 
+ 119 0154 0240 00FF 		and.w #255,%d0
+ 120 0158 588F      		addq.l #4,%sp
+ 121               	.L7:
+ 122 015a 0280 0000 		and.l #65535,%d0
+ 122      FFFF 
+ 123 0160 4CEE 1C00 		movm.l -16(%fp),#0x1c00
+ 123      FFF0 
+ 124 0166 4E5E      		unlk %fp
+ 125 0168 4E75      		rts
+ 126               		.size	do_phio, .-do_phio
+ 127               		.local	last_dsk.1015
+ 128               		.comm	last_dsk.1015,1,1
+ 129               		.comm	chainp,4,4
+ 130               		.ident	"GCC: (GNU) 4.1.1"
+68K GAS  iosys.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 iosys.c
+                            *ABS*:00000001 RETAIL
+                            *ABS*:000109a0 M68000
+             iosys.s:7      .text:00000000 do_phio
+                             .bss:00000000 last_dsk.1015
+                            *COM*:00000004 chainp
+
+UNDEFINED SYMBOLS
+_bios4
+udiv
+_bios2
+_bios5
+_bios3
+_bios1

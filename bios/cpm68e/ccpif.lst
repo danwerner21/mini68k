@@ -1,0 +1,185 @@
+68K GAS  ccpif.s 			page 1
+
+
+   1               	#************************************************************************
+   2               	#									*
+   3               	#                    CPM68K INTERFACE MODULE FOR			*
+   4               	#		     THE CONSOLE COMMAND PROCESSOR			*
+   5               	#									*
+   6               	#	    THIS IS THE DUAL-PROCESSOR,ROMABLE CP/M-68K SYSTEM		*
+   7               	#	    ==================================================		*
+   8               	#									*
+   9               	#       (C) Copyright Digital Research 1983 all rights reserved		*
+  10               	#									*
+  11               	#************************************************************************
+  12               	
+  13               	
+  14               		.globl  _bios1
+  15               		.globl  _bdos
+  16               		.globl  load68k
+  17               		.globl  load_tbl
+  18               		.globl	init_tbl
+  19               		.globl	load_try
+  20               		.globl  autorom
+  21               		.globl	flags
+  22               		.globl	TPAB
+  23               		.globl  stack
+  24               		.globl	bdosinit
+  25               		.globl  ccp_main
+  26               		.globl  submit
+  27               		.globl  morecmds
+  28               		.globl  autost
+  29               		.globl  usercmd
+  30               		.globl	_init
+  31               		.globl	_ccp
+  32               		.globl  patch
+  33               		.globl  cpm
+  34               		.globl	copyright
+  35               	
+  36               		.globl	_start
+  37               	
+  38               		.text
+  39               	_start:
+  40               	cpm:
+  41 0000 4EFA 0060 		jmp.l	ccpstart	/* start ccp with possible initial command */
+  42 0004 4E71      		nop					/* just in case the interval needs to be 6 */
+  43 0006 4EFA 0054 		jmp.l   ccpclear	/* clear auto start flag */
+  44 000a 4E71      		nop
+  45               	
+  46               	
+  47               	
+  48               		.bss
+  49 0000 00        	autost:  .ds.b  1		/* autostart command flag */
+  50 0001 0000 0000 	usercmd: .ds.b  130		/* user command buffer */
+  50      0000 0000 
+  50      0000 0000 
+  50      0000 0000 
+  50      0000 0000 
+  51               	
+  52               		.text
+  53               	copyright:
+68K GAS  ccpif.s 			page 2
+
+
+  54 000c 0D0A 0A   		.ascii	"\r\n\n"
+  55 000f 2020 2020 		.ascii  "    CP/M-68K (tm), Version 1.2, Copyright (c) 1982,1984, Digital Research\r\n"
+  55      4350 2F4D 
+  55      2D36 384B 
+  55      2028 746D 
+  55      292C 2056 
+  56 005a 00        		.byte	0
+  57               	
+  58               		.text
+  59 005b 00        		.even
+  60               	ccpclear:
+  61 005c 4239 0000 		clr.b	autost		/* clear the autostart flag */
+  61      0000 
+  62               	
+  63               	ccpstart:
+  64 0062 4FF9 0000 		lea	stack,%sp	/* set up the stack pointer */
+  64      0000 
+  65               					/* SP will be the ISP on 68020++ */
+  66 0068 4239 0000 		clr.b   autost		/* clear the auto start flag */
+  66      0000 
+  67 006e 4EB9 0000 		jsr	_init		/* call bios init */
+  67      0000 
+  68 0074 33C0 0000 		move.w	%d0,dskuser	/* save user # & disk */
+  68      0000 
+  69               	#
+  70               	#
+  71               	#	ROM SYSTEM INITIALIZATION
+  72               	#	OF BSS VARIABLES
+  73               	#
+  74               	#
+  75               	
+  76 007a 4239 0000 		clr.b	load_try	
+  76      0000 
+  77 0080 4239 0000 		clr.b	submit
+  77      0000 
+  78 0086 4239 0000 		clr.b	morecmds
+  78      0000 
+  79 008c 13FC 0001 		move.b  #0x1,autorom
+  79      0000 0000 
+  80 0094 4279 0000 		clr.w	flags
+  80      0000 
+  81 009a 4279 0000 		clr.w	TPAB
+  81      0000 
+  82 00a0 4EB9 0000 		jsr	init_tbl
+  82      0000 
+  83               	
+  84               	
+  85               	
+  86 00a6 4EB9 0000 		jsr	bdosinit	/* do bdos init */
+  86      0000 
+  87 00ac 303C 0020 		move.w  #32,%d0		/* get user bdos func # */
+  88 00b0 4281      		clr.l	%d1		/* clear out %d1 */
+  89 00b2 1239 0000 		move.b  dskuser,%d1	/* get the user # */
+  89      0000 
+  90 00b8 4E42      		trap	#2		/* set the user number */
+  91 00ba 4280      		clr.l	%d0		/* clear %d0 */
+  92 00bc 303C 000E 		move.w  #14,%d0		/* select function */
+68K GAS  ccpif.s 			page 3
+
+
+  93 00c0 4281      		clr.l	%d1		/* clear %d1 */
+  94 00c2 3239 0000 		move.w	dskuser,%d1	/* get disk to be selected */
+  94      0000 
+  95 00c8 0241 00FF 		andi    #0x0ff,%d1	/* mask off the user # */
+  96 00cc 4E42      		trap	#2		/* select the disk */
+  97               	
+  98               	_ccp:
+  99 00ce 4FF9 0000 		lea	stack,%sp	/* set up the stack pointer */
+  99      0000 
+ 100 00d4 4EB9 0000 		jsr	ccp_main		/* call the CCP */
+ 100      0000 
+ 101 00da 6000 FFF2 		bra	_ccp
+ 102               	
+ 103               		.bss
+ 104 0083 00        		.even
+ 105               	
+ 106 0084 0000      	dskuser: .ds.w  1
+ 107               		.even
+ 108 0086 00        	submit: .ds.b  1
+ 109 0087 00        		.even
+ 110 0088 00        	morecmds: .ds.b 1
+ 111 0089 00        		.even
+ 112 008a 0000 0000 	patch:	.ds.l	25
+ 112      0000 0000 
+ 112      0000 0000 
+ 112      0000 0000 
+ 112      0000 0000 
+ 113               	
+ 114               		.end	cpm
+68K GAS  ccpif.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000001 RETAIL
+                            *ABS*:000109a0 M68000
+             ccpif.s:108    .bss:00000086 submit
+             ccpif.s:110    .bss:00000088 morecmds
+             ccpif.s:49     .bss:00000000 autost
+             ccpif.s:50     .bss:00000001 usercmd
+             ccpif.s:98     .text:000000ce _ccp
+             ccpif.s:112    .bss:0000008a patch
+             ccpif.s:40     .text:00000000 cpm
+             ccpif.s:53     .text:0000000c copyright
+             ccpif.s:39     .text:00000000 _start
+             ccpif.s:63     .text:00000062 ccpstart
+             ccpif.s:60     .text:0000005c ccpclear
+             ccpif.s:106    .bss:00000084 dskuser
+
+UNDEFINED SYMBOLS
+_bios1
+_bdos
+load68k
+load_tbl
+init_tbl
+load_try
+autorom
+flags
+TPAB
+stack
+bdosinit
+ccp_main
+_init

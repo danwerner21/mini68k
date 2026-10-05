@@ -1,0 +1,1180 @@
+68K GAS  fileio.s 			page 1
+
+
+   1               	#NO_APP
+   2               		.file	"fileio.c"
+   3               		.text
+   4               		.align	2
+   5               		.globl	move
+   6               		.type	move, @function
+   7               	move:
+   8 0000 4E56 0000 		link.w %fp,#0
+   9 0004 226E 0008 		move.l 8(%fp),%a1
+  10 0008 206E 000C 		move.l 12(%fp),%a0
+  11 000c 302E 0012 		move.w 18(%fp),%d0
+  12 0010 6002      		jbra .L2
+  13               	.L3:
+  14 0012 10D9      		move.b (%a1)+,(%a0)+
+  15               	.L2:
+  16 0014 51C8 FFFC 		dbra %d0,.L3
+  17 0018 4E5E      		unlk %fp
+  18 001a 4E75      		rts
+  19               		.size	move, .-move
+  20               		.align	2
+  21               		.globl	match
+  22               		.type	match, @function
+  23               	match:
+  24 001c 4E56 0000 		link.w %fp,#0
+  25 0020 48E7 3820 		movm.l #0x3820,-(%sp)
+  26 0024 226E 0008 		move.l 8(%fp),%a1
+  27 0028 206E 000C 		move.l 12(%fp),%a0
+  28 002c 162E 0013 		move.b 19(%fp),%d3
+  29 0030 740C      		moveq #12,%d2
+  30               	.L7:
+  31 0032 1211      		move.b (%a1),%d1
+  32 0034 1010      		move.b (%a0),%d0
+  33 0036 B300      		eor.b %d1,%d0
+  34 0038 787F      		moveq #127,%d4
+  35 003a C084      		and.l %d4,%d0
+  36 003c 6706      		jbeq .L8
+  37 003e 0C01 003F 		cmp.b #63,%d1
+  38 0042 6664      		jbne .L10
+  39               	.L8:
+  40 0044 5289      		addq.l #1,%a1
+  41 0046 5288      		addq.l #1,%a0
+  42 0048 0C42 0001 		cmp.w #1,%d2
+  43 004c 6704      		jbeq .L11
+  44 004e 5342      		subq.w #1,%d2
+  45 0050 60E0      		jbra .L7
+  46               	.L11:
+  47 0052 4A03      		tst.b %d3
+  48 0054 6604      		jbne .L13
+  49 0056 7001      		moveq #1,%d0
+  50 0058 6050      		jbra .L15
+  51               	.L13:
+  52 005a 1211      		move.b (%a1),%d1
+  53 005c 0C01 003F 		cmp.b #63,%d1
+  54 0060 6728      		jbeq .L16
+  55 0062 1010      		move.b (%a0),%d0
+  56 0064 B101      		eor.b %d0,%d1
+  57 0066 0281 0000 		and.l #255,%d1
+68K GAS  fileio.s 			page 2
+
+
+  57      00FF 
+  58 006c 3439 0000 		move.w gbls+18,%d2
+  58      0000 
+  59 0072 3002      		move.w %d2,%d0
+  60 0074 4840      		swap %d0
+  61 0076 3039 0000 		mov.w gbls+20,%d0
+  61      0000 
+  62 007c 2440      		move.l %d0,%a2
+  63 007e 7000      		moveq #0,%d0
+  64 0080 102A 0004 		move.b 4(%a2),%d0
+  65 0084 4680      		not.l %d0
+  66 0086 C280      		and.l %d0,%d1
+  67 0088 661E      		jbne .L10
+  68               	.L16:
+  69 008a 1029 0002 		move.b 2(%a1),%d0
+  70 008e 1228 0002 		move.b 2(%a0),%d1
+  71 0092 B300      		eor.b %d1,%d0
+  72 0094 743F      		moveq #63,%d2
+  73 0096 C082      		and.l %d2,%d0
+  74 0098 56C0      		sne %d0
+  75 009a 4400      		neg.b %d0
+  76 009c 0A00 0001 		eor.b #1,%d0
+  77 00a0 0280 0000 		and.l #255,%d0
+  77      00FF 
+  78 00a6 6002      		jbra .L15
+  79               	.L10:
+  80 00a8 7000      		moveq #0,%d0
+  81               	.L15:
+  82 00aa 4CDF 041C 		movm.l (%sp)+,#0x41c
+  83 00ae 4E5E      		unlk %fp
+  84 00b0 4E75      		rts
+  85               		.size	match, .-match
+  86               		.align	2
+  87               		.globl	openfile
+  88               		.type	openfile, @function
+  89               	openfile:
+  90 00b2 4E56 0000 		link.w %fp,#0
+  91 00b6 48E7 3820 		movm.l #0x3820,-(%sp)
+  92 00ba 246E 0008 		move.l 8(%fp),%a2
+  93 00be 282E 000C 		move.l 12(%fp),%d4
+  94 00c2 4878 0001 		pea 1.w
+  95 00c6 2F04      		move.l %d4,-(%sp)
+  96 00c8 2F0A      		move.l %a2,-(%sp)
+  97 00ca 6100 FF50 		jbsr match
+  98 00ce 1600      		move.b %d0,%d3
+  99 00d0 4FEF 000C 		lea (12,%sp),%sp
+ 100 00d4 6730      		jbeq .L20
+ 101 00d6 142A 000C 		move.b 12(%a2),%d2
+ 102 00da 4878 0020 		pea 32.w
+ 103 00de 2F0A      		move.l %a2,-(%sp)
+ 104 00e0 2F04      		move.l %d4,-(%sp)
+ 105 00e2 6100 FF1C 		jbsr move
+ 106 00e6 1542 000C 		move.b %d2,12(%a2)
+ 107 00ea 002A FF80 		or.b #-128,14(%a2)
+ 107      000E 
+ 108 00f0 7200      		moveq #0,%d1
+ 109 00f2 1239 0000 		move.b gbls+6,%d1
+68K GAS  fileio.s 			page 3
+
+
+ 109      0000 
+ 110 00f8 7001      		moveq #1,%d0
+ 111 00fa E3A8      		lsl.l %d1,%d0
+ 112 00fc 8179 0000 		or.w %d0,crit_dsk
+ 112      0000 
+ 113 0102 4FEF 000C 		lea (12,%sp),%sp
+ 114               	.L20:
+ 115 0106 1003      		move.b %d3,%d0
+ 116 0108 4880      		ext.w %d0
+ 117 010a 48C0      		ext.l %d0
+ 118 010c 4CEE 041C 		movm.l -16(%fp),#0x41c
+ 118      FFF0 
+ 119 0112 4E5E      		unlk %fp
+ 120 0114 4E75      		rts
+ 121               		.size	openfile, .-openfile
+ 122               		.align	2
+ 123               		.globl	alltrue
+ 124               		.type	alltrue, @function
+ 125               	alltrue:
+ 126 0116 4E56 0000 		link.w %fp,#0
+ 127 011a 7001      		moveq #1,%d0
+ 128 011c 4E5E      		unlk %fp
+ 129 011e 4E75      		rts
+ 130               		.size	alltrue, .-alltrue
+ 131               		.align	2
+ 132               		.globl	matchit
+ 133               		.type	matchit, @function
+ 134               	matchit:
+ 135 0120 4E56 0000 		link.w %fp,#0
+ 136 0124 4878 0001 		pea 1.w
+ 137 0128 2F2E 000C 		move.l 12(%fp),-(%sp)
+ 138 012c 2F2E 0008 		move.l 8(%fp),-(%sp)
+ 139 0130 6100 FEEA 		jbsr match
+ 140 0134 4880      		ext.w %d0
+ 141 0136 48C0      		ext.l %d0
+ 142 0138 4E5E      		unlk %fp
+ 143 013a 4E75      		rts
+ 144               		.size	matchit, .-matchit
+ 145               		.align	2
+ 146               		.globl	extsize
+ 147               		.type	extsize, @function
+ 148               	extsize:
+ 149 013c 4E56 0000 		link.w %fp,#0
+ 150 0140 2F02      		move.l %d2,-(%sp)
+ 151 0142 206E 0008 		move.l 8(%fp),%a0
+ 152 0146 1028 000C 		move.b 12(%a0),%d0
+ 153 014a 721F      		moveq #31,%d1
+ 154 014c C081      		and.l %d1,%d0
+ 155 014e EF88      		lsl.l #7,%d0
+ 156 0150 1228 000E 		move.b 14(%a0),%d1
+ 157 0154 743F      		moveq #63,%d2
+ 158 0156 C282      		and.l %d2,%d1
+ 159 0158 143C 000C 		move.b #12,%d2
+ 160 015c E5A9      		lsl.l %d2,%d1
+ 161 015e 8081      		or.l %d1,%d0
+ 162 0160 241F      		move.l (%sp)+,%d2
+ 163 0162 4E5E      		unlk %fp
+68K GAS  fileio.s 			page 4
+
+
+ 164 0164 4E75      		rts
+ 165               		.size	extsize, .-extsize
+ 166               		.align	2
+ 167               		.globl	setran
+ 168               		.type	setran, @function
+ 169               	setran:
+ 170 0166 4E56 FFFC 		link.w %fp,#-4
+ 171 016a 2F0A      		move.l %a2,-(%sp)
+ 172 016c 2F02      		move.l %d2,-(%sp)
+ 173 016e 246E 0008 		move.l 8(%fp),%a2
+ 174 0172 7400      		moveq #0,%d2
+ 175 0174 142A 0020 		move.b 32(%a2),%d2
+ 176 0178 2F0A      		move.l %a2,-(%sp)
+ 177 017a 61C0      		jbsr extsize
+ 178 017c 588F      		addq.l #4,%sp
+ 179 017e D480      		add.l %d0,%d2
+ 180 0180 2002      		move.l %d2,%d0
+ 181 0182 4240      		clr.w %d0
+ 182 0184 4840      		swap %d0
+ 183 0186 3D40 FFFC 		move.w %d0,-4(%fp)
+ 184 018a 3D42 FFFE 		move.w %d2,-2(%fp)
+ 185 018e 156E FFFD 		move.b -3(%fp),33(%a2)
+ 185      0021 
+ 186 0194 156E FFFE 		move.b -2(%fp),34(%a2)
+ 186      0022 
+ 187 019a 156E FFFF 		move.b -1(%fp),35(%a2)
+ 187      0023 
+ 188 01a0 242E FFF4 		move.l -12(%fp),%d2
+ 189 01a4 246E FFF8 		move.l -8(%fp),%a2
+ 190 01a8 4E5E      		unlk %fp
+ 191 01aa 4E75      		rts
+ 192               		.size	setran, .-setran
+ 193               		.align	2
+ 194               		.globl	fsize
+ 195               		.type	fsize, @function
+ 196               	fsize:
+ 197 01ac 4E56 FFFC 		link.w %fp,#-4
+ 198 01b0 48E7 3030 		movm.l #0x3030,-(%sp)
+ 199 01b4 266E 0008 		move.l 8(%fp),%a3
+ 200 01b8 246E 000C 		move.l 12(%fp),%a2
+ 201 01bc 42A7      		clr.l -(%sp)
+ 202 01be 2F0A      		move.l %a2,-(%sp)
+ 203 01c0 2F0B      		move.l %a3,-(%sp)
+ 204 01c2 6100 FE58 		jbsr match
+ 205 01c6 1600      		move.b %d0,%d3
+ 206 01c8 4FEF 000C 		lea (12,%sp),%sp
+ 207 01cc 6730      		jbeq .L32
+ 208 01ce 7400      		moveq #0,%d2
+ 209 01d0 142A 000F 		move.b 15(%a2),%d2
+ 210 01d4 2F0A      		move.l %a2,-(%sp)
+ 211 01d6 6100 FF64 		jbsr extsize
+ 212 01da 588F      		addq.l #4,%sp
+ 213 01dc D480      		add.l %d0,%d2
+ 214 01de 2002      		move.l %d2,%d0
+ 215 01e0 4240      		clr.w %d0
+ 216 01e2 4840      		swap %d0
+ 217 01e4 3D40 FFFC 		move.w %d0,-4(%fp)
+68K GAS  fileio.s 			page 5
+
+
+ 218 01e8 3D42 FFFE 		move.w %d2,-2(%fp)
+ 219 01ec 176E FFFD 		move.b -3(%fp),33(%a3)
+ 219      0021 
+ 220 01f2 176E FFFE 		move.b -2(%fp),34(%a3)
+ 220      0022 
+ 221 01f8 176E FFFF 		move.b -1(%fp),35(%a3)
+ 221      0023 
+ 222               	.L32:
+ 223 01fe 1003      		move.b %d3,%d0
+ 224 0200 4880      		ext.w %d0
+ 225 0202 48C0      		ext.l %d0
+ 226 0204 4CEE 0C0C 		movm.l -20(%fp),#0xc0c
+ 226      FFEC 
+ 227 020a 4E5E      		unlk %fp
+ 228 020c 4E75      		rts
+ 229               		.size	fsize, .-fsize
+ 230               		.align	2
+ 231               		.globl	getsize
+ 232               		.type	getsize, @function
+ 233               	getsize:
+ 234 020e 4E56 FFF8 		link.w %fp,#-8
+ 235 0212 2F0A      		move.l %a2,-(%sp)
+ 236 0214 2F02      		move.l %d2,-(%sp)
+ 237 0216 246E 0008 		move.l 8(%fp),%a2
+ 238 021a 426E FFFC 		clr.w -4(%fp)
+ 239 021e 426E FFFE 		clr.w -2(%fp)
+ 240 0222 426E FFF8 		clr.w -8(%fp)
+ 241 0226 426E FFFA 		clr.w -6(%fp)
+ 242 022a 7400      		moveq #0,%d2
+ 243 022c 4240      		clr.w %d0
+ 244 022e 6026      		jbra .L36
+ 245               	.L37:
+ 246 0230 1D6A 0021 		move.b 33(%a2),-7(%fp)
+ 246      FFF9 
+ 247 0236 1D6A 0022 		move.b 34(%a2),-6(%fp)
+ 247      FFFA 
+ 248 023c 1D6A 0023 		move.b 35(%a2),-5(%fp)
+ 248      FFFB 
+ 249 0242 322E FFF8 		move.w -8(%fp),%d1
+ 250 0246 3001      		move.w %d1,%d0
+ 251 0248 4840      		swap %d0
+ 252 024a 302E FFFA 		mov.w -6(%fp),%d0
+ 253 024e B082      		cmp.l %d2,%d0
+ 254 0250 6F02      		jble .L38
+ 255 0252 2400      		move.l %d0,%d2
+ 256               	.L38:
+ 257 0254 7001      		moveq #1,%d0
+ 258               	.L36:
+ 259 0256 7201      		moveq #1,%d1
+ 260 0258 C280      		and.l %d0,%d1
+ 261 025a 2F01      		move.l %d1,-(%sp)
+ 262 025c 2F0A      		move.l %a2,-(%sp)
+ 263 025e 487A FF4C 		pea fsize
+ 264 0262 4EB9 0000 		jbsr dirscan
+ 264      0000 
+ 265 0268 4FEF 000C 		lea (12,%sp),%sp
+ 266 026c 0C40 00FE 		cmp.w #254,%d0
+68K GAS  fileio.s 			page 6
+
+
+ 267 0270 63BE      		jbls .L37
+ 268 0272 2002      		move.l %d2,%d0
+ 269 0274 4240      		clr.w %d0
+ 270 0276 4840      		swap %d0
+ 271 0278 3D40 FFFC 		move.w %d0,-4(%fp)
+ 272 027c 3D42 FFFE 		move.w %d2,-2(%fp)
+ 273 0280 156E FFFD 		move.b -3(%fp),33(%a2)
+ 273      0021 
+ 274 0286 156E FFFE 		move.b -2(%fp),34(%a2)
+ 274      0022 
+ 275 028c 156E FFFF 		move.b -1(%fp),35(%a2)
+ 275      0023 
+ 276 0292 242E FFF0 		move.l -16(%fp),%d2
+ 277 0296 246E FFF4 		move.l -12(%fp),%a2
+ 278 029a 4E5E      		unlk %fp
+ 279 029c 4E75      		rts
+ 280               		.size	getsize, .-getsize
+ 281               		.align	2
+ 282               		.globl	set_attr
+ 283               		.type	set_attr, @function
+ 284               	set_attr:
+ 285 029e 4E56 0000 		link.w %fp,#0
+ 286 02a2 48E7 3030 		movm.l #0x3030,-(%sp)
+ 287 02a6 266E 0008 		move.l 8(%fp),%a3
+ 288 02aa 246E 000C 		move.l 12(%fp),%a2
+ 289 02ae 342E 0012 		move.w 18(%fp),%d2
+ 290 02b2 42A7      		clr.l -(%sp)
+ 291 02b4 2F0A      		move.l %a2,-(%sp)
+ 292 02b6 2F0B      		move.l %a3,-(%sp)
+ 293 02b8 6100 FD62 		jbsr match
+ 294 02bc 1600      		move.b %d0,%d3
+ 295 02be 4FEF 000C 		lea (12,%sp),%sp
+ 296 02c2 6720      		jbeq .L42
+ 297 02c4 4878 000B 		pea 11.w
+ 298 02c8 486A 0001 		pea 1(%a2)
+ 299 02cc 486B 0001 		pea 1(%a3)
+ 300 02d0 6100 FD2E 		jbsr move
+ 301 02d4 E442      		asr.w #2,%d2
+ 302 02d6 3042      		move.w %d2,%a0
+ 303 02d8 2F08      		move.l %a0,-(%sp)
+ 304 02da 4EB9 0000 		jbsr dir_wr
+ 304      0000 
+ 305 02e0 4FEF 0010 		lea (16,%sp),%sp
+ 306               	.L42:
+ 307 02e4 1003      		move.b %d3,%d0
+ 308 02e6 4880      		ext.w %d0
+ 309 02e8 48C0      		ext.l %d0
+ 310 02ea 4CEE 0C0C 		movm.l -16(%fp),#0xc0c
+ 310      FFF0 
+ 311 02f0 4E5E      		unlk %fp
+ 312 02f2 4E75      		rts
+ 313               		.size	set_attr, .-set_attr
+ 314               		.align	2
+ 315               		.globl	create
+ 316               		.type	create, @function
+ 317               	create:
+ 318 02f4 4E56 0000 		link.w %fp,#0
+68K GAS  fileio.s 			page 7
+
+
+ 319 02f8 48E7 3020 		movm.l #0x3020,-(%sp)
+ 320 02fc 246E 0008 		move.l 8(%fp),%a2
+ 321 0300 226E 000C 		move.l 12(%fp),%a1
+ 322 0304 342E 0012 		move.w 18(%fp),%d2
+ 323 0308 0C11 FFE5 		cmp.b #-27,(%a1)
+ 324 030c 57C3      		seq %d3
+ 325 030e 4403      		neg.b %d3
+ 326 0310 675E      		jbeq .L46
+ 327 0312 41EA 000F 		lea (15,%a2),%a0
+ 328 0316 7011      		moveq #17,%d0
+ 329               	.L48:
+ 330 0318 4218      		clr.b (%a0)+
+ 331 031a 5340      		subq.w #1,%d0
+ 332 031c 66FA      		jbne .L48
+ 333 031e 4878 0020 		pea 32.w
+ 334 0322 2F09      		move.l %a1,-(%sp)
+ 335 0324 2F0A      		move.l %a2,-(%sp)
+ 336 0326 6100 FCD8 		jbsr move
+ 337 032a 3002      		move.w %d2,%d0
+ 338 032c E440      		asr.w #2,%d0
+ 339 032e 3040      		move.w %d0,%a0
+ 340 0330 2F08      		move.l %a0,-(%sp)
+ 341 0332 4EB9 0000 		jbsr dir_wr
+ 341      0000 
+ 342 0338 3239 0000 		move.w gbls+10,%d1
+ 342      0000 
+ 343 033e 3001      		move.w %d1,%d0
+ 344 0340 4840      		swap %d0
+ 345 0342 3039 0000 		mov.w gbls+12,%d0
+ 345      0000 
+ 346 0348 2240      		move.l %d0,%a1
+ 347 034a 3042      		move.w %d2,%a0
+ 348 034c 7000      		moveq #0,%d0
+ 349 034e 3029 0004 		move.w 4(%a1),%d0
+ 350 0352 4FEF 0010 		lea (16,%sp),%sp
+ 351 0356 B088      		cmp.l %a0,%d0
+ 352 0358 6C04      		jbge .L50
+ 353 035a 3342 0004 		move.w %d2,4(%a1)
+ 354               	.L50:
+ 355 035e 7200      		moveq #0,%d1
+ 356 0360 1239 0000 		move.b gbls+6,%d1
+ 356      0000 
+ 357 0366 7001      		moveq #1,%d0
+ 358 0368 E3A8      		lsl.l %d1,%d0
+ 359 036a 8179 0000 		or.w %d0,crit_dsk
+ 359      0000 
+ 360               	.L46:
+ 361 0370 1003      		move.b %d3,%d0
+ 362 0372 4880      		ext.w %d0
+ 363 0374 48C0      		ext.l %d0
+ 364 0376 4CEE 040C 		movm.l -12(%fp),#0x40c
+ 364      FFF4 
+ 365 037c 4E5E      		unlk %fp
+ 366 037e 4E75      		rts
+ 367               		.size	create, .-create
+ 368               		.align	2
+ 369               		.globl	rename
+68K GAS  fileio.s 			page 8
+
+
+ 370               		.type	rename, @function
+ 371               	rename:
+ 372 0380 4E56 0000 		link.w %fp,#0
+ 373 0384 48E7 3030 		movm.l #0x3030,-(%sp)
+ 374 0388 246E 0008 		move.l 8(%fp),%a2
+ 375 038c 266E 000C 		move.l 12(%fp),%a3
+ 376 0390 342E 0012 		move.w 18(%fp),%d2
+ 377 0394 42A7      		clr.l -(%sp)
+ 378 0396 2F0B      		move.l %a3,-(%sp)
+ 379 0398 2F0A      		move.l %a2,-(%sp)
+ 380 039a 6100 FC80 		jbsr match
+ 381 039e 1600      		move.b %d0,%d3
+ 382 03a0 4FEF 000C 		lea (12,%sp),%sp
+ 383 03a4 6738      		jbeq .L56
+ 384 03a6 4A2B 0009 		tst.b 9(%a3)
+ 385 03aa 6C0E      		jbge .L58
+ 386 03ac 3042      		move.w %d2,%a0
+ 387 03ae 2F08      		move.l %a0,-(%sp)
+ 388 03b0 2F0A      		move.l %a2,-(%sp)
+ 389 03b2 4EB9 0000 		jbsr ro_err
+ 389      0000 
+ 390 03b8 508F      		addq.l #8,%sp
+ 391               	.L58:
+ 392 03ba 43EA 0011 		lea (17,%a2),%a1
+ 393 03be 41EB 0001 		lea (1,%a3),%a0
+ 394 03c2 700B      		moveq #11,%d0
+ 395               	.L60:
+ 396 03c4 1219      		move.b (%a1)+,%d1
+ 397 03c6 0201 007F 		and.b #127,%d1
+ 398 03ca 10C1      		move.b %d1,(%a0)+
+ 399 03cc 5340      		subq.w #1,%d0
+ 400 03ce 66F4      		jbne .L60
+ 401 03d0 E442      		asr.w #2,%d2
+ 402 03d2 3042      		move.w %d2,%a0
+ 403 03d4 2F08      		move.l %a0,-(%sp)
+ 404 03d6 4EB9 0000 		jbsr dir_wr
+ 404      0000 
+ 405 03dc 588F      		addq.l #4,%sp
+ 406               	.L56:
+ 407 03de 1003      		move.b %d3,%d0
+ 408 03e0 4880      		ext.w %d0
+ 409 03e2 48C0      		ext.l %d0
+ 410 03e4 4CEE 0C0C 		movm.l -16(%fp),#0xc0c
+ 410      FFF0 
+ 411 03ea 4E5E      		unlk %fp
+ 412 03ec 4E75      		rts
+ 413               		.size	rename, .-rename
+ 414               		.align	2
+ 415               		.globl	delete
+ 416               		.type	delete, @function
+ 417               	delete:
+ 418 03ee 4E56 0000 		link.w %fp,#0
+ 419 03f2 48E7 3820 		movm.l #0x3820,-(%sp)
+ 420 03f6 262E 0008 		move.l 8(%fp),%d3
+ 421 03fa 246E 000C 		move.l 12(%fp),%a2
+ 422 03fe 342E 0012 		move.w 18(%fp),%d2
+ 423 0402 42A7      		clr.l -(%sp)
+68K GAS  fileio.s 			page 9
+
+
+ 424 0404 2F0A      		move.l %a2,-(%sp)
+ 425 0406 2F03      		move.l %d3,-(%sp)
+ 426 0408 6100 FC12 		jbsr match
+ 427 040c 1800      		move.b %d0,%d4
+ 428 040e 4FEF 000C 		lea (12,%sp),%sp
+ 429 0412 6700 0086 		jbeq .L66
+ 430 0416 4A2A 0009 		tst.b 9(%a2)
+ 431 041a 6C0E      		jbge .L68
+ 432 041c 3042      		move.w %d2,%a0
+ 433 041e 2F08      		move.l %a0,-(%sp)
+ 434 0420 2F03      		move.l %d3,-(%sp)
+ 435 0422 4EB9 0000 		jbsr ro_err
+ 435      0000 
+ 436 0428 508F      		addq.l #8,%sp
+ 437               	.L68:
+ 438 042a 14BC FFE5 		move.b #-27,(%a2)
+ 439 042e E442      		asr.w #2,%d2
+ 440 0430 3042      		move.w %d2,%a0
+ 441 0432 2F08      		move.l %a0,-(%sp)
+ 442 0434 4EB9 0000 		jbsr dir_wr
+ 442      0000 
+ 443 043a 3239 0000 		move.w gbls+18,%d1
+ 443      0000 
+ 444 0440 3001      		move.w %d1,%d0
+ 445 0442 4840      		swap %d0
+ 446 0444 3039 0000 		mov.w gbls+20,%d0
+ 446      0000 
+ 447 044a 588F      		addq.l #4,%sp
+ 448 044c 2040      		move.l %d0,%a0
+ 449 044e 0C68 00FF 		cmp.w #255,6(%a0)
+ 449      0006 
+ 450 0454 621E      		jbhi .L70
+ 451 0456 45EA 001F 		lea (31,%a2),%a2
+ 452 045a 7410      		moveq #16,%d2
+ 453               	.L72:
+ 454 045c 5342      		subq.w #1,%d2
+ 455 045e 7000      		moveq #0,%d0
+ 456 0460 1012      		move.b (%a2),%d0
+ 457 0462 2F00      		move.l %d0,-(%sp)
+ 458 0464 4EB9 0000 		jbsr clraloc
+ 458      0000 
+ 459 046a 538A      		subq.l #1,%a2
+ 460 046c 588F      		addq.l #4,%sp
+ 461 046e 4A42      		tst.w %d2
+ 462 0470 6728      		jbeq .L66
+ 463 0472 60E8      		jbra .L72
+ 464               	.L70:
+ 465 0474 45EA 001E 		lea (30,%a2),%a2
+ 466 0478 7408      		moveq #8,%d2
+ 467               	.L73:
+ 468 047a 5342      		subq.w #1,%d2
+ 469 047c 7000      		moveq #0,%d0
+ 470 047e 3012      		move.w (%a2),%d0
+ 471 0480 2F00      		move.l %d0,-(%sp)
+ 472 0482 4EB9 0000 		jbsr swap
+ 472      0000 
+ 473 0488 3F00      		move.w %d0,-(%sp)
+68K GAS  fileio.s 			page 10
+
+
+ 474 048a 4267      		clr.w -(%sp)
+ 475 048c 4EB9 0000 		jbsr clraloc
+ 475      0000 
+ 476 0492 558A      		subq.l #2,%a2
+ 477 0494 508F      		addq.l #8,%sp
+ 478 0496 4A42      		tst.w %d2
+ 479 0498 66E0      		jbne .L73
+ 480               	.L66:
+ 481 049a 1004      		move.b %d4,%d0
+ 482 049c 4880      		ext.w %d0
+ 483 049e 48C0      		ext.l %d0
+ 484 04a0 4CEE 041C 		movm.l -16(%fp),#0x41c
+ 484      FFF0 
+ 485 04a6 4E5E      		unlk %fp
+ 486 04a8 4E75      		rts
+ 487               		.size	delete, .-delete
+ 488               		.align	2
+ 489               		.globl	close
+ 490               		.type	close, @function
+ 491               	close:
+ 492 04aa 4E56 0000 		link.w %fp,#0
+ 493 04ae 48E7 3038 		movm.l #0x3038,-(%sp)
+ 494 04b2 266E 0008 		move.l 8(%fp),%a3
+ 495 04b6 246E 000C 		move.l 12(%fp),%a2
+ 496 04ba 362E 0012 		move.w 18(%fp),%d3
+ 497 04be 4878 0001 		pea 1.w
+ 498 04c2 2F0A      		move.l %a2,-(%sp)
+ 499 04c4 2F0B      		move.l %a3,-(%sp)
+ 500 04c6 6100 FB54 		jbsr match
+ 501 04ca 4FEF 000C 		lea (12,%sp),%sp
+ 502 04ce 4A00      		tst.b %d0
+ 503 04d0 6700 00DE 		jbeq .L106
+ 504 04d4 41EB 0010 		lea (16,%a3),%a0
+ 505 04d8 43EA 0010 		lea (16,%a2),%a1
+ 506 04dc 3239 0000 		move.w gbls+18,%d1
+ 506      0000 
+ 507 04e2 3001      		move.w %d1,%d0
+ 508 04e4 4840      		swap %d0
+ 509 04e6 3039 0000 		mov.w gbls+20,%d0
+ 509      0000 
+ 510 04ec 2840      		move.l %d0,%a4
+ 511 04ee 0C6C 00FF 		cmp.w #255,6(%a4)
+ 511      0006 
+ 512 04f4 6226      		jbhi .L81
+ 513 04f6 7410      		moveq #16,%d2
+ 514               	.L83:
+ 515 04f8 1011      		move.b (%a1),%d0
+ 516 04fa 6710      		jbeq .L84
+ 517 04fc 1210      		move.b (%a0),%d1
+ 518 04fe 6708      		jbeq .L86
+ 519 0500 B200      		cmp.b %d0,%d1
+ 520 0502 670A      		jbeq .L89
+ 521 0504 6000 0098 		jbra .L88
+ 522               	.L86:
+ 523 0508 1080      		move.b %d0,(%a0)
+ 524 050a 6002      		jbra .L89
+ 525               	.L84:
+68K GAS  fileio.s 			page 11
+
+
+ 526 050c 1290      		move.b (%a0),(%a1)
+ 527               	.L89:
+ 528 050e 0C42 0001 		cmp.w #1,%d2
+ 529 0512 672C      		jbeq .L90
+ 530 0514 5288      		addq.l #1,%a0
+ 531 0516 5289      		addq.l #1,%a1
+ 532 0518 5342      		subq.w #1,%d2
+ 533 051a 60DC      		jbra .L83
+ 534               	.L81:
+ 535 051c 7408      		moveq #8,%d2
+ 536               	.L92:
+ 537 051e 3011      		move.w (%a1),%d0
+ 538 0520 670E      		jbeq .L93
+ 539 0522 3210      		move.w (%a0),%d1
+ 540 0524 6706      		jbeq .L95
+ 541 0526 B240      		cmp.w %d0,%d1
+ 542 0528 6708      		jbeq .L97
+ 543 052a 6072      		jbra .L88
+ 544               	.L95:
+ 545 052c 3080      		move.w %d0,(%a0)
+ 546 052e 6002      		jbra .L97
+ 547               	.L93:
+ 548 0530 3290      		move.w (%a0),(%a1)
+ 549               	.L97:
+ 550 0532 0C42 0001 		cmp.w #1,%d2
+ 551 0536 6708      		jbeq .L90
+ 552 0538 5488      		addq.l #2,%a0
+ 553 053a 5489      		addq.l #2,%a1
+ 554 053c 5342      		subq.w #1,%d2
+ 555 053e 60DE      		jbra .L92
+ 556               	.L90:
+ 557 0540 2F0B      		move.l %a3,-(%sp)
+ 558 0542 4EB9 0000 		jbsr calcext
+ 558      0000 
+ 559 0548 122A 000C 		move.b 12(%a2),%d1
+ 560 054c 0241 001F 		and.w #31,%d1
+ 561 0550 588F      		addq.l #4,%sp
+ 562 0552 B240      		cmp.w %d0,%d1
+ 563 0554 650C      		jbcs .L99
+ 564 0556 6614      		jbne .L101
+ 565 0558 122B 000F 		move.b 15(%a3),%d1
+ 566 055c B22A 000F 		cmp.b 15(%a2),%d1
+ 567 0560 630A      		jbls .L101
+ 568               	.L99:
+ 569 0562 156B 000F 		move.b 15(%a3),15(%a2)
+ 569      000F 
+ 570 0568 1540 000C 		move.b %d0,12(%a2)
+ 571               	.L101:
+ 572 056c 156B 000D 		move.b 13(%a3),13(%a2)
+ 572      000D 
+ 573 0572 4A2A 0009 		tst.b 9(%a2)
+ 574 0576 6C0E      		jbge .L103
+ 575 0578 3043      		move.w %d3,%a0
+ 576 057a 2F08      		move.l %a0,-(%sp)
+ 577 057c 2F0B      		move.l %a3,-(%sp)
+ 578 057e 4EB9 0000 		jbsr ro_err
+ 578      0000 
+68K GAS  fileio.s 			page 12
+
+
+ 579 0584 508F      		addq.l #8,%sp
+ 580               	.L103:
+ 581 0586 022A 007F 		and.b #127,11(%a2)
+ 581      000B 
+ 582 058c E443      		asr.w #2,%d3
+ 583 058e 3843      		move.w %d3,%a4
+ 584 0590 2F0C      		move.l %a4,-(%sp)
+ 585 0592 4EB9 0000 		jbsr dir_wr
+ 585      0000 
+ 586 0598 7001      		moveq #1,%d0
+ 587 059a 588F      		addq.l #4,%sp
+ 588 059c 6014      		jbra .L80
+ 589               	.L88:
+ 590 059e 7200      		moveq #0,%d1
+ 591 05a0 1239 0000 		move.b gbls+6,%d1
+ 591      0000 
+ 592 05a6 7001      		moveq #1,%d0
+ 593 05a8 E3A8      		lsl.l %d1,%d0
+ 594 05aa 8179 0000 		or.w %d0,ro_dsk
+ 594      0000 
+ 595               	.L106:
+ 596 05b0 7000      		moveq #0,%d0
+ 597               	.L80:
+ 598 05b2 4CEE 1C0C 		movm.l -20(%fp),#0x1c0c
+ 598      FFEC 
+ 599 05b8 4E5E      		unlk %fp
+ 600 05ba 4E75      		rts
+ 601               		.size	close, .-close
+ 602               		.align	2
+ 603               		.globl	flushit
+ 604               		.type	flushit, @function
+ 605               	flushit:
+ 606 05bc 4E56 FFEC 		link.w %fp,#-20
+ 607 05c0 2F02      		move.l %d2,-(%sp)
+ 608 05c2 1D7C 0003 		move.b #3,-18(%fp)
+ 608      FFEE 
+ 609 05c8 6010      		jbra .L108
+ 610               	.L109:
+ 611 05ca 4878 0001 		pea 1.w
+ 612 05ce 4EB9 0000 		jbsr error
+ 612      0000 
+ 613 05d4 588F      		addq.l #4,%sp
+ 614 05d6 4A40      		tst.w %d0
+ 615 05d8 6610      		jbne .L110
+ 616               	.L108:
+ 617 05da 486E FFEE 		pea -18(%fp)
+ 618 05de 4EB9 0000 		jbsr do_phio
+ 618      0000 
+ 619 05e4 3400      		move.w %d0,%d2
+ 620 05e6 588F      		addq.l #4,%sp
+ 621 05e8 66E0      		jbne .L109
+ 622               	.L110:
+ 623 05ea 7000      		moveq #0,%d0
+ 624 05ec 3002      		move.w %d2,%d0
+ 625 05ee 242E FFE8 		move.l -24(%fp),%d2
+ 626 05f2 4E5E      		unlk %fp
+ 627 05f4 4E75      		rts
+68K GAS  fileio.s 			page 13
+
+
+ 628               		.size	flushit, .-flushit
+ 629               		.align	2
+ 630               		.globl	close_fi
+ 631               		.type	close_fi, @function
+ 632               	close_fi:
+ 633 05f6 4E56 0000 		link.w %fp,#0
+ 634 05fa 2F0A      		move.l %a2,-(%sp)
+ 635 05fc 246E 0008 		move.l 8(%fp),%a2
+ 636 0600 61BA      		jbsr flushit
+ 637 0602 4A2A 000E 		tst.b 14(%a2)
+ 638 0606 6C04      		jbge .L113
+ 639 0608 7000      		moveq #0,%d0
+ 640 060a 6018      		jbra .L115
+ 641               	.L113:
+ 642 060c 42A7      		clr.l -(%sp)
+ 643 060e 2F0A      		move.l %a2,-(%sp)
+ 644 0610 487A FE98 		pea close
+ 645 0614 4EB9 0000 		jbsr dirscan
+ 645      0000 
+ 646 061a 0280 0000 		and.l #65535,%d0
+ 646      FFFF 
+ 647 0620 4FEF 000C 		lea (12,%sp),%sp
+ 648               	.L115:
+ 649 0624 246E FFFC 		move.l -4(%fp),%a2
+ 650 0628 4E5E      		unlk %fp
+ 651 062a 4E75      		rts
+ 652               		.size	close_fi, .-close_fi
+ 653               		.align	2
+ 654               		.globl	seldsk
+ 655               		.type	seldsk, @function
+ 656               	seldsk:
+ 657 062c 4E56 FFEC 		link.w %fp,#-20
+ 658 0630 48E7 3800 		movm.l #0x3800,-(%sp)
+ 659 0634 242E 0008 		move.l 8(%fp),%d2
+ 660 0638 1202      		move.b %d2,%d1
+ 661 063a 7800      		moveq #0,%d4
+ 662 063c 1802      		move.b %d2,%d4
+ 663 063e 7000      		moveq #0,%d0
+ 664 0640 3039 0000 		move.w log_dsk,%d0
+ 664      0000 
+ 665 0646 E8A0      		asr.l %d4,%d0
+ 666 0648 1600      		move.b %d0,%d3
+ 667 064a 4603      		not.b %d3
+ 668 064c 0203 0001 		and.b #1,%d3
+ 669 0650 B439 0000 		cmp.b gbls+6.l,%d2
+ 669      0000 
+ 670 0656 6606      		jbne .L118
+ 671 0658 4A03      		tst.b %d3
+ 672 065a 6700 014C 		jbeq .L132
+ 673               	.L118:
+ 674 065e 422E FFEC 		clr.b -20(%fp)
+ 675 0662 1D42 FFEF 		move.b %d2,-17(%fp)
+ 676 0666 13C2 0000 		move.b %d2,gbls+6
+ 676      0000 
+ 677 066c 0C01 000F 		cmp.b #15,%d1
+ 678 0670 630C      		jbls .L121
+ 679 0672 4878 0002 		pea 2.w
+68K GAS  fileio.s 			page 14
+
+
+ 680 0676 4EB9 0000 		jbsr error
+ 680      0000 
+ 681 067c 588F      		addq.l #4,%sp
+ 682               	.L121:
+ 683 067e 1003      		move.b %d3,%d0
+ 684 0680 0A00 0001 		eor.b #1,%d0
+ 685 0684 1D40 FFED 		move.b %d0,-19(%fp)
+ 686               	.L123:
+ 687 0688 486E FFEC 		pea -20(%fp)
+ 688 068c 4EB9 0000 		jbsr do_phio
+ 688      0000 
+ 689 0692 306E FFFA 		move.w -6(%fp),%a0
+ 690 0696 3208      		move.w %a0,%d1
+ 691 0698 4841      		swap %d1
+ 692 069a 322E FFFC 		mov.w -4(%fp),%d1
+ 693 069e 2001      		move.l %d1,%d0
+ 694 06a0 4240      		clr.w %d0
+ 695 06a2 4840      		swap %d0
+ 696 06a4 33C0 0000 		move.w %d0,gbls+10
+ 696      0000 
+ 697 06aa 33C1 0000 		move.w %d1,gbls+12
+ 697      0000 
+ 698 06b0 588F      		addq.l #4,%sp
+ 699 06b2 4A81      		tst.l %d1
+ 700 06b4 6610      		jbne .L124
+ 701 06b6 4878 0003 		pea 3.w
+ 702 06ba 4EB9 0000 		jbsr error
+ 702      0000 
+ 703 06c0 588F      		addq.l #4,%sp
+ 704 06c2 4A40      		tst.w %d0
+ 705 06c4 67C2      		jbeq .L123
+ 706               	.L124:
+ 707 06c6 3239 0000 		move.w gbls+10,%d1
+ 707      0000 
+ 708 06cc 3001      		move.w %d1,%d0
+ 709 06ce 4840      		swap %d0
+ 710 06d0 3039 0000 		mov.w gbls+12,%d0
+ 710      0000 
+ 711 06d6 2040      		move.l %d0,%a0
+ 712 06d8 3268 000A 		move.w 10(%a0),%a1
+ 713 06dc 3209      		move.w %a1,%d1
+ 714 06de 4841      		swap %d1
+ 715 06e0 3228 000C 		mov.w 12(%a0),%d1
+ 716 06e4 2001      		move.l %d1,%d0
+ 717 06e6 4240      		clr.w %d0
+ 718 06e8 4840      		swap %d0
+ 719 06ea 33C0 0000 		move.w %d0,gbls+14
+ 719      0000 
+ 720 06f0 33C1 0000 		move.w %d1,gbls+16
+ 720      0000 
+ 721 06f6 3028 000E 		move.w 14(%a0),%d0
+ 722 06fa 3200      		move.w %d0,%d1
+ 723 06fc 4841      		swap %d1
+ 724 06fe 3228 0010 		mov.w 16(%a0),%d1
+ 725 0702 2001      		move.l %d1,%d0
+ 726 0704 4240      		clr.w %d0
+ 727 0706 4840      		swap %d0
+68K GAS  fileio.s 			page 15
+
+
+ 728 0708 33C0 0000 		move.w %d0,gbls+18
+ 728      0000 
+ 729 070e 33C1 0000 		move.w %d1,gbls+20
+ 729      0000 
+ 730 0714 4A03      		tst.b %d3
+ 731 0716 6700 0090 		jbeq .L132
+ 732 071a 2041      		move.l %d1,%a0
+ 733 071c 3428 0006 		move.w 6(%a0),%d2
+ 734               	.L127:
+ 735 0720 3242      		move.w %d2,%a1
+ 736 0722 2F09      		move.l %a1,-(%sp)
+ 737 0724 4EB9 0000 		jbsr clraloc
+ 737      0000 
+ 738 072a 588F      		addq.l #4,%sp
+ 739 072c 51CA FFF2 		dbra %d2,.L127
+ 740 0730 3239 0000 		move.w gbls+18,%d1
+ 740      0000 
+ 741 0736 3001      		move.w %d1,%d0
+ 742 0738 4840      		swap %d0
+ 743 073a 3039 0000 		mov.w gbls+20,%d0
+ 743      0000 
+ 744 0740 2040      		move.l %d0,%a0
+ 745 0742 486E FFFE 		pea -2(%fp)
+ 746 0746 1028 0003 		move.b 3(%a0),%d0
+ 747 074a E588      		lsl.l #2,%d0
+ 748 074c 0280 0000 		and.l #1020,%d0
+ 748      03FC 
+ 749 0752 2240      		move.l %d0,%a1
+ 750 0754 4869 0004 		pea 4(%a1)
+ 751 0758 7000      		moveq #0,%d0
+ 752 075a 3028 0008 		move.w 8(%a0),%d0
+ 753 075e 2040      		move.l %d0,%a0
+ 754 0760 4868 0001 		pea 1(%a0)
+ 755 0764 4EB9 0000 		jbsr udiv
+ 755      0000 
+ 756 076a 3400      		move.w %d0,%d2
+ 757 076c 4FEF 000C 		lea (12,%sp),%sp
+ 758 0770 4A6E FFFE 		tst.w -2(%fp)
+ 759 0774 6702      		jbeq .L133
+ 760 0776 5242      		addq.w #1,%d2
+ 761               	.L133:
+ 762 0778 5342      		subq.w #1,%d2
+ 763 077a 3242      		move.w %d2,%a1
+ 764 077c 2F09      		move.l %a1,-(%sp)
+ 765 077e 4EB9 0000 		jbsr setaloc
+ 765      0000 
+ 766 0784 588F      		addq.l #4,%sp
+ 767 0786 4A42      		tst.w %d2
+ 768 0788 66EE      		jbne .L133
+ 769 078a 4878 000E 		pea 14.w
+ 770 078e 42A7      		clr.l -(%sp)
+ 771 0790 487A 0174 		pea alloc
+ 772 0794 4EB9 0000 		jbsr dirscan
+ 772      0000 
+ 773 079a 7001      		moveq #1,%d0
+ 774 079c E9A8      		lsl.l %d4,%d0
+ 775 079e 8179 0000 		or.w %d0,log_dsk
+68K GAS  fileio.s 			page 16
+
+
+ 775      0000 
+ 776 07a4 4FEF 000C 		lea (12,%sp),%sp
+ 777               	.L132:
+ 778 07a8 4CEE 001C 		movm.l -32(%fp),#0x1c
+ 778      FFE0 
+ 779 07ae 4E5E      		unlk %fp
+ 780 07b0 4E75      		rts
+ 781               		.size	seldsk, .-seldsk
+ 782               		.align	2
+ 783               		.globl	free_sp
+ 784               		.type	free_sp, @function
+ 785               	free_sp:
+ 786 07b2 4E56 FFFC 		link.w %fp,#-4
+ 787 07b6 48E7 3030 		movm.l #0x3030,-(%sp)
+ 788 07ba 7000      		moveq #0,%d0
+ 789 07bc 102E 000B 		move.b 11(%fp),%d0
+ 790 07c0 2F00      		move.l %d0,-(%sp)
+ 791 07c2 6100 FE68 		jbsr seldsk
+ 792 07c6 3239 0000 		move.w gbls+10,%d1
+ 792      0000 
+ 793 07cc 3001      		move.w %d1,%d0
+ 794 07ce 4840      		swap %d0
+ 795 07d0 3039 0000 		mov.w gbls+12,%d0
+ 795      0000 
+ 796 07d6 2040      		move.l %d0,%a0
+ 797 07d8 3228 0016 		move.w 22(%a0),%d1
+ 798 07dc 3001      		move.w %d1,%d0
+ 799 07de 4840      		swap %d0
+ 800 07e0 3028 0018 		mov.w 24(%a0),%d0
+ 801 07e4 2640      		move.l %d0,%a3
+ 802 07e6 3239 0000 		move.w gbls+18,%d1
+ 802      0000 
+ 803 07ec 3001      		move.w %d1,%d0
+ 804 07ee 4840      		swap %d0
+ 805 07f0 3039 0000 		mov.w gbls+20,%d0
+ 805      0000 
+ 806 07f6 2440      		move.l %d0,%a2
+ 807 07f8 7400      		moveq #0,%d2
+ 808 07fa 342A 0006 		move.w 6(%a2),%d2
+ 809 07fe 4243      		clr.w %d3
+ 810 0800 93C9      		sub.l %a1,%a1
+ 811 0802 4241      		clr.w %d1
+ 812 0804 91C8      		sub.l %a0,%a0
+ 813 0806 588F      		addq.l #4,%sp
+ 814 0808 6020      		jbra .L140
+ 815               	.L141:
+ 816 080a 4A41      		tst.w %d1
+ 817 080c 6608      		jbne .L142
+ 818 080e 361B      		move.w (%a3)+,%d3
+ 819 0810 4643      		not.w %d3
+ 820 0812 323C 8000 		move.w #-32768,%d1
+ 821               	.L142:
+ 822 0816 3003      		move.w %d3,%d0
+ 823 0818 C041      		and.w %d1,%d0
+ 824 081a 670A      		jbeq .L144
+ 825 081c 7000      		moveq #0,%d0
+ 826 081e 102A 0003 		move.b 3(%a2),%d0
+68K GAS  fileio.s 			page 17
+
+
+ 827 0822 43F1 0801 		lea 1(%a1,%d0.l),%a1
+ 828               	.L144:
+ 829 0826 E249      		lsr.w #1,%d1
+ 830 0828 5288      		addq.l #1,%a0
+ 831               	.L140:
+ 832 082a B488      		cmp.l %a0,%d2
+ 833 082c 6CDC      		jbge .L141
+ 834 082e 204E      		move.l %fp,%a0
+ 835 0830 2109      		move.l %a1,-(%a0)
+ 836 0832 4878 0004 		pea 4.w
+ 837 0836 3239 0000 		move.w gbls+24,%d1
+ 837      0000 
+ 838 083c 3001      		move.w %d1,%d0
+ 839 083e 4840      		swap %d0
+ 840 0840 3039 0000 		mov.w gbls+26,%d0
+ 840      0000 
+ 841 0846 2F00      		move.l %d0,-(%sp)
+ 842 0848 2F08      		move.l %a0,-(%sp)
+ 843 084a 6100 F7B4 		jbsr move
+ 844 084e 4FEF 000C 		lea (12,%sp),%sp
+ 845 0852 4CEE 0C0C 		movm.l -20(%fp),#0xc0c
+ 845      FFEC 
+ 846 0858 4E5E      		unlk %fp
+ 847 085a 4E75      		rts
+ 848               		.size	free_sp, .-free_sp
+ 849               		.align	2
+ 850               		.globl	search
+ 851               		.type	search, @function
+ 852               	search:
+ 853 085c 4E56 0000 		link.w %fp,#0
+ 854 0860 2F0A      		move.l %a2,-(%sp)
+ 855 0862 2F02      		move.l %d2,-(%sp)
+ 856 0864 246E 0008 		move.l 8(%fp),%a2
+ 857 0868 342E 000E 		move.w 14(%fp),%d2
+ 858 086c 0C12 003F 		cmp.b #63,(%a2)
+ 859 0870 6626      		jbne .L149
+ 860 0872 7000      		moveq #0,%d0
+ 861 0874 1039 0000 		move.b gbls+7,%d0
+ 861      0000 
+ 862 087a 2F00      		move.l %d0,-(%sp)
+ 863 087c 6100 FDAE 		jbsr seldsk
+ 864 0880 3F02      		move.w %d2,-(%sp)
+ 865 0882 4267      		clr.w -(%sp)
+ 866 0884 2F0A      		move.l %a2,-(%sp)
+ 867 0886 487A F88E 		pea alltrue
+ 868 088a 4EB9 0000 		jbsr dirscan
+ 868      0000 
+ 869 0890 3440      		move.w %d0,%a2
+ 870 0892 4FEF 0010 		lea (16,%sp),%sp
+ 871 0896 6032      		jbra .L151
+ 872               	.L149:
+ 873 0898 2F2E 0010 		move.l 16(%fp),-(%sp)
+ 874 089c 4EB9 0000 		jbsr tmp_sel
+ 874      0000 
+ 875 08a2 588F      		addq.l #4,%sp
+ 876 08a4 0C2A 003F 		cmp.b #63,12(%a2)
+ 876      000C 
+68K GAS  fileio.s 			page 18
+
+
+ 877 08aa 6704      		jbeq .L152
+ 878 08ac 422A 000C 		clr.b 12(%a2)
+ 879               	.L152:
+ 880 08b0 422A 000E 		clr.b 14(%a2)
+ 881 08b4 3F02      		move.w %d2,-(%sp)
+ 882 08b6 4267      		clr.w -(%sp)
+ 883 08b8 2F0A      		move.l %a2,-(%sp)
+ 884 08ba 487A F864 		pea matchit
+ 885 08be 4EB9 0000 		jbsr dirscan
+ 885      0000 
+ 886 08c4 3440      		move.w %d0,%a2
+ 887 08c6 4FEF 000C 		lea (12,%sp),%sp
+ 888               	.L151:
+ 889 08ca 4878 0080 		pea 128.w
+ 890 08ce 3239 0000 		move.w gbls+24,%d1
+ 890      0000 
+ 891 08d4 3001      		move.w %d1,%d0
+ 892 08d6 4840      		swap %d0
+ 893 08d8 3039 0000 		mov.w gbls+26,%d0
+ 893      0000 
+ 894 08de 2F00      		move.l %d0,-(%sp)
+ 895 08e0 3239 0000 		move.w gbls+14,%d1
+ 895      0000 
+ 896 08e6 3001      		move.w %d1,%d0
+ 897 08e8 4840      		swap %d0
+ 898 08ea 3039 0000 		mov.w gbls+16,%d0
+ 898      0000 
+ 899 08f0 2F00      		move.l %d0,-(%sp)
+ 900 08f2 6100 F70C 		jbsr move
+ 901 08f6 7000      		moveq #0,%d0
+ 902 08f8 300A      		move.w %a2,%d0
+ 903 08fa 242E FFF8 		move.l -8(%fp),%d2
+ 904 08fe 246E FFFC 		move.l -4(%fp),%a2
+ 905 0902 4E5E      		unlk %fp
+ 906 0904 4E75      		rts
+ 907               		.size	search, .-search
+ 908               		.align	2
+ 909               		.globl	alloc
+ 910               		.type	alloc, @function
+ 911               	alloc:
+ 912 0906 4E56 0000 		link.w %fp,#0
+ 913 090a 2F0A      		move.l %a2,-(%sp)
+ 914 090c 2F02      		move.l %d2,-(%sp)
+ 915 090e 206E 000C 		move.l 12(%fp),%a0
+ 916 0912 222E 0010 		move.l 16(%fp),%d1
+ 917 0916 0C10 000F 		cmp.b #15,(%a0)
+ 918 091a 6304      		jbls .L156
+ 919 091c 7000      		moveq #0,%d0
+ 920 091e 6076      		jbra .L158
+ 921               	.L156:
+ 922 0920 3279 0000 		move.w gbls+10,%a1
+ 922      0000 
+ 923 0926 3009      		move.w %a1,%d0
+ 924 0928 4840      		swap %d0
+ 925 092a 3039 0000 		mov.w gbls+12,%d0
+ 925      0000 
+ 926 0930 2240      		move.l %d0,%a1
+68K GAS  fileio.s 			page 19
+
+
+ 927 0932 3341 0004 		move.w %d1,4(%a1)
+ 928 0936 3239 0000 		move.w gbls+18,%d1
+ 928      0000 
+ 929 093c 3001      		move.w %d1,%d0
+ 930 093e 4840      		swap %d0
+ 931 0940 3039 0000 		mov.w gbls+20,%d0
+ 931      0000 
+ 932 0946 41E8 0010 		lea (16,%a0),%a0
+ 933 094a 2240      		move.l %d0,%a1
+ 934 094c 0C69 00FF 		cmp.w #255,6(%a1)
+ 934      0006 
+ 935 0952 621C      		jbhi .L159
+ 936 0954 2448      		move.l %a0,%a2
+ 937 0956 4242      		clr.w %d2
+ 938               	.L161:
+ 939 0958 5242      		addq.w #1,%d2
+ 940 095a 7000      		moveq #0,%d0
+ 941 095c 101A      		move.b (%a2)+,%d0
+ 942 095e 2F00      		move.l %d0,-(%sp)
+ 943 0960 4EB9 0000 		jbsr setaloc
+ 943      0000 
+ 944 0966 588F      		addq.l #4,%sp
+ 945 0968 0C42 0010 		cmp.w #16,%d2
+ 946 096c 6726      		jbeq .L162
+ 947 096e 60E8      		jbra .L161
+ 948               	.L159:
+ 949 0970 2448      		move.l %a0,%a2
+ 950 0972 4242      		clr.w %d2
+ 951               	.L163:
+ 952 0974 5242      		addq.w #1,%d2
+ 953 0976 7000      		moveq #0,%d0
+ 954 0978 301A      		move.w (%a2)+,%d0
+ 955 097a 2F00      		move.l %d0,-(%sp)
+ 956 097c 4EB9 0000 		jbsr swap
+ 956      0000 
+ 957 0982 3F00      		move.w %d0,-(%sp)
+ 958 0984 4267      		clr.w -(%sp)
+ 959 0986 4EB9 0000 		jbsr setaloc
+ 959      0000 
+ 960 098c 508F      		addq.l #8,%sp
+ 961 098e 0C42 0008 		cmp.w #8,%d2
+ 962 0992 66E0      		jbne .L163
+ 963               	.L162:
+ 964 0994 7001      		moveq #1,%d0
+ 965               	.L158:
+ 966 0996 242E FFF8 		move.l -8(%fp),%d2
+ 967 099a 246E FFFC 		move.l -4(%fp),%a2
+ 968 099e 4E5E      		unlk %fp
+ 969 09a0 4E75      		rts
+ 970               		.size	alloc, .-alloc
+ 971               		.comm	chainp,4,4
+ 972               		.ident	"GCC: (GNU) 4.1.1"
+68K GAS  fileio.s 			page 20
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 fileio.c
+                            *ABS*:00000001 RETAIL
+                            *ABS*:000109a0 M68000
+            fileio.s:7      .text:00000000 move
+            fileio.s:23     .text:0000001c match
+            fileio.s:89     .text:000000b2 openfile
+            fileio.s:125    .text:00000116 alltrue
+            fileio.s:134    .text:00000120 matchit
+            fileio.s:148    .text:0000013c extsize
+            fileio.s:169    .text:00000166 setran
+            fileio.s:196    .text:000001ac fsize
+            fileio.s:233    .text:0000020e getsize
+            fileio.s:284    .text:0000029e set_attr
+            fileio.s:317    .text:000002f4 create
+            fileio.s:371    .text:00000380 rename
+            fileio.s:417    .text:000003ee delete
+            fileio.s:491    .text:000004aa close
+            fileio.s:605    .text:000005bc flushit
+            fileio.s:632    .text:000005f6 close_fi
+            fileio.s:656    .text:0000062c seldsk
+            fileio.s:911    .text:00000906 alloc
+            fileio.s:785    .text:000007b2 free_sp
+            fileio.s:852    .text:0000085c search
+                            *COM*:00000004 chainp
+
+UNDEFINED SYMBOLS
+gbls
+crit_dsk
+dirscan
+dir_wr
+ro_err
+clraloc
+swap
+calcext
+ro_dsk
+error
+do_phio
+log_dsk
+udiv
+setaloc
+tmp_sel

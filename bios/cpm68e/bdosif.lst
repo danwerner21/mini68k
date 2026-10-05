@@ -1,0 +1,231 @@
+68K GAS  bdosif.s 			page 1
+
+
+   1               	#****************************************************************
+   2               	#                                                               *
+   3               	#       CP/M-68K Basic Disk Operating System interface module   *
+   4               	#               For "C" version of CP/M-68K                     *
+   5               	#                                                               *
+   6               	#       Copyright (c) 1982 Digital Research, Inc.               *
+   7               	#                                                               *
+   8               	#       Version 0.2 -- September 22, 1982                       *
+   9               	#                                                               *
+  10               	#****************************************************************
+  11               	
+  12               	#  Declare Public Routines
+  13               	
+  14               	        .globl  _bios1          /* 6 BIOS entry points from BDOS */
+  15               	        .globl  _bios2
+  16               	        .globl  _bios3
+  17               	        .globl  _bios4
+  18               	        .globl  _bios5
+  19               	        .globl  _bios6
+  20               	        .globl  _trap2hnd      /* trap #2 handler */
+  21               	        .globl  swap           /* byte swapper */
+  22               		.globl	bswap	       /* long word byte swapper */	
+  23               	        .globl  udiv           /* unsigned divide routine */
+  24               	
+  25               	# Declare external routines
+  26               	        .globl  __bdos          /* BDOS entry point in bdosmain */
+  27               	
+  28               	# The following external references were put in just to make sure that all
+  29               	#       the BDOS modules were referenced, so we could put them in a library
+  30               	        .globl  _constat        /* references conbdos.o */
+  31               	        .globl  _dirscan        /* references dskutil.o */
+  32               	        .globl  _create         /* references fileio.o */
+  33               	        .globl  _bdosrw         /* references bdosrw.o */
+  34               	
+  35               	        biosf   = 50
+  36               	        setsupf = 62
+  37               	
+  38               	_trap2hnd:
+  39               	#
+  40               	#       first save the registers and
+  41               	#       check for functions handled by assembly language routines
+  42               	#
+  43 0000 0C40 003E 	        cmpi.w  #setsupf,%d0
+  44 0004 6700 0034 	        beq     setsup
+  45 0008 48E7 7FFE 	        movem.l %d1-%d7/%a0-%a6,-(%sp)
+  46 000c 0C40 0032 	        cmpi.w  #biosf,%d0
+  47 0010 6700 001A 	        beq     bioscall
+  48               	#
+  49               	#       function number is passed in D0
+  50               	#       byte and word pararmeters are passed in D1.W
+  51               	#       address parameters are passed in D1.L
+  52               	#
+  53 0014 2F01      	        move.l  %d1,-(%sp)
+  54               	#jrc      move.w  %d1,-(%sp)
+  55 0016 2F01      	        move.l  %d1,-(%sp)
+  56               	#jrc      move.w  %d0,-(%sp)
+  57 0018 2F00      	        move.l  %d0,-(%sp)
+68K GAS  bdosif.s 			page 2
+
+
+  58 001a 4EB9 0000 	        jsr     __bdos                  /* call BDOS */
+  58      0000 
+  59               	#
+  60               	#       now restore the regs
+  61               	#
+  62 0020 48C0      	        ext.l   %d0
+  63               	###	addq.l   #8,%sp                   /* fix up the stack */
+  64 0022 4FEF 000C 		lea.l	12(%sp),%sp		/* fix up the stack */
+  65               	bdone:
+  66 0026 4CDF 7FFE 	        movem.l (%sp)+,%a0-%a6/%d1-%d7
+  67 002a 4E73      	        rte                             /* return from trap call */
+  68               	
+  69               	#
+  70               	# direct BIOS call function
+  71               	#
+  72               	bioscall:
+  73 002c 2041      	        move.l  %d1,%a0           /* get address of CPB */
+  74               	###        move.w  (%a0)+,%d0
+  75 002e 2018      	        move.l  (%a0)+,%d0
+  76 0030 4CD8 0006 	        movem.l (%a0)+,%d1-%d2
+  77 0034 4E43      	        trap    #3
+  78 0036 6000 FFEE 	        bra     bdone
+  79               	
+  80               	#
+  81               	# Set supervisor mode procedure
+  82               	#
+  83               	setsup:
+  84 003a 0057 2000 	        ori.w   #0x2000,(%sp)     /* turn on supervisor bit in SR in the stack */
+  85 003e 4E73      	        rte
+  86               	
+  87               	#
+  88               	# BIOS Interface Routines
+  89               	#
+  90               	#
+  91               	#  Note - there are 6 BIOS entry points from the BDOS, labelled BIOS1 -
+  92               	#    BIOS6, depending on the parameters passed.
+  93               	#
+  94               	#  Alcyon C did not save D2, so all the old offsets below are off
+  95               	#  GCC requires D2 to be saved
+  96               	#
+  97               	.if 0
+  98               	_bios5:
+  99               	# For BIOS functions sectran and set exception vector
+ 100               	# Has function number and 2 parameters, a word followed by a long word
+ 101               	###	move.l  8(%sp),%d2        /* get 2nd parameter (long word) */
+ 102               		move.l  12(%sp),%d2        /* get 2nd parameter (long word) */
+ 103               	        bra     _bios2          /* join common routine */
+ 104               	
+ 105               	_bios4:
+ 106               	# For BIOS function seldsk
+ 107               	# Has function number followed by 2 word parameters
+ 108               	###	move.w  8(%sp),%d2        /* get 2nd parameter (word) */
+ 109               		move.l  12(%sp),%d2        /* get 2nd parameter (word) */
+ 110               	        bra     _bios2          /* join common routine */
+ 111               	
+ 112               	_bios3:
+ 113               	# For BIOS function set dma
+68K GAS  bdosif.s 			page 3
+
+
+ 114               	# Has function number followed by 1 long parameter
+ 115               	###	move.l  6(%sp),%d1        /* get long word parameter */
+ 116               		move.l  8(%sp),%d1        /* get long word parameter */
+ 117               	        bra     _bios1          /* join common routine */
+ 118               	
+ 119               	_bios2:
+ 120               	# For all BIOS functions with a word parameter
+ 121               	# Word parameter follows function number
+ 122               	###	move.w  6(%sp),%d1        /* get 1st parameter (word) */
+ 123               		move.l  8(%sp),%d1        /* get 1st parameter (word) */
+ 124               	
+ 125               	_bios6:
+ 126               	_bios1:
+ 127               	# For all BIOS functions that have no parameter other than function number
+ 128               	###     move.w  4(%sp),%d0        /* get function number */
+ 129               	        move.l  4(%sp),%d0        /* get word function number */
+ 130               	.else
+ 131               	_bios1:
+ 132               	_bios2:
+ 133               	_bios3:
+ 134               	_bios4:
+ 135               	_bios5:
+ 136               	_bios6:
+ 137 0040 2F02      		move.l	%d2,-(%sp)		/**** save D2  */
+ 138 0042 242F 0010 		move.l	16(%sp),%d2	  /* D2 parameter word or long */
+ 139 0046 222F 000C 		move.l	12(%sp),%d1	  /* D1 parameter word or long */
+ 140 004a 202F 0008 	        move.l  8(%sp),%d0        /* get word function number */
+ 141               	.endif
+ 142 004e 48E7 1F3E 	        movem.l %d3-%d7/%a2-%a6,-(%sp)
+ 143               	#                               /* save C register variables */
+ 144 0052 4E43      	        trap    #3              /* do BIOS call */
+ 145               	#                               /* returns value in %d0 */
+ 146 0054 4CDF 7CF8 	        movem.l (%sp)+,%d3-%d7/%a2-%a6
+ 147               	
+ 148 0058 241F      		move.l	(%sp)+,%d2	/***** restore D2  */
+ 149 005a 4E75      	        rts
+ 150               	
+ 151               	#
+ 152               	#  Utility Subroutines
+ 153               	#
+ 154               	
+ 155               	swap:
+ 156               	# Swap bytes of a word, return swapped value in %d0
+ 157 005c 302F 0006 		move.w	6(%sp),%d0		/* pick up word arg */
+ 158 0060 E158      		rol.w	#8,%d0			/* swap bytes */
+ 159 0062 4E75      	        rts
+ 160               	
+ 161               	bswap:
+ 162               	# Swap all the bytes of a long, return result in %d0
+ 163 0064 202F 0004 		move.l	4(%sp),%d0
+ 164 0068 E158      		rol.w	#8,%d0			/* swap bytes */
+ 165 006a 4840      		swap	%d0			/* swap hi & lo words */
+ 166 006c E158      		rol.w	#8,%d0			/* swap bytes */
+ 167 006e 4E75      		rts
+ 168               	
+ 169               	udiv:
+ 170               	# Unsigned divide routine
+68K GAS  bdosif.s 			page 4
+
+
+ 171               	# returns unsigned quotient in %D0.W
+ 172               	
+ 173               	#   UWORD udiv( dividend, divisor, remp )
+ 174               	#
+ 175               	#   REG LONG dividend;
+ 176               	#   UWORD    divisor;
+ 177               	#   UWORD    *remp              /* pointer to remainder (returned) */ */
+ 178               	
+ 179 0070 202F 0004 	        move.l  4(%sp), %d0       /* get dividend */
+ 180               	###      divu    8(%sp), %d0       /* do the divide */
+ 181 0074 80EF 000A 	        divu    10(%sp), %d0       /* do the divide */
+ 182               	###      movea.l 10(%sp),%a0
+ 183 0078 206F 000C 	        movea.l 12(%sp),%a0
+ 184 007c 4840      	        swap    %d0
+ 185 007e 3080      	        move.w  %d0, (%a0)        /* store remainder */
+ 186 0080 4240      	        clr.w   %d0
+ 187 0082 4840      	        swap    %d0              /* word quotient in %d0 */
+ 188 0084 4E75      	        rts
+ 189               	
+ 190               	        .end
+68K GAS  bdosif.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000001 RETAIL
+                            *ABS*:000109a0 M68000
+            bdosif.s:131    .text:00000040 _bios1
+            bdosif.s:132    .text:00000040 _bios2
+            bdosif.s:133    .text:00000040 _bios3
+            bdosif.s:134    .text:00000040 _bios4
+            bdosif.s:135    .text:00000040 _bios5
+            bdosif.s:136    .text:00000040 _bios6
+            bdosif.s:38     .text:00000000 _trap2hnd
+            bdosif.s:155    .text:0000005c swap
+            bdosif.s:161    .text:00000064 bswap
+            bdosif.s:169    .text:00000070 udiv
+            bdosif.s:35     *ABS*:00000032 biosf
+            bdosif.s:36     *ABS*:0000003e setsupf
+            bdosif.s:83     .text:0000003a setsup
+            bdosif.s:72     .text:0000002c bioscall
+            bdosif.s:65     .text:00000026 bdone
+
+UNDEFINED SYMBOLS
+__bdos
+_constat
+_dirscan
+_create
+_bdosrw

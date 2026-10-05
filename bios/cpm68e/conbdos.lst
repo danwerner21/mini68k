@@ -1,0 +1,652 @@
+68K GAS  conbdos.s 			page 1
+
+
+   1               	#NO_APP
+   2               		.file	"conbdos.c"
+   3               		.text
+   4               		.align	2
+   5               		.globl	getch
+   6               		.type	getch, @function
+   7               	getch:
+   8 0000 4E56 0000 		link.w %fp,#0
+   9 0004 2F02      		move.l %d2,-(%sp)
+  10 0006 4A39 0000 		tst.b gbls
+  10      0000 
+  11 000c 676A      		jbeq .L2
+  12 000e 3239 0000 		move.w gbls+108,%d1
+  12      0000 
+  13 0014 3001      		move.w %d1,%d0
+  14 0016 4840      		swap %d0
+  15 0018 3039 0000 		mov.w gbls+110,%d0
+  15      0000 
+  16 001e 2040      		move.l %d0,%a0
+  17 0020 1418      		move.b (%a0)+,%d2
+  18 0022 2008      		move.l %a0,%d0
+  19 0024 4240      		clr.w %d0
+  20 0026 4840      		swap %d0
+  21 0028 33C0 0000 		move.w %d0,gbls+108
+  21      0000 
+  22 002e 33C8 0000 		move.w %a0,gbls+110
+  22      0000 
+  23 0034 1039 0000 		move.b gbls,%d0
+  23      0000 
+  24 003a 5300      		subq.b #1,%d0
+  25 003c 13C0 0000 		move.b %d0,gbls
+  25      0000 
+  26 0042 662E      		jbne .L4
+  27 0044 203C 0000 		move.l #gbls+112,%d0
+  27      0000 
+  28 004a 4240      		clr.w %d0
+  29 004c 4840      		swap %d0
+  30 004e 33C0 0000 		move.w %d0,gbls+104
+  30      0000 
+  31 0054 223C 0000 		move.l #gbls+112,%d1
+  31      0000 
+  32 005a 0281 0000 		and.l #65535,%d1
+  32      FFFF 
+  33 0060 33C1 0000 		move.w %d1,gbls+106
+  33      0000 
+  34 0066 33C0 0000 		move.w %d0,gbls+108
+  34      0000 
+  35 006c 33C1 0000 		move.w %d1,gbls+110
+  35      0000 
+  36               	.L4:
+  37 0072 7000      		moveq #0,%d0
+  38 0074 1002      		move.b %d2,%d0
+  39 0076 6012      		jbra .L6
+  40               	.L2:
+  41 0078 4878 0003 		pea 3.w
+  42 007c 4EB9 0000 		jbsr _bios1
+  42      0000 
+68K GAS  conbdos.s 			page 2
+
+
+  43 0082 0280 0000 		and.l #255,%d0
+  43      00FF 
+  44 0088 588F      		addq.l #4,%sp
+  45               	.L6:
+  46 008a 242E FFFC 		move.l -4(%fp),%d2
+  47 008e 4E5E      		unlk %fp
+  48 0090 4E75      		rts
+  49               		.size	getch, .-getch
+  50               		.align	2
+  51               		.globl	conbrk
+  52               		.type	conbrk, @function
+  53               	conbrk:
+  54 0092 4E56 0000 		link.w %fp,#0
+  55 0096 2F03      		move.l %d3,-(%sp)
+  56 0098 2F02      		move.l %d2,-(%sp)
+  57 009a 4878 0002 		pea 2.w
+  58 009e 4EB9 0000 		jbsr _bios1
+  58      0000 
+  59 00a4 588F      		addq.l #4,%sp
+  60 00a6 4A00      		tst.b %d0
+  61 00a8 6700 0088 		jbeq .L21
+  62 00ac 4203      		clr.b %d3
+  63 00ae 6002      		jbra .L27
+  64               	.L12:
+  65 00b0 7601      		moveq #1,%d3
+  66               	.L27:
+  67 00b2 4878 0003 		pea 3.w
+  68 00b6 4EB9 0000 		jbsr _bios1
+  68      0000 
+  69 00bc 1400      		move.b %d0,%d2
+  70 00be 588F      		addq.l #4,%sp
+  71 00c0 0C00 0003 		cmp.b #3,%d0
+  72 00c4 660E      		jbne .L13
+  73 00c6 4878 0002 		pea 2.w
+  74 00ca 4EB9 0000 		jbsr warmboot
+  74      0000 
+  75 00d0 588F      		addq.l #4,%sp
+  76 00d2 6024      		jbra .L15
+  77               	.L13:
+  78 00d4 0C00 0013 		cmp.b #19,%d0
+  79 00d8 67D6      		jbeq .L12
+  80 00da 0C00 0011 		cmp.b #17,%d0
+  81 00de 6752      		jbeq .L21
+  82 00e0 0C00 0010 		cmp.b #16,%d0
+  83 00e4 6612      		jbne .L15
+  84 00e6 4A39 0000 		tst.b gbls+2
+  84      0000 
+  85 00ec 57C0      		seq %d0
+  86 00ee 4400      		neg.b %d0
+  87 00f0 13C0 0000 		move.b %d0,gbls+2
+  87      0000 
+  88 00f6 6036      		jbra .L19
+  89               	.L15:
+  90 00f8 0C39 007D 		cmp.b #125,gbls.l
+  90      0000 0000 
+  91 0100 622C      		jbhi .L19
+  92 0102 3239 0000 		move.w gbls+104,%d1
+68K GAS  conbdos.s 			page 3
+
+
+  92      0000 
+  93 0108 3001      		move.w %d1,%d0
+  94 010a 4840      		swap %d0
+  95 010c 3039 0000 		mov.w gbls+106,%d0
+  95      0000 
+  96 0112 2040      		move.l %d0,%a0
+  97 0114 10C2      		move.b %d2,(%a0)+
+  98 0116 2008      		move.l %a0,%d0
+  99 0118 4240      		clr.w %d0
+ 100 011a 4840      		swap %d0
+ 101 011c 33C0 0000 		move.w %d0,gbls+104
+ 101      0000 
+ 102 0122 33C8 0000 		move.w %a0,gbls+106
+ 102      0000 
+ 103 0128 5239 0000 		addq.b #1,gbls
+ 103      0000 
+ 104               	.L19:
+ 105 012e 4A03      		tst.b %d3
+ 106 0130 6680      		jbne .L27
+ 107               	.L21:
+ 108 0132 242E FFF8 		move.l -8(%fp),%d2
+ 109 0136 262E FFFC 		move.l -4(%fp),%d3
+ 110 013a 4E5E      		unlk %fp
+ 111 013c 4E75      		rts
+ 112               		.size	conbrk, .-conbrk
+ 113               		.align	2
+ 114               		.globl	conout
+ 115               		.type	conout, @function
+ 116               	conout:
+ 117 013e 4E56 0000 		link.w %fp,#0
+ 118 0142 48E7 3020 		movm.l #0x3020,-(%sp)
+ 119 0146 142E 000B 		move.b 11(%fp),%d2
+ 120 014a 6100 FF46 		jbsr conbrk
+ 121 014e 7600      		moveq #0,%d3
+ 122 0150 1602      		move.b %d2,%d3
+ 123 0152 2F03      		move.l %d3,-(%sp)
+ 124 0154 4878 0004 		pea 4.w
+ 125 0158 45F9 0000 		lea _bios2,%a2
+ 125      0000 
+ 126 015e 4E92      		jbsr (%a2)
+ 127 0160 508F      		addq.l #8,%sp
+ 128 0162 4A39 0000 		tst.b gbls+2
+ 128      0000 
+ 129 0168 670A      		jbeq .L29
+ 130 016a 2F03      		move.l %d3,-(%sp)
+ 131 016c 4878 0005 		pea 5.w
+ 132 0170 4E92      		jbsr (%a2)
+ 133 0172 508F      		addq.l #8,%sp
+ 134               	.L29:
+ 135 0174 0C02 001F 		cmp.b #31,%d2
+ 136 0178 6308      		jbls .L31
+ 137 017a 5279 0000 		addq.w #1,gbls+4
+ 137      0000 
+ 138 0180 601A      		jbra .L37
+ 139               	.L31:
+ 140 0182 0C02 000D 		cmp.b #13,%d2
+ 141 0186 6608      		jbne .L34
+68K GAS  conbdos.s 			page 4
+
+
+ 142 0188 4279 0000 		clr.w gbls+4
+ 142      0000 
+ 143 018e 600C      		jbra .L37
+ 144               	.L34:
+ 145 0190 0C02 0008 		cmp.b #8,%d2
+ 146 0194 6606      		jbne .L37
+ 147 0196 5379 0000 		subq.w #1,gbls+4
+ 147      0000 
+ 148               	.L37:
+ 149 019c 4CEE 040C 		movm.l -12(%fp),#0x40c
+ 149      FFF4 
+ 150 01a2 4E5E      		unlk %fp
+ 151 01a4 4E75      		rts
+ 152               		.size	conout, .-conout
+ 153               		.align	2
+ 154               		.globl	backsp
+ 155               		.type	backsp, @function
+ 156               	backsp:
+ 157 01a6 4E56 0000 		link.w %fp,#0
+ 158 01aa 2F0A      		move.l %a2,-(%sp)
+ 159 01ac 2F02      		move.l %d2,-(%sp)
+ 160 01ae 206E 0008 		move.l 8(%fp),%a0
+ 161 01b2 342E 000E 		move.w 14(%fp),%d2
+ 162 01b6 1028 0001 		move.b 1(%a0),%d0
+ 163 01ba 6706      		jbeq .L39
+ 164 01bc 5300      		subq.b #1,%d0
+ 165 01be 1140 0001 		move.b %d0,1(%a0)
+ 166               	.L39:
+ 167 01c2 4241      		clr.w %d1
+ 168 01c4 1228 0001 		move.b 1(%a0),%d1
+ 169 01c8 5488      		addq.l #2,%a0
+ 170 01ca 601E      		jbra .L41
+ 171               	.L42:
+ 172 01cc 1010      		move.b (%a0),%d0
+ 173 01ce 0C00 0009 		cmp.b #9,%d0
+ 174 01d2 6608      		jbne .L43
+ 175 01d4 5042      		addq.w #8,%d2
+ 176 01d6 0242 FFF8 		and.w #-8,%d2
+ 177 01da 600C      		jbra .L45
+ 178               	.L43:
+ 179 01dc 0C00 001F 		cmp.b #31,%d0
+ 180 01e0 6204      		jbhi .L46
+ 181 01e2 5442      		addq.w #2,%d2
+ 182 01e4 6002      		jbra .L45
+ 183               	.L46:
+ 184 01e6 5242      		addq.w #1,%d2
+ 185               	.L45:
+ 186 01e8 5288      		addq.l #1,%a0
+ 187               	.L41:
+ 188 01ea 51C9 FFE0 		dbra %d1,.L42
+ 189 01ee 601A      		jbra .L52
+ 190               	.L49:
+ 191 01f0 4878 0008 		pea 8.w
+ 192 01f4 45FA FF48 		lea conout,%a2
+ 193 01f8 4E92      		jbsr (%a2)
+ 194 01fa 4878 0020 		pea 32.w
+ 195 01fe 4E92      		jbsr (%a2)
+68K GAS  conbdos.s 			page 5
+
+
+ 196 0200 4878 0008 		pea 8.w
+ 197 0204 4E92      		jbsr (%a2)
+ 198 0206 4FEF 000C 		lea (12,%sp),%sp
+ 199               	.L52:
+ 200 020a 7000      		moveq #0,%d0
+ 201 020c 3039 0000 		move.w gbls+4,%d0
+ 201      0000 
+ 202 0212 3042      		move.w %d2,%a0
+ 203 0214 B1C0      		cmp.l %d0,%a0
+ 204 0216 6DD8      		jblt .L49
+ 205 0218 242E FFF8 		move.l -8(%fp),%d2
+ 206 021c 246E FFFC 		move.l -4(%fp),%a2
+ 207 0220 4E5E      		unlk %fp
+ 208 0222 4E75      		rts
+ 209               		.size	backsp, .-backsp
+ 210               		.align	2
+ 211               		.globl	newline
+ 212               		.type	newline, @function
+ 213               	newline:
+ 214 0224 4E56 0000 		link.w %fp,#0
+ 215 0228 2F0A      		move.l %a2,-(%sp)
+ 216 022a 2F02      		move.l %d2,-(%sp)
+ 217 022c 342E 000A 		move.w 10(%fp),%d2
+ 218 0230 4878 000D 		pea 13.w
+ 219 0234 45FA FF08 		lea conout,%a2
+ 220 0238 4E92      		jbsr (%a2)
+ 221 023a 4878 000A 		pea 10.w
+ 222 023e 4E92      		jbsr (%a2)
+ 223 0240 508F      		addq.l #8,%sp
+ 224 0242 600C      		jbra .L54
+ 225               	.L55:
+ 226 0244 4878 0020 		pea 32.w
+ 227 0248 6100 FEF4 		jbsr conout
+ 228 024c 5342      		subq.w #1,%d2
+ 229 024e 588F      		addq.l #4,%sp
+ 230               	.L54:
+ 231 0250 4A42      		tst.w %d2
+ 232 0252 66F0      		jbne .L55
+ 233 0254 242E FFF8 		move.l -8(%fp),%d2
+ 234 0258 246E FFFC 		move.l -4(%fp),%a2
+ 235 025c 4E5E      		unlk %fp
+ 236 025e 4E75      		rts
+ 237               		.size	newline, .-newline
+ 238               		.align	2
+ 239               		.globl	conin
+ 240               		.type	conin, @function
+ 241               	conin:
+ 242 0260 4E56 0000 		link.w %fp,#0
+ 243 0264 2F03      		move.l %d3,-(%sp)
+ 244 0266 2F02      		move.l %d2,-(%sp)
+ 245 0268 6100 FD96 		jbsr getch
+ 246 026c 1400      		move.b %d0,%d2
+ 247 026e 7600      		moveq #0,%d3
+ 248 0270 1600      		move.b %d0,%d3
+ 249 0272 2F03      		move.l %d3,-(%sp)
+ 250 0274 6100 FEC8 		jbsr conout
+ 251 0278 588F      		addq.l #4,%sp
+68K GAS  conbdos.s 			page 6
+
+
+ 252 027a 0C02 0010 		cmp.b #16,%d2
+ 253 027e 6610      		jbne .L59
+ 254 0280 4A39 0000 		tst.b gbls+2
+ 254      0000 
+ 255 0286 57C0      		seq %d0
+ 256 0288 4400      		neg.b %d0
+ 257 028a 13C0 0000 		move.b %d0,gbls+2
+ 257      0000 
+ 258               	.L59:
+ 259 0290 2003      		move.l %d3,%d0
+ 260 0292 242E FFF8 		move.l -8(%fp),%d2
+ 261 0296 262E FFFC 		move.l -4(%fp),%d3
+ 262 029a 4E5E      		unlk %fp
+ 263 029c 4E75      		rts
+ 264               		.size	conin, .-conin
+ 265               		.align	2
+ 266               		.globl	tabout
+ 267               		.type	tabout, @function
+ 268               	tabout:
+ 269 029e 4E56 0000 		link.w %fp,#0
+ 270 02a2 102E 000B 		move.b 11(%fp),%d0
+ 271 02a6 0C00 0009 		cmp.b #9,%d0
+ 272 02aa 6618      		jbne .L63
+ 273               	.L67:
+ 274 02ac 4878 0020 		pea 32.w
+ 275 02b0 6100 FE8C 		jbsr conout
+ 276 02b4 3039 0000 		move.w gbls+4,%d0
+ 276      0000 
+ 277 02ba 7207      		moveq #7,%d1
+ 278 02bc C081      		and.l %d1,%d0
+ 279 02be 588F      		addq.l #4,%sp
+ 280 02c0 6710      		jbeq .L66
+ 281 02c2 60E8      		jbra .L67
+ 282               	.L63:
+ 283 02c4 0280 0000 		and.l #255,%d0
+ 283      00FF 
+ 284 02ca 2F00      		move.l %d0,-(%sp)
+ 285 02cc 6100 FE70 		jbsr conout
+ 286 02d0 588F      		addq.l #4,%sp
+ 287               	.L66:
+ 288 02d2 4E5E      		unlk %fp
+ 289 02d4 4E75      		rts
+ 290               		.size	tabout, .-tabout
+ 291               		.align	2
+ 292               		.globl	prt_line
+ 293               		.type	prt_line, @function
+ 294               	prt_line:
+ 295 02d6 4E56 0000 		link.w %fp,#0
+ 296 02da 2F0A      		move.l %a2,-(%sp)
+ 297 02dc 246E 0008 		move.l 8(%fp),%a2
+ 298 02e0 600E      		jbra .L70
+ 299               	.L71:
+ 300 02e2 528A      		addq.l #1,%a2
+ 301 02e4 0280 0000 		and.l #255,%d0
+ 301      00FF 
+ 302 02ea 2F00      		move.l %d0,-(%sp)
+ 303 02ec 61B0      		jbsr tabout
+68K GAS  conbdos.s 			page 7
+
+
+ 304 02ee 588F      		addq.l #4,%sp
+ 305               	.L70:
+ 306 02f0 1012      		move.b (%a2),%d0
+ 307 02f2 B039 0000 		cmp.b gbls+1.l,%d0
+ 307      0000 
+ 308 02f8 66E8      		jbne .L71
+ 309 02fa 246E FFFC 		move.l -4(%fp),%a2
+ 310 02fe 4E5E      		unlk %fp
+ 311 0300 4E75      		rts
+ 312               		.size	prt_line, .-prt_line
+ 313               		.align	2
+ 314               		.globl	cookdout
+ 315               		.type	cookdout, @function
+ 316               	cookdout:
+ 317 0302 4E56 0000 		link.w %fp,#0
+ 318 0306 2F02      		move.l %d2,-(%sp)
+ 319 0308 142E 000B 		move.b 11(%fp),%d2
+ 320 030c 0C02 0009 		cmp.b #9,%d2
+ 321 0310 6608      		jbne .L75
+ 322 0312 4878 0009 		pea 9.w
+ 323 0316 6186      		jbsr tabout
+ 324 0318 601E      		jbra .L81
+ 325               	.L75:
+ 326 031a 0C02 001F 		cmp.b #31,%d2
+ 327 031e 620E      		jbhi .L78
+ 328 0320 4878 005E 		pea 94.w
+ 329 0324 6100 FE18 		jbsr conout
+ 330 0328 0002 0040 		or.b #64,%d2
+ 331 032c 588F      		addq.l #4,%sp
+ 332               	.L78:
+ 333 032e 7000      		moveq #0,%d0
+ 334 0330 1002      		move.b %d2,%d0
+ 335 0332 2F00      		move.l %d0,-(%sp)
+ 336 0334 6100 FE08 		jbsr conout
+ 337               	.L81:
+ 338 0338 588F      		addq.l #4,%sp
+ 339 033a 242E FFFC 		move.l -4(%fp),%d2
+ 340 033e 4E5E      		unlk %fp
+ 341 0340 4E75      		rts
+ 342               		.size	cookdout, .-cookdout
+ 343               		.align	2
+ 344               		.globl	readline
+ 345               		.type	readline, @function
+ 346               	readline:
+ 347 0342 4E56 0000 		link.w %fp,#0
+ 348 0346 48E7 3020 		movm.l #0x3020,-(%sp)
+ 349 034a 246E 0008 		move.l 8(%fp),%a2
+ 350 034e 3639 0000 		move.w gbls+4,%d3
+ 350      0000 
+ 351 0354 422A 0001 		clr.b 1(%a2)
+ 352 0358 6000 0152 		jbra .L122
+ 353               	.L84:
+ 354 035c 6100 FCA2 		jbsr getch
+ 355 0360 1400      		move.b %d0,%d2
+ 356 0362 0C00 0003 		cmp.b #3,%d0
+ 357 0366 661A      		jbne .L85
+ 358 0368 4A2A 0001 		tst.b 1(%a2)
+68K GAS  conbdos.s 			page 8
+
+
+ 359 036c 6600 0120 		jbne .L87
+ 360 0370 4878 0003 		pea 3.w
+ 361 0374 618C      		jbsr cookdout
+ 362 0376 4878 0002 		pea 2.w
+ 363 037a 4EB9 0000 		jbsr warmboot
+ 363      0000 
+ 364 0380 602A      		jbra .L119
+ 365               	.L85:
+ 366 0382 0C00 000D 		cmp.b #13,%d0
+ 367 0386 6706      		jbeq .L89
+ 368 0388 0C00 000A 		cmp.b #10,%d0
+ 369 038c 660E      		jbne .L91
+ 370               	.L89:
+ 371 038e 4878 000D 		pea 13.w
+ 372 0392 6100 FDAA 		jbsr conout
+ 373 0396 588F      		addq.l #4,%sp
+ 374 0398 6000 011C 		jbra .L111
+ 375               	.L91:
+ 376 039c 0C00 0008 		cmp.b #8,%d0
+ 377 03a0 6610      		jbne .L93
+ 378               	.L121:
+ 379 03a2 3F03      		move.w %d3,-(%sp)
+ 380 03a4 4267      		clr.w -(%sp)
+ 381 03a6 2F0A      		move.l %a2,-(%sp)
+ 382 03a8 6100 FDFC 		jbsr backsp
+ 383               	.L119:
+ 384 03ac 508F      		addq.l #8,%sp
+ 385 03ae 6000 00FC 		jbra .L122
+ 386               	.L93:
+ 387 03b2 0C00 007F 		cmp.b #127,%d0
+ 388 03b6 6630      		jbne .L95
+ 389 03b8 4A39 0000 		tst.b gbls+3
+ 389      0000 
+ 390 03be 67E2      		jbeq .L121
+ 391 03c0 102A 0001 		move.b 1(%a2),%d0
+ 392 03c4 6700 00E6 		jbeq .L122
+ 393 03c8 5300      		subq.b #1,%d0
+ 394 03ca 1540 0001 		move.b %d0,1(%a2)
+ 395 03ce 0280 0000 		and.l #255,%d0
+ 395      00FF 
+ 396 03d4 1032 0802 		move.b 2(%a2,%d0.l),%d0
+ 397 03d8 0280 0000 		and.l #255,%d0
+ 397      00FF 
+ 398 03de 2F00      		move.l %d0,-(%sp)
+ 399 03e0 6100 FD5C 		jbsr conout
+ 400 03e4 6000 00C4 		jbra .L120
+ 401               	.L95:
+ 402 03e8 0C00 0010 		cmp.b #16,%d0
+ 403 03ec 6614      		jbne .L100
+ 404 03ee 4A39 0000 		tst.b gbls+2
+ 404      0000 
+ 405 03f4 57C0      		seq %d0
+ 406 03f6 4400      		neg.b %d0
+ 407 03f8 13C0 0000 		move.b %d0,gbls+2
+ 407      0000 
+ 408 03fe 6000 00AC 		jbra .L122
+ 409               	.L100:
+68K GAS  conbdos.s 			page 9
+
+
+ 410 0402 0C00 0018 		cmp.b #24,%d0
+ 411 0406 6616      		jbne .L102
+ 412               	.L115:
+ 413 0408 3F03      		move.w %d3,-(%sp)
+ 414 040a 4267      		clr.w -(%sp)
+ 415 040c 2F0A      		move.l %a2,-(%sp)
+ 416 040e 6100 FD96 		jbsr backsp
+ 417 0412 508F      		addq.l #8,%sp
+ 418 0414 4A2A 0001 		tst.b 1(%a2)
+ 419 0418 6700 0092 		jbeq .L122
+ 420 041c 60EA      		jbra .L115
+ 421               	.L102:
+ 422 041e 0C00 0005 		cmp.b #5,%d0
+ 423 0422 660A      		jbne .L104
+ 424 0424 3F03      		move.w %d3,-(%sp)
+ 425 0426 4267      		clr.w -(%sp)
+ 426 0428 6100 FDFA 		jbsr newline
+ 427 042c 607C      		jbra .L120
+ 428               	.L104:
+ 429 042e 0C00 0015 		cmp.b #21,%d0
+ 430 0432 6618      		jbne .L106
+ 431 0434 4878 0023 		pea 35.w
+ 432 0438 6100 FD04 		jbsr conout
+ 433 043c 3F03      		move.w %d3,-(%sp)
+ 434 043e 4267      		clr.w -(%sp)
+ 435 0440 6100 FDE2 		jbsr newline
+ 436 0444 422A 0001 		clr.b 1(%a2)
+ 437 0448 6000 FF62 		jbra .L119
+ 438               	.L106:
+ 439 044c 0C00 0012 		cmp.b #18,%d0
+ 440 0450 663C      		jbne .L87
+ 441 0452 4878 0023 		pea 35.w
+ 442 0456 6100 FCE6 		jbsr conout
+ 443 045a 3F03      		move.w %d3,-(%sp)
+ 444 045c 4267      		clr.w -(%sp)
+ 445 045e 6100 FDC4 		jbsr newline
+ 446 0462 7400      		moveq #0,%d2
+ 447 0464 508F      		addq.l #8,%sp
+ 448 0466 6016      		jbra .L109
+ 449               	.L110:
+ 450 0468 7000      		moveq #0,%d0
+ 451 046a 3001      		move.w %d1,%d0
+ 452 046c 1032 0802 		move.b 2(%a2,%d0.l),%d0
+ 453 0470 0280 0000 		and.l #255,%d0
+ 453      00FF 
+ 454 0476 2F00      		move.l %d0,-(%sp)
+ 455 0478 6100 FE88 		jbsr cookdout
+ 456 047c 588F      		addq.l #4,%sp
+ 457               	.L109:
+ 458 047e 3202      		move.w %d2,%d1
+ 459 0480 5282      		addq.l #1,%d2
+ 460 0482 4240      		clr.w %d0
+ 461 0484 102A 0001 		move.b 1(%a2),%d0
+ 462 0488 B041      		cmp.w %d1,%d0
+ 463 048a 62DC      		jbhi .L110
+ 464 048c 601E      		jbra .L122
+ 465               	.L87:
+68K GAS  conbdos.s 			page 10
+
+
+ 466 048e 102A 0001 		move.b 1(%a2),%d0
+ 467 0492 7200      		moveq #0,%d1
+ 468 0494 1200      		move.b %d0,%d1
+ 469 0496 1582 1802 		move.b %d2,2(%a2,%d1.l)
+ 470 049a 5200      		addq.b #1,%d0
+ 471 049c 1540 0001 		move.b %d0,1(%a2)
+ 472 04a0 7000      		moveq #0,%d0
+ 473 04a2 1002      		move.b %d2,%d0
+ 474 04a4 2F00      		move.l %d0,-(%sp)
+ 475 04a6 6100 FE5A 		jbsr cookdout
+ 476               	.L120:
+ 477 04aa 588F      		addq.l #4,%sp
+ 478               	.L122:
+ 479 04ac 102A 0001 		move.b 1(%a2),%d0
+ 480 04b0 B012      		cmp.b (%a2),%d0
+ 481 04b2 6500 FEA8 		jbcs .L84
+ 482               	.L111:
+ 483 04b6 4CEE 040C 		movm.l -12(%fp),#0x40c
+ 483      FFF4 
+ 484 04bc 4E5E      		unlk %fp
+ 485 04be 4E75      		rts
+ 486               		.size	readline, .-readline
+ 487               		.align	2
+ 488               		.globl	constat
+ 489               		.type	constat, @function
+ 490               	constat:
+ 491 04c0 4E56 0000 		link.w %fp,#0
+ 492 04c4 4A39 0000 		tst.b gbls
+ 492      0000 
+ 493 04ca 6706      		jbeq .L124
+ 494 04cc 307C 0001 		move.w #1,%a0
+ 495 04d0 6010      		jbra .L126
+ 496               	.L124:
+ 497 04d2 4878 0002 		pea 2.w
+ 498 04d6 4EB9 0000 		jbsr _bios1
+ 498      0000 
+ 499 04dc 4880      		ext.w %d0
+ 500 04de 3040      		move.w %d0,%a0
+ 501 04e0 588F      		addq.l #4,%sp
+ 502               	.L126:
+ 503 04e2 2008      		move.l %a0,%d0
+ 504 04e4 4E5E      		unlk %fp
+ 505 04e6 4E75      		rts
+ 506               		.size	constat, .-constat
+ 507               		.align	2
+ 508               		.globl	rawconio
+ 509               		.type	rawconio, @function
+ 510               	rawconio:
+ 511 04e8 4E56 0000 		link.w %fp,#0
+ 512 04ec 2F02      		move.l %d2,-(%sp)
+ 513 04ee 342E 000A 		move.w 10(%fp),%d2
+ 514 04f2 0C42 00FF 		cmp.w #255,%d2
+ 515 04f6 6606      		jbne .L129
+ 516 04f8 6100 FB06 		jbsr getch
+ 517 04fc 6008      		jbra .L135
+ 518               	.L129:
+ 519 04fe 0C42 00FE 		cmp.w #254,%d2
+68K GAS  conbdos.s 			page 11
+
+
+ 520 0502 660A      		jbne .L132
+ 521 0504 61BA      		jbsr constat
+ 522               	.L135:
+ 523 0506 0280 0000 		and.l #255,%d0
+ 523      00FF 
+ 524 050c 6016      		jbra .L131
+ 525               	.L132:
+ 526 050e 7000      		moveq #0,%d0
+ 527 0510 1002      		move.b %d2,%d0
+ 528 0512 2F00      		move.l %d0,-(%sp)
+ 529 0514 4878 0004 		pea 4.w
+ 530 0518 4EB9 0000 		jbsr _bios2
+ 530      0000 
+ 531 051e 7000      		moveq #0,%d0
+ 532 0520 1002      		move.b %d2,%d0
+ 533 0522 508F      		addq.l #8,%sp
+ 534               	.L131:
+ 535 0524 242E FFFC 		move.l -4(%fp),%d2
+ 536 0528 4E5E      		unlk %fp
+ 537 052a 4E75      		rts
+ 538               		.size	rawconio, .-rawconio
+ 539               		.comm	chainp,4,4
+ 540               		.ident	"GCC: (GNU) 4.1.1"
+68K GAS  conbdos.s 			page 12
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 conbdos.c
+                            *ABS*:00000001 RETAIL
+                            *ABS*:000109a0 M68000
+           conbdos.s:7      .text:00000000 getch
+           conbdos.s:53     .text:00000092 conbrk
+           conbdos.s:116    .text:0000013e conout
+           conbdos.s:156    .text:000001a6 backsp
+           conbdos.s:213    .text:00000224 newline
+           conbdos.s:241    .text:00000260 conin
+           conbdos.s:268    .text:0000029e tabout
+           conbdos.s:294    .text:000002d6 prt_line
+           conbdos.s:316    .text:00000302 cookdout
+           conbdos.s:346    .text:00000342 readline
+           conbdos.s:490    .text:000004c0 constat
+           conbdos.s:510    .text:000004e8 rawconio
+                            *COM*:00000004 chainp
+
+UNDEFINED SYMBOLS
+gbls
+_bios1
+warmboot
+_bios2

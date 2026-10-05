@@ -1,0 +1,656 @@
+68K GAS  bdosmisc.s 			page 1
+
+
+   1               	#NO_APP
+   2               		.file	"bdosmisc.c"
+   3               		.text
+   4               		.align	2
+   5               		.globl	setexc
+   6               		.type	setexc, @function
+   7               	setexc:
+   8 0000 4E56 0000 		link.w %fp,#0
+   9 0004 2F0A      		move.l %a2,-(%sp)
+  10 0006 246E 0008 		move.l 8(%fp),%a2
+  11 000a 3212      		move.w (%a2),%d1
+  12 000c 5541      		subq.w #2,%d1
+  13 000e 3001      		move.w %d1,%d0
+  14 0010 0640 FFE0 		add.w #-32,%d0
+  15 0014 207C 0000 		move.l #65535,%a0
+  15      FFFF 
+  16 001a 0C40 0001 		cmp.w #1,%d0
+  17 001e 635A      		jbls .L4
+  18 0020 5440      		addq.w #2,%d0
+  19 0022 0C40 0007 		cmp.w #7,%d0
+  20 0026 6206      		jbhi .L5
+  21 0028 0641 FFEC 		add.w #-20,%d1
+  22 002c 600A      		jbra .L7
+  23               	.L5:
+  24 002e 307C 00FF 		move.w #255,%a0
+  25 0032 0C41 0009 		cmp.w #9,%d1
+  26 0036 6242      		jbhi .L4
+  27               	.L7:
+  28 0038 3041      		move.w %d1,%a0
+  29 003a 43F9 0000 		lea gbls+32,%a1
+  29      0000 
+  30 0040 D1C8      		add.l %a0,%a0
+  31 0042 D1C8      		add.l %a0,%a0
+  32 0044 3031 8800 		move.w (%a1,%a0.l),%d0
+  33 0048 3200      		move.w %d0,%d1
+  34 004a 4841      		swap %d1
+  35 004c 3231 8802 		mov.w 2(%a1,%a0.l),%d1
+  36 0050 2001      		move.l %d1,%d0
+  37 0052 4240      		clr.w %d0
+  38 0054 4840      		swap %d0
+  39 0056 3540 0006 		move.w %d0,6(%a2)
+  40 005a 3541 0008 		move.w %d1,8(%a2)
+  41 005e 302A 0002 		move.w 2(%a2),%d0
+  42 0062 3200      		move.w %d0,%d1
+  43 0064 4841      		swap %d1
+  44 0066 322A 0004 		mov.w 4(%a2),%d1
+  45 006a 2001      		move.l %d1,%d0
+  46 006c 4240      		clr.w %d0
+  47 006e 4840      		swap %d0
+  48 0070 3380 8800 		move.w %d0,(%a1,%a0.l)
+  49 0074 3381 8802 		move.w %d1,2(%a1,%a0.l)
+  50 0078 91C8      		sub.l %a0,%a0
+  51               	.L4:
+  52 007a 2008      		move.l %a0,%d0
+  53 007c 245F      		move.l (%sp)+,%a2
+  54 007e 4E5E      		unlk %fp
+  55 0080 4E75      		rts
+68K GAS  bdosmisc.s 			page 2
+
+
+  56               		.size	setexc, .-setexc
+  57               		.align	2
+  58               		.globl	set_tpa
+  59               		.type	set_tpa, @function
+  60               	set_tpa:
+  61 0082 4E56 0000 		link.w %fp,#0
+  62 0086 2F02      		move.l %d2,-(%sp)
+  63 0088 206E 0008 		move.l 8(%fp),%a0
+  64 008c 7400      		moveq #0,%d2
+  65 008e 3410      		move.w (%a0),%d2
+  66 0090 0802 0000 		btst #0,%d2
+  67 0094 6738      		jbeq .L11
+  68 0096 3028 0002 		move.w 2(%a0),%d0
+  69 009a 3200      		move.w %d0,%d1
+  70 009c 4841      		swap %d1
+  71 009e 3228 0004 		mov.w 4(%a0),%d1
+  72 00a2 23C1 0000 		move.l %d1,tpa_lt
+  72      0000 
+  73 00a8 3268 0006 		move.w 6(%a0),%a1
+  74 00ac 3009      		move.w %a1,%d0
+  75 00ae 4840      		swap %d0
+  76 00b0 3028 0008 		mov.w 8(%a0),%d0
+  77 00b4 23C0 0000 		move.l %d0,tpa_ht
+  77      0000 
+  78 00ba 0802 0001 		btst #1,%d2
+  79 00be 672E      		jbeq .L15
+  80 00c0 23C1 0000 		move.l %d1,tpa_lp
+  80      0000 
+  81 00c6 23C0 0000 		move.l %d0,tpa_hp
+  81      0000 
+  82 00cc 6020      		jbra .L15
+  83               	.L11:
+  84 00ce 3179 0000 		move.w tpa_lt,2(%a0)
+  84      0000 0002 
+  85 00d6 3179 0000 		move.w tpa_lt+2,4(%a0)
+  85      0000 0004 
+  86 00de 3179 0000 		move.w tpa_ht,6(%a0)
+  86      0000 0006 
+  87 00e6 3179 0000 		move.w tpa_ht+2,8(%a0)
+  87      0000 0008 
+  88               	.L15:
+  89 00ee 241F      		move.l (%sp)+,%d2
+  90 00f0 4E5E      		unlk %fp
+  91 00f2 4E75      		rts
+  92               		.size	set_tpa, .-set_tpa
+  93               		.section	.rodata.str1.1,"aMS",@progbits,1
+  94               	.LC0:
+  95 0000 2065 7272 		.string	" error on drive $"
+  95      6F72 206F 
+  95      6E20 6472 
+  95      6976 6520 
+  95      2400 
+  96               		.text
+  97               		.align	2
+  98               		.globl	prt_err
+  99               		.type	prt_err, @function
+ 100               	prt_err:
+68K GAS  bdosmisc.s 			page 3
+
+
+ 101 00f4 4E56 0000 		link.w %fp,#0
+ 102 00f8 2F0A      		move.l %a2,-(%sp)
+ 103 00fa 2F2E 0008 		move.l 8(%fp),-(%sp)
+ 104 00fe 45F9 0000 		lea prt_line,%a2
+ 104      0000 
+ 105 0104 4E92      		jbsr (%a2)
+ 106 0106 4879 0000 		pea .LC0
+ 106      0000 
+ 107 010c 4E92      		jbsr (%a2)
+ 108 010e 7000      		moveq #0,%d0
+ 109 0110 1039 0000 		move.b gbls+6,%d0
+ 109      0000 
+ 110 0116 2040      		move.l %d0,%a0
+ 111 0118 4868 0041 		pea 65(%a0)
+ 112 011c 4EB9 0000 		jbsr conout
+ 112      0000 
+ 113 0122 4FEF 000C 		lea (12,%sp),%sp
+ 114 0126 246E FFFC 		move.l -4(%fp),%a2
+ 115 012a 4E5E      		unlk %fp
+ 116 012c 4E75      		rts
+ 117               		.size	prt_err, .-prt_err
+ 118               		.align	2
+ 119               		.globl	warmboot
+ 120               		.type	warmboot, @function
+ 121               	warmboot:
+ 122 012e 4E56 0000 		link.w %fp,#0
+ 123 0132 222E 0008 		move.l 8(%fp),%d1
+ 124 0136 0C41 0002 		cmp.w #2,%d1
+ 125 013a 6720      		jbeq .L19
+ 126 013c 3039 0000 		move.w ro_dsk,%d0
+ 126      0000 
+ 127 0142 4640      		not.w %d0
+ 128 0144 C179 0000 		and.w %d0,log_dsk
+ 128      0000 
+ 129 014a 4279 0000 		clr.w ro_dsk
+ 129      0000 
+ 130 0150 4279 0000 		clr.w crit_dsk
+ 130      0000 
+ 131 0156 4A41      		tst.w %d1
+ 132 0158 6620      		jbne .L21
+ 133 015a 602A      		jbra .L22
+ 134               	.L19:
+ 135 015c 7200      		moveq #0,%d1
+ 136 015e 1239 0000 		move.b gbls+6,%d1
+ 136      0000 
+ 137 0164 7001      		moveq #1,%d0
+ 138 0166 E3A8      		lsl.l %d1,%d0
+ 139 0168 C179 0000 		and.w %d0,log_dsk
+ 139      0000 
+ 140 016e 4279 0000 		clr.w ro_dsk
+ 140      0000 
+ 141 0174 4279 0000 		clr.w crit_dsk
+ 141      0000 
+ 142               	.L21:
+ 143 017a 4239 0000 		clr.b morecmds
+ 143      0000 
+ 144 0180 4239 0000 		clr.b submit
+68K GAS  bdosmisc.s 			page 4
+
+
+ 144      0000 
+ 145               	.L22:
+ 146 0186 50F9 0000 		st gbls+6
+ 146      0000 
+ 147 018c 23F9 0000 		move.l tpa_lp,tpa_lt
+ 147      0000 0000 
+ 147      0000 
+ 148 0196 23F9 0000 		move.l tpa_hp,tpa_ht
+ 148      0000 0000 
+ 148      0000 
+ 149 01a0 4879 0000 		pea gbls+32
+ 149      0000 
+ 150 01a6 4EB9 0000 		jbsr initexc
+ 150      0000 
+ 151 01ac 4878 0001 		pea 1.w
+ 152 01b0 4EB9 0000 		jbsr _bios1
+ 152      0000 
+ 153 01b6 508F      		addq.l #8,%sp
+ 154 01b8 4E5E      		unlk %fp
+ 155 01ba 4E75      		rts
+ 156               		.size	warmboot, .-warmboot
+ 157               		.section	.rodata.str1.1
+ 158               	.LC1:
+ 159 0012 4350 2F4D 		.string	"CP/M Disk file error: $"
+ 159      2044 6973 
+ 159      6B20 6669 
+ 159      6C65 2065 
+ 159      7272 6F72 
+ 160               	.LC2:
+ 161 002a 2069 7320 		.string	" is read-only.$"
+ 161      7265 6164 
+ 161      2D6F 6E6C 
+ 161      792E 2400 
+ 162               	.LC3:
+ 163 003a 0D0A 446F 		.string	"\r\nDo you want to: Change it to read/write (C), or Abort (A)? $"
+ 163      2079 6F75 
+ 163      2077 616E 
+ 163      7420 746F 
+ 163      3A20 4368 
+ 164               	.LC4:
+ 165 0079 0D0A 2400 		.string	"\r\n$"
+ 166               		.text
+ 167               		.align	2
+ 168               		.globl	ro_err
+ 169               		.type	ro_err, @function
+ 170               	ro_err:
+ 171 01bc 4E56 0000 		link.w %fp,#0
+ 172 01c0 48E7 3038 		movm.l #0x3038,-(%sp)
+ 173 01c4 286E 0008 		move.l 8(%fp),%a4
+ 174 01c8 362E 000E 		move.w 14(%fp),%d3
+ 175 01cc 4879 0000 		pea .LC1
+ 175      0000 
+ 176 01d2 4EB9 0000 		jbsr prt_line
+ 176      0000 
+ 177 01d8 244C      		move.l %a4,%a2
+ 178 01da 588F      		addq.l #4,%sp
+ 179               	.L25:
+68K GAS  bdosmisc.s 			page 5
+
+
+ 180 01dc 528A      		addq.l #1,%a2
+ 181 01de 1012      		move.b (%a2),%d0
+ 182 01e0 727F      		moveq #127,%d1
+ 183 01e2 C081      		and.l %d1,%d0
+ 184 01e4 2F00      		move.l %d0,-(%sp)
+ 185 01e6 47F9 0000 		lea conout,%a3
+ 185      0000 
+ 186 01ec 4E93      		jbsr (%a3)
+ 187 01ee 41EC 0008 		lea (8,%a4),%a0
+ 188 01f2 588F      		addq.l #4,%sp
+ 189 01f4 B1CA      		cmp.l %a2,%a0
+ 190 01f6 66E4      		jbne .L25
+ 191 01f8 4878 002E 		pea 46.w
+ 192 01fc 4E93      		jbsr (%a3)
+ 193 01fe 588F      		addq.l #4,%sp
+ 194               	.L27:
+ 195 0200 528A      		addq.l #1,%a2
+ 196 0202 1012      		move.b (%a2),%d0
+ 197 0204 727F      		moveq #127,%d1
+ 198 0206 C081      		and.l %d1,%d0
+ 199 0208 2F00      		move.l %d0,-(%sp)
+ 200 020a 4EB9 0000 		jbsr conout
+ 200      0000 
+ 201 0210 41EC 000B 		lea (11,%a4),%a0
+ 202 0214 588F      		addq.l #4,%sp
+ 203 0216 B1CA      		cmp.l %a2,%a0
+ 204 0218 66E6      		jbne .L27
+ 205 021a 4879 0000 		pea .LC2
+ 205      0000 
+ 206 0220 45F9 0000 		lea prt_line,%a2
+ 206      0000 
+ 207 0226 4E92      		jbsr (%a2)
+ 208 0228 2F39 0000 		move.l warning,-(%sp)
+ 208      0000 
+ 209 022e 4E92      		jbsr (%a2)
+ 210 0230 508F      		addq.l #8,%sp
+ 211               	.L29:
+ 212 0232 4879 0000 		pea .LC3
+ 212      0000 
+ 213 0238 45F9 0000 		lea prt_line,%a2
+ 213      0000 
+ 214 023e 4E92      		jbsr (%a2)
+ 215 0240 4EB9 0000 		jbsr conin
+ 215      0000 
+ 216 0246 1400      		move.b %d0,%d2
+ 217 0248 4879 0000 		pea .LC4
+ 217      0000 
+ 218 024e 4E92      		jbsr (%a2)
+ 219 0250 508F      		addq.l #8,%sp
+ 220 0252 0202 005F 		and.b #95,%d2
+ 221 0256 0C02 0041 		cmp.b #65,%d2
+ 222 025a 6716      		jbeq .L31
+ 223 025c 0C02 0043 		cmp.b #67,%d2
+ 224 0260 671A      		jbeq .L32
+ 225 0262 0C02 0003 		cmp.b #3,%d2
+ 226 0266 66CA      		jbne .L29
+ 227 0268 4878 0001 		pea 1.w
+68K GAS  bdosmisc.s 			page 6
+
+
+ 228 026c 6100 FEC0 		jbsr warmboot
+ 229 0270 588F      		addq.l #4,%sp
+ 230               	.L31:
+ 231 0272 4878 0001 		pea 1.w
+ 232 0276 6100 FEB6 		jbsr warmboot
+ 233 027a 588F      		addq.l #4,%sp
+ 234               	.L32:
+ 235 027c 022C 007F 		and.b #127,9(%a4)
+ 235      0009 
+ 236 0282 4878 0002 		pea 2.w
+ 237 0286 2F0C      		move.l %a4,-(%sp)
+ 238 0288 4879 0000 		pea set_attr
+ 238      0000 
+ 239 028e 4EB9 0000 		jbsr dirscan
+ 239      0000 
+ 240 0294 E443      		asr.w #2,%d3
+ 241 0296 3043      		move.w %d3,%a0
+ 242 0298 2F08      		move.l %a0,-(%sp)
+ 243 029a 4EB9 0000 		jbsr dir_rd
+ 243      0000 
+ 244 02a0 0280 0000 		and.l #65535,%d0
+ 244      FFFF 
+ 245 02a6 4CEE 1C0C 		movm.l -20(%fp),#0x1c0c
+ 245      FFEC 
+ 246 02ac 4E5E      		unlk %fp
+ 247 02ae 4E75      		rts
+ 248               		.size	ro_err, .-ro_err
+ 249               		.section	.rodata.str1.1
+ 250               	.LC5:
+ 251 007d 0A0D 446F 		.string	"\n\rDo you want to:  Abort (A),  Retry (R)$"
+ 251      2079 6F75 
+ 251      2077 616E 
+ 251      7420 746F 
+ 251      3A20 2041 
+ 252               	.LC6:
+ 253 00a7 2C20 6F72 		.string	", or Continue with bad data (C)$"
+ 253      2043 6F6E 
+ 253      7469 6E75 
+ 253      6520 7769 
+ 253      7468 2062 
+ 254               	.LC7:
+ 255 00c8 3F20 2400 		.string	"? $"
+ 256               		.text
+ 257               		.align	2
+ 258               		.globl	ext_err
+ 259               		.type	ext_err, @function
+ 260               	ext_err:
+ 261 02b0 4E56 0000 		link.w %fp,#0
+ 262 02b4 48E7 3020 		movm.l #0x3020,-(%sp)
+ 263 02b8 162E 000B 		move.b 11(%fp),%d3
+ 264 02bc 2F2E 000C 		move.l 12(%fp),-(%sp)
+ 265 02c0 6100 FE32 		jbsr prt_err
+ 266 02c4 2F39 0000 		move.l warning,-(%sp)
+ 266      0000 
+ 267 02ca 4EB9 0000 		jbsr prt_line
+ 267      0000 
+ 268 02d0 508F      		addq.l #8,%sp
+68K GAS  bdosmisc.s 			page 7
+
+
+ 269               	.L57:
+ 270 02d2 4879 0000 		pea .LC5
+ 270      0000 
+ 271 02d8 45F9 0000 		lea prt_line,%a2
+ 271      0000 
+ 272 02de 4E92      		jbsr (%a2)
+ 273 02e0 588F      		addq.l #4,%sp
+ 274 02e2 4A03      		tst.b %d3
+ 275 02e4 670A      		jbeq .L42
+ 276 02e6 4879 0000 		pea .LC6
+ 276      0000 
+ 277 02ec 4E92      		jbsr (%a2)
+ 278 02ee 588F      		addq.l #4,%sp
+ 279               	.L42:
+ 280 02f0 4879 0000 		pea .LC7
+ 280      0000 
+ 281 02f6 4E92      		jbsr (%a2)
+ 282 02f8 4EB9 0000 		jbsr conin
+ 282      0000 
+ 283 02fe 1400      		move.b %d0,%d2
+ 284 0300 4879 0000 		pea .LC4
+ 284      0000 
+ 285 0306 4E92      		jbsr (%a2)
+ 286 0308 508F      		addq.l #8,%sp
+ 287 030a 0202 005F 		and.b #95,%d2
+ 288 030e 0C02 0041 		cmp.b #65,%d2
+ 289 0312 6724      		jbeq .L45
+ 290 0314 6208      		jbhi .L48
+ 291 0316 0C02 0003 		cmp.b #3,%d2
+ 292 031a 66B6      		jbne .L57
+ 293 031c 6010      		jbra .L44
+ 294               	.L48:
+ 295 031e 0C02 0043 		cmp.b #67,%d2
+ 296 0322 671E      		jbeq .L46
+ 297 0324 0C02 0052 		cmp.b #82,%d2
+ 298 0328 66A8      		jbne .L57
+ 299 032a 7000      		moveq #0,%d0
+ 300 032c 601A      		jbra .L49
+ 301               	.L44:
+ 302 032e 4878 0001 		pea 1.w
+ 303 0332 6100 FDFA 		jbsr warmboot
+ 304 0336 588F      		addq.l #4,%sp
+ 305               	.L45:
+ 306 0338 4878 0001 		pea 1.w
+ 307 033c 6100 FDF0 		jbsr warmboot
+ 308 0340 588F      		addq.l #4,%sp
+ 309               	.L46:
+ 310 0342 4A03      		tst.b %d3
+ 311 0344 678C      		jbeq .L57
+ 312 0346 7001      		moveq #1,%d0
+ 313               	.L49:
+ 314 0348 4CEE 040C 		movm.l -12(%fp),#0x40c
+ 314      FFF4 
+ 315 034e 4E5E      		unlk %fp
+ 316 0350 4E75      		rts
+ 317               		.size	ext_err, .-ext_err
+ 318               		.align	2
+68K GAS  bdosmisc.s 			page 8
+
+
+ 319               		.globl	abrt_err
+ 320               		.type	abrt_err, @function
+ 321               	abrt_err:
+ 322 0352 4E56 0000 		link.w %fp,#0
+ 323 0356 2F2E 0008 		move.l 8(%fp),-(%sp)
+ 324 035a 6100 FD98 		jbsr prt_err
+ 325 035e 4878 0001 		pea 1.w
+ 326 0362 6100 FDCA 		jbsr warmboot
+ 327 0366 508F      		addq.l #8,%sp
+ 328 0368 4E5E      		unlk %fp
+ 329 036a 4E75      		rts
+ 330               		.size	abrt_err, .-abrt_err
+ 331               		.section	.rodata.str1.1
+ 332               	.LC8:
+ 333 00cc 0D0A 4350 		.string	"\r\nCP/M Disk $"
+ 333      2F4D 2044 
+ 333      6973 6B20 
+ 333      2400 
+ 334               	.LC9:
+ 335 00da 7265 6164 		.string	"read$"
+ 335      2400 
+ 336               	.LC10:
+ 337 00e0 7772 6974 		.string	"write$"
+ 337      6524 00
+ 338               	.LC11:
+ 339 00e7 7365 6C65 		.string	"select$"
+ 339      6374 2400 
+ 340               	.LC12:
+ 341 00ef 6368 616E 		.string	"change$"
+ 341      6765 2400 
+ 342               		.text
+ 343               		.align	2
+ 344               		.globl	error
+ 345               		.type	error, @function
+ 346               	error:
+ 347 036c 4E56 0000 		link.w %fp,#0
+ 348 0370 2F02      		move.l %d2,-(%sp)
+ 349 0372 342E 000A 		move.w 10(%fp),%d2
+ 350 0376 4879 0000 		pea .LC8
+ 350      0000 
+ 351 037c 4EB9 0000 		jbsr prt_line
+ 351      0000 
+ 352 0382 588F      		addq.l #4,%sp
+ 353 0384 0C42 0004 		cmp.w #4,%d2
+ 354 0388 6218      		jbhi .L61
+ 355 038a 7000      		moveq #0,%d0
+ 356 038c 3002      		move.w %d2,%d0
+ 357 038e D080      		add.l %d0,%d0
+ 358               		.set .LI67,.+2
+ 359 0390 303B 0806 		move.w .L67-.LI67.b(%pc,%d0.l),%d0
+ 360 0394 4EFB 0002 		jmp %pc@(2,%d0:w)
+ 361               		.align	2
+ 362               		.swbeg	&5
+ 363               	.L67:
+ 364 0398 000E      		.word .L62-.L67
+ 365 039a 0016      		.word .L63-.L67
+ 366 039c 002E      		.word .L64-.L67
+68K GAS  bdosmisc.s 			page 9
+
+
+ 367 039e 0038      		.word .L65-.L67
+ 368 03a0 0042      		.word .L66-.L67
+ 369               	.L61:
+ 370 03a2 7000      		moveq #0,%d0
+ 371 03a4 6042      		jbra .L68
+ 372               	.L62:
+ 373 03a6 4879 0000 		pea .LC9
+ 373      0000 
+ 374 03ac 6006      		jbra .L70
+ 375               	.L63:
+ 376 03ae 4879 0000 		pea .LC10
+ 376      0000 
+ 377               	.L70:
+ 378 03b4 4878 0001 		pea 1.w
+ 379               	.L71:
+ 380 03b8 6100 FEF6 		jbsr ext_err
+ 381 03bc 0280 0000 		and.l #65535,%d0
+ 381      FFFF 
+ 382 03c2 508F      		addq.l #8,%sp
+ 383 03c4 6022      		jbra .L68
+ 384               	.L64:
+ 385 03c6 4879 0000 		pea .LC11
+ 385      0000 
+ 386 03cc 6184      		jbsr abrt_err
+ 387 03ce 588F      		addq.l #4,%sp
+ 388               	.L65:
+ 389 03d0 4879 0000 		pea .LC11
+ 389      0000 
+ 390 03d6 42A7      		clr.l -(%sp)
+ 391 03d8 60DE      		jbra .L71
+ 392               	.L66:
+ 393 03da 4879 0000 		pea .LC12
+ 393      0000 
+ 394 03e0 6100 FF70 		jbsr abrt_err
+ 395 03e4 7000      		moveq #0,%d0
+ 396 03e6 588F      		addq.l #4,%sp
+ 397               	.L68:
+ 398 03e8 242E FFFC 		move.l -4(%fp),%d2
+ 399 03ec 4E5E      		unlk %fp
+ 400 03ee 4E75      		rts
+ 401               		.size	error, .-error
+ 402               		.align	2
+ 403               		.globl	bdosinit
+ 404               		.type	bdosinit, @function
+ 405               	bdosinit:
+ 406 03f0 4E56 0000 		link.w %fp,#0
+ 407 03f4 4879 0000 		pea _trap2hnd
+ 407      0000 
+ 408 03fa 4878 0022 		pea 34.w
+ 409 03fe 4878 0016 		pea 22.w
+ 410 0402 4EB9 0000 		jbsr _bios5
+ 410      0000 
+ 411 0408 4239 0000 		clr.b gbls
+ 411      0000 
+ 412 040e 203C 0000 		move.l #gbls+112,%d0
+ 412      0000 
+ 413 0414 2200      		move.l %d0,%d1
+68K GAS  bdosmisc.s 			page 10
+
+
+ 414 0416 4241      		clr.w %d1
+ 415 0418 4841      		swap %d1
+ 416 041a 33C1 0000 		move.w %d1,gbls+108
+ 416      0000 
+ 417 0420 0280 0000 		and.l #65535,%d0
+ 417      FFFF 
+ 418 0426 33C0 0000 		move.w %d0,gbls+110
+ 418      0000 
+ 419 042c 33C1 0000 		move.w %d1,gbls+104
+ 419      0000 
+ 420 0432 33C0 0000 		move.w %d0,gbls+106
+ 420      0000 
+ 421 0438 13FC 0024 		move.b #36,gbls+1
+ 421      0000 0000 
+ 422 0440 4239 0000 		clr.b gbls+2
+ 422      0000 
+ 423 0446 13FC 0001 		move.b #1,gbls+3
+ 423      0000 0000 
+ 424 044e 42B9 0000 		clr.l chainp
+ 424      0000 
+ 425 0454 4878 000D 		pea 13.w
+ 426 0458 4EB9 0000 		jbsr __bdos
+ 426      0000 
+ 427 045e 4878 0012 		pea 18.w
+ 428 0462 4EB9 0000 		jbsr _bios6
+ 428      0000 
+ 429 0468 2040      		move.l %d0,%a0
+ 430 046a 3228 0002 		move.w 2(%a0),%d1
+ 431 046e 3001      		move.w %d1,%d0
+ 432 0470 4840      		swap %d0
+ 433 0472 3028 0004 		mov.w 4(%a0),%d0
+ 434 0476 23C0 0000 		move.l %d0,tpa_lp
+ 434      0000 
+ 435 047c 23C0 0000 		move.l %d0,tpa_lt
+ 435      0000 
+ 436 0482 3268 0006 		move.w 6(%a0),%a1
+ 437 0486 3209      		move.w %a1,%d1
+ 438 0488 4841      		swap %d1
+ 439 048a 3228 0008 		mov.w 8(%a0),%d1
+ 440 048e D081      		add.l %d1,%d0
+ 441 0490 23C0 0000 		move.l %d0,tpa_hp
+ 441      0000 
+ 442 0496 23C0 0000 		move.l %d0,tpa_ht
+ 442      0000 
+ 443 049c 4879 0000 		pea gbls+32
+ 443      0000 
+ 444 04a2 4EB9 0000 		jbsr initexc
+ 444      0000 
+ 445 04a8 4FEF 0018 		lea (24,%sp),%sp
+ 446 04ac 4E5E      		unlk %fp
+ 447 04ae 4E75      		rts
+ 448               		.size	bdosinit, .-bdosinit
+ 449               		.globl	warning
+ 450               		.section	.rodata.str1.1
+ 451               	.LC13:
+ 452 00f7 0D0A 5741 		.string	"\r\nWARNING -- Do not attempt to change disks$"
+ 452      524E 494E 
+68K GAS  bdosmisc.s 			page 11
+
+
+ 452      4720 2D2D 
+ 452      2044 6F20 
+ 452      6E6F 7420 
+ 453               		.data
+ 454               		.align	4
+ 455               		.type	warning, @object
+ 456               		.size	warning, 4
+ 457               	warning:
+ 458 0000 0000 0000 		.long	.LC13
+ 459               		.comm	chainp,4,4
+ 460               		.ident	"GCC: (GNU) 4.1.1"
+68K GAS  bdosmisc.s 			page 12
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 bdosmisc.c
+                            *ABS*:00000001 RETAIL
+                            *ABS*:000109a0 M68000
+          bdosmisc.s:7      .text:00000000 setexc
+          bdosmisc.s:60     .text:00000082 set_tpa
+          bdosmisc.s:100    .text:000000f4 prt_err
+          bdosmisc.s:121    .text:0000012e warmboot
+          bdosmisc.s:170    .text:000001bc ro_err
+          bdosmisc.s:457    .data:00000000 warning
+          bdosmisc.s:260    .text:000002b0 ext_err
+          bdosmisc.s:321    .text:00000352 abrt_err
+          bdosmisc.s:346    .text:0000036c error
+          bdosmisc.s:405    .text:000003f0 bdosinit
+                            *COM*:00000004 chainp
+
+UNDEFINED SYMBOLS
+gbls
+tpa_lt
+tpa_ht
+tpa_lp
+tpa_hp
+prt_line
+conout
+ro_dsk
+log_dsk
+crit_dsk
+morecmds
+submit
+initexc
+_bios1
+conin
+set_attr
+dirscan
+dir_rd
+_trap2hnd
+_bios5
+__bdos
+_bios6

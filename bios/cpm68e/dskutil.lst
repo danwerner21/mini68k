@@ -1,0 +1,602 @@
+68K GAS  dskutil.s 			page 1
+
+
+   1               	#NO_APP
+   2               		.file	"dskutil.c"
+   3               		.text
+   4               		.align	2
+   5               		.globl	dchksum
+   6               		.type	dchksum, @function
+   7               	dchksum:
+   8 0000 4E56 0000 		link.w %fp,#0
+   9 0004 3239 0000 		move.w gbls+14,%d1
+   9      0000 
+  10 000a 3001      		move.w %d1,%d0
+  11 000c 4840      		swap %d0
+  12 000e 3039 0000 		mov.w gbls+16,%d0
+  12      0000 
+  13 0014 2040      		move.l %d0,%a0
+  14 0016 7200      		moveq #0,%d1
+  15 0018 7000      		moveq #0,%d0
+  16               	.L2:
+  17 001a D2B0 0800 		add.l (%a0,%d0.l),%d1
+  18 001e 5880      		addq.l #4,%d0
+  19 0020 0C80 0000 		cmp.l #128,%d0
+  19      0080 
+  20 0026 66F2      		jbne .L2
+  21 0028 2001      		move.l %d1,%d0
+  22 002a 4840      		swap %d0
+  23 002c 48C0      		ext.l %d0
+  24 002e D081      		add.l %d1,%d0
+  25 0030 2200      		move.l %d0,%d1
+  26 0032 E081      		asr.l #8,%d1
+  27 0034 D081      		add.l %d1,%d0
+  28 0036 0280 0000 		and.l #255,%d0
+  28      00FF 
+  29 003c 4E5E      		unlk %fp
+  30 003e 4E75      		rts
+  31               		.size	dchksum, .-dchksum
+  32               		.align	2
+  33               		.globl	setaloc
+  34               		.type	setaloc, @function
+  35               	setaloc:
+  36 0040 4E56 0000 		link.w %fp,#0
+  37 0044 2F03      		move.l %d3,-(%sp)
+  38 0046 2F02      		move.l %d2,-(%sp)
+  39 0048 202E 0008 		move.l 8(%fp),%d0
+  40 004c 3600      		move.w %d0,%d3
+  41 004e 6D52      		jblt .L11
+  42 0050 3400      		move.w %d0,%d2
+  43 0052 48C2      		ext.l %d2
+  44 0054 3239 0000 		move.w gbls+18,%d1
+  44      0000 
+  45 005a 3001      		move.w %d1,%d0
+  46 005c 4840      		swap %d0
+  47 005e 3039 0000 		mov.w gbls+20,%d0
+  47      0000 
+  48 0064 2040      		move.l %d0,%a0
+  49 0066 7000      		moveq #0,%d0
+  50 0068 3028 0006 		move.w 6(%a0),%d0
+  51 006c B082      		cmp.l %d2,%d0
+68K GAS  dskutil.s 			page 2
+
+
+  52 006e 6D32      		jblt .L11
+  53 0070 3239 0000 		move.w gbls+10,%d1
+  53      0000 
+  54 0076 3001      		move.w %d1,%d0
+  55 0078 4840      		swap %d0
+  56 007a 3039 0000 		mov.w gbls+12,%d0
+  56      0000 
+  57 0080 2040      		move.l %d0,%a0
+  58 0082 3268 0016 		move.w 22(%a0),%a1
+  59 0086 3209      		move.w %a1,%d1
+  60 0088 4841      		swap %d1
+  61 008a 3228 0018 		mov.w 24(%a0),%d1
+  62 008e E643      		asr.w #3,%d3
+  63 0090 7007      		moveq #7,%d0
+  64 0092 C480      		and.l %d0,%d2
+  65 0094 707F      		moveq #127,%d0
+  66 0096 4600      		not.b %d0
+  67 0098 E4A0      		asr.l %d2,%d0
+  68 009a 3243      		move.w %d3,%a1
+  69 009c 2041      		move.l %d1,%a0
+  70 009e 8130 9800 		or.b %d0,(%a0,%a1.l)
+  71               	.L11:
+  72 00a2 241F      		move.l (%sp)+,%d2
+  73 00a4 261F      		move.l (%sp)+,%d3
+  74 00a6 4E5E      		unlk %fp
+  75 00a8 4E75      		rts
+  76               		.size	setaloc, .-setaloc
+  77               		.align	2
+  78               		.globl	clraloc
+  79               		.type	clraloc, @function
+  80               	clraloc:
+  81 00aa 4E56 0000 		link.w %fp,#0
+  82 00ae 2F03      		move.l %d3,-(%sp)
+  83 00b0 2F02      		move.l %d2,-(%sp)
+  84 00b2 202E 0008 		move.l 8(%fp),%d0
+  85 00b6 3600      		move.w %d0,%d3
+  86 00b8 6F54      		jble .L16
+  87 00ba 3400      		move.w %d0,%d2
+  88 00bc 48C2      		ext.l %d2
+  89 00be 3239 0000 		move.w gbls+18,%d1
+  89      0000 
+  90 00c4 3001      		move.w %d1,%d0
+  91 00c6 4840      		swap %d0
+  92 00c8 3039 0000 		mov.w gbls+20,%d0
+  92      0000 
+  93 00ce 2040      		move.l %d0,%a0
+  94 00d0 7000      		moveq #0,%d0
+  95 00d2 3028 0006 		move.w 6(%a0),%d0
+  96 00d6 B082      		cmp.l %d2,%d0
+  97 00d8 6D34      		jblt .L16
+  98 00da 3239 0000 		move.w gbls+10,%d1
+  98      0000 
+  99 00e0 3001      		move.w %d1,%d0
+ 100 00e2 4840      		swap %d0
+ 101 00e4 3039 0000 		mov.w gbls+12,%d0
+ 101      0000 
+ 102 00ea 2040      		move.l %d0,%a0
+68K GAS  dskutil.s 			page 3
+
+
+ 103 00ec 3268 0016 		move.w 22(%a0),%a1
+ 104 00f0 3209      		move.w %a1,%d1
+ 105 00f2 4841      		swap %d1
+ 106 00f4 3228 0018 		mov.w 24(%a0),%d1
+ 107 00f8 E643      		asr.w #3,%d3
+ 108 00fa 7007      		moveq #7,%d0
+ 109 00fc C480      		and.l %d0,%d2
+ 110 00fe 707F      		moveq #127,%d0
+ 111 0100 4600      		not.b %d0
+ 112 0102 E4A0      		asr.l %d2,%d0
+ 113 0104 4600      		not.b %d0
+ 114 0106 3243      		move.w %d3,%a1
+ 115 0108 2041      		move.l %d1,%a0
+ 116 010a C130 9800 		and.b %d0,(%a0,%a1.l)
+ 117               	.L16:
+ 118 010e 241F      		move.l (%sp)+,%d2
+ 119 0110 261F      		move.l (%sp)+,%d3
+ 120 0112 4E5E      		unlk %fp
+ 121 0114 4E75      		rts
+ 122               		.size	clraloc, .-clraloc
+ 123               		.align	2
+ 124               		.globl	chkaloc
+ 125               		.type	chkaloc, @function
+ 126               	chkaloc:
+ 127 0116 4E56 0000 		link.w %fp,#0
+ 128 011a 2F02      		move.l %d2,-(%sp)
+ 129 011c 342E 000A 		move.w 10(%fp),%d2
+ 130 0120 3239 0000 		move.w gbls+10,%d1
+ 130      0000 
+ 131 0126 3001      		move.w %d1,%d0
+ 132 0128 4840      		swap %d0
+ 133 012a 3039 0000 		mov.w gbls+12,%d0
+ 133      0000 
+ 134 0130 2040      		move.l %d0,%a0
+ 135 0132 3028 0016 		move.w 22(%a0),%d0
+ 136 0136 3200      		move.w %d0,%d1
+ 137 0138 4841      		swap %d1
+ 138 013a 3228 0018 		mov.w 24(%a0),%d1
+ 139 013e 3002      		move.w %d2,%d0
+ 140 0140 E648      		lsr.w #3,%d0
+ 141 0142 0280 0000 		and.l #65535,%d0
+ 141      FFFF 
+ 142 0148 2041      		move.l %d1,%a0
+ 143 014a 1030 0800 		move.b (%a0,%d0.l),%d0
+ 144 014e 0240 00FF 		and.w #255,%d0
+ 145 0152 4640      		not.w %d0
+ 146 0154 7207      		moveq #7,%d1
+ 147 0156 C481      		and.l %d1,%d2
+ 148 0158 727F      		moveq #127,%d1
+ 149 015a 4601      		not.b %d1
+ 150 015c E4A1      		asr.l %d2,%d1
+ 151 015e C041      		and.w %d1,%d0
+ 152 0160 0280 0000 		and.l #65535,%d0
+ 152      FFFF 
+ 153 0166 241F      		move.l (%sp)+,%d2
+ 154 0168 4E5E      		unlk %fp
+ 155 016a 4E75      		rts
+68K GAS  dskutil.s 			page 4
+
+
+ 156               		.size	chkaloc, .-chkaloc
+ 157               		.align	2
+ 158               		.globl	getaloc
+ 159               		.type	getaloc, @function
+ 160               	getaloc:
+ 161 016c 4E56 0000 		link.w %fp,#0
+ 162 0170 48E7 3800 		movm.l #0x3800,-(%sp)
+ 163 0174 222E 0008 		move.l 8(%fp),%d1
+ 164 0178 3601      		move.w %d1,%d3
+ 165 017a 3079 0000 		move.w gbls+18,%a0
+ 165      0000 
+ 166 0180 3008      		move.w %a0,%d0
+ 167 0182 4840      		swap %d0
+ 168 0184 3039 0000 		mov.w gbls+20,%d0
+ 168      0000 
+ 169 018a 2040      		move.l %d0,%a0
+ 170 018c 3828 0006 		move.w 6(%a0),%d4
+ 171 0190 3401      		move.w %d1,%d2
+ 172 0192 6024      		jbra .L38
+ 173               	.L21:
+ 174 0194 5343      		subq.w #1,%d3
+ 175 0196 3F03      		move.w %d3,-(%sp)
+ 176 0198 4267      		clr.w -(%sp)
+ 177 019a 6100 FF7A 		jbsr chkaloc
+ 178 019e 588F      		addq.l #4,%sp
+ 179 01a0 4A40      		tst.w %d0
+ 180 01a2 6620      		jbne .L22
+ 181 01a4 B842      		cmp.w %d2,%d4
+ 182 01a6 6310      		jbls .L38
+ 183               	.L24:
+ 184 01a8 5242      		addq.w #1,%d2
+ 185 01aa 3F02      		move.w %d2,-(%sp)
+ 186 01ac 4267      		clr.w -(%sp)
+ 187 01ae 6100 FF66 		jbsr chkaloc
+ 188 01b2 588F      		addq.l #4,%sp
+ 189 01b4 4A40      		tst.w %d0
+ 190 01b6 660E      		jbne .L26
+ 191               	.L38:
+ 192 01b8 4A43      		tst.w %d3
+ 193 01ba 66D8      		jbne .L21
+ 194 01bc B842      		cmp.w %d2,%d4
+ 195 01be 62E8      		jbhi .L24
+ 196 01c0 74FF      		moveq #-1,%d2
+ 197 01c2 6012      		jbra .L29
+ 198               	.L22:
+ 199 01c4 3403      		move.w %d3,%d2
+ 200               	.L26:
+ 201 01c6 0C42 FFFF 		cmp.w #-1,%d2
+ 202 01ca 670A      		jbeq .L29
+ 203 01cc 3F02      		move.w %d2,-(%sp)
+ 204 01ce 4267      		clr.w -(%sp)
+ 205 01d0 6100 FE6E 		jbsr setaloc
+ 206 01d4 588F      		addq.l #4,%sp
+ 207               	.L29:
+ 208 01d6 7000      		moveq #0,%d0
+ 209 01d8 3002      		move.w %d2,%d0
+ 210 01da 4CEE 001C 		movm.l -12(%fp),#0x1c
+68K GAS  dskutil.s 			page 5
+
+
+ 210      FFF4 
+ 211 01e0 4E5E      		unlk %fp
+ 212 01e2 4E75      		rts
+ 213               		.size	getaloc, .-getaloc
+ 214               		.align	2
+ 215               		.globl	rdwrt
+ 216               		.type	rdwrt, @function
+ 217               	rdwrt:
+ 218 01e4 4E56 FFEC 		link.w %fp,#-20
+ 219 01e8 48E7 3C00 		movm.l #0x3c00,-(%sp)
+ 220 01ec 282E 0008 		move.l 8(%fp),%d4
+ 221 01f0 2A2E 000C 		move.l 12(%fp),%d5
+ 222 01f4 202E 0010 		move.l 16(%fp),%d0
+ 223 01f8 3600      		move.w %d0,%d3
+ 224 01fa 1439 0000 		move.b gbls+6,%d2
+ 224      0000 
+ 225 0200 1D42 FFF1 		move.b %d2,-15(%fp)
+ 226 0204 4A40      		tst.w %d0
+ 227 0206 672A      		jbeq .L40
+ 228 0208 1D7C 0002 		move.b #2,-18(%fp)
+ 228      FFEE 
+ 229 020e 5300      		subq.b #1,%d0
+ 230 0210 1D40 FFEF 		move.b %d0,-17(%fp)
+ 231 0214 7200      		moveq #0,%d1
+ 232 0216 3239 0000 		move.w ro_dsk,%d1
+ 232      0000 
+ 233 021c 7000      		moveq #0,%d0
+ 234 021e 1002      		move.b %d2,%d0
+ 235 0220 0101      		btst %d0,%d1
+ 236 0222 6718      		jbeq .L42
+ 237 0224 4878 0004 		pea 4.w
+ 238 0228 4EB9 0000 		jbsr error
+ 238      0000 
+ 239 022e 588F      		addq.l #4,%sp
+ 240 0230 600A      		jbra .L42
+ 241               	.L40:
+ 242 0232 1D7C 0001 		move.b #1,-18(%fp)
+ 242      FFEE 
+ 243 0238 422E FFEF 		clr.b -17(%fp)
+ 244               	.L42:
+ 245 023c 2004      		move.l %d4,%d0
+ 246 023e 4240      		clr.w %d0
+ 247 0240 4840      		swap %d0
+ 248 0242 3D40 FFF2 		move.w %d0,-14(%fp)
+ 249 0246 3D44 FFF4 		move.w %d4,-12(%fp)
+ 250 024a 2005      		move.l %d5,%d0
+ 251 024c 4240      		clr.w %d0
+ 252 024e 4840      		swap %d0
+ 253 0250 3D40 FFF8 		move.w %d0,-8(%fp)
+ 254 0254 3D45 FFFA 		move.w %d5,-6(%fp)
+ 255 0258 3039 0000 		move.w gbls+10,%d0
+ 255      0000 
+ 256 025e 3200      		move.w %d0,%d1
+ 257 0260 4841      		swap %d1
+ 258 0262 3239 0000 		mov.w gbls+12,%d1
+ 258      0000 
+ 259 0268 2001      		move.l %d1,%d0
+68K GAS  dskutil.s 			page 6
+
+
+ 260 026a 4240      		clr.w %d0
+ 261 026c 4840      		swap %d0
+ 262 026e 3D40 FFFC 		move.w %d0,-4(%fp)
+ 263 0272 3D41 FFFE 		move.w %d1,-2(%fp)
+ 264 0276 6018      		jbra .L44
+ 265               	.L45:
+ 266 0278 4A43      		tst.w %d3
+ 267 027a 56C0      		sne %d0
+ 268 027c 4880      		ext.w %d0
+ 269 027e 48C0      		ext.l %d0
+ 270 0280 4480      		neg.l %d0
+ 271 0282 2F00      		move.l %d0,-(%sp)
+ 272 0284 4EB9 0000 		jbsr error
+ 272      0000 
+ 273 028a 588F      		addq.l #4,%sp
+ 274 028c 4A40      		tst.w %d0
+ 275 028e 6610      		jbne .L46
+ 276               	.L44:
+ 277 0290 486E FFEE 		pea -18(%fp)
+ 278 0294 4EB9 0000 		jbsr do_phio
+ 278      0000 
+ 279 029a 588F      		addq.l #4,%sp
+ 280 029c 4A40      		tst.w %d0
+ 281 029e 66D8      		jbne .L45
+ 282               	.L46:
+ 283 02a0 7000      		moveq #0,%d0
+ 284 02a2 4CEE 003C 		movm.l -36(%fp),#0x3c
+ 284      FFDC 
+ 285 02a8 4E5E      		unlk %fp
+ 286 02aa 4E75      		rts
+ 287               		.size	rdwrt, .-rdwrt
+ 288               		.align	2
+ 289               		.globl	dir_wr
+ 290               		.type	dir_wr, @function
+ 291               	dir_wr:
+ 292 02ac 4E56 0000 		link.w %fp,#0
+ 293 02b0 2F0A      		move.l %a2,-(%sp)
+ 294 02b2 2F02      		move.l %d2,-(%sp)
+ 295 02b4 4878 0002 		pea 2.w
+ 296 02b8 3239 0000 		move.w gbls+14,%d1
+ 296      0000 
+ 297 02be 3001      		move.w %d1,%d0
+ 298 02c0 4840      		swap %d0
+ 299 02c2 3039 0000 		mov.w gbls+16,%d0
+ 299      0000 
+ 300 02c8 2F00      		move.l %d0,-(%sp)
+ 301 02ca 346E 000A 		move.w 10(%fp),%a2
+ 302 02ce 2F0A      		move.l %a2,-(%sp)
+ 303 02d0 6100 FF12 		jbsr rdwrt
+ 304 02d4 3400      		move.w %d0,%d2
+ 305 02d6 3079 0000 		move.w gbls+18,%a0
+ 305      0000 
+ 306 02dc 3008      		move.w %a0,%d0
+ 307 02de 4840      		swap %d0
+ 308 02e0 3039 0000 		mov.w gbls+20,%d0
+ 308      0000 
+ 309 02e6 2040      		move.l %d0,%a0
+68K GAS  dskutil.s 			page 7
+
+
+ 310 02e8 7000      		moveq #0,%d0
+ 311 02ea 3028 000C 		move.w 12(%a0),%d0
+ 312 02ee 4FEF 000C 		lea (12,%sp),%sp
+ 313 02f2 B08A      		cmp.l %a2,%d0
+ 314 02f4 6F28      		jble .L49
+ 315 02f6 3239 0000 		move.w gbls+10,%d1
+ 315      0000 
+ 316 02fc 3001      		move.w %d1,%d0
+ 317 02fe 4840      		swap %d0
+ 318 0300 3039 0000 		mov.w gbls+12,%d0
+ 318      0000 
+ 319 0306 2040      		move.l %d0,%a0
+ 320 0308 3228 0012 		move.w 18(%a0),%d1
+ 321 030c 3001      		move.w %d1,%d0
+ 322 030e 4840      		swap %d0
+ 323 0310 3028 0014 		mov.w 20(%a0),%d0
+ 324 0314 45F2 0800 		lea (%a2,%d0.l),%a2
+ 325 0318 6100 FCE6 		jbsr dchksum
+ 326 031c 1480      		move.b %d0,(%a2)
+ 327               	.L49:
+ 328 031e 7000      		moveq #0,%d0
+ 329 0320 3002      		move.w %d2,%d0
+ 330 0322 242E FFF8 		move.l -8(%fp),%d2
+ 331 0326 246E FFFC 		move.l -4(%fp),%a2
+ 332 032a 4E5E      		unlk %fp
+ 333 032c 4E75      		rts
+ 334               		.size	dir_wr, .-dir_wr
+ 335               		.align	2
+ 336               		.globl	dir_rd
+ 337               		.type	dir_rd, @function
+ 338               	dir_rd:
+ 339 032e 4E56 0000 		link.w %fp,#0
+ 340 0332 42A7      		clr.l -(%sp)
+ 341 0334 3239 0000 		move.w gbls+14,%d1
+ 341      0000 
+ 342 033a 3001      		move.w %d1,%d0
+ 343 033c 4840      		swap %d0
+ 344 033e 3039 0000 		mov.w gbls+16,%d0
+ 344      0000 
+ 345 0344 2F00      		move.l %d0,-(%sp)
+ 346 0346 306E 000A 		move.w 10(%fp),%a0
+ 347 034a 2F08      		move.l %a0,-(%sp)
+ 348 034c 6100 FE96 		jbsr rdwrt
+ 349 0350 0280 0000 		and.l #65535,%d0
+ 349      FFFF 
+ 350 0356 4E5E      		unlk %fp
+ 351 0358 4E75      		rts
+ 352               		.size	dir_rd, .-dir_rd
+ 353               		.align	2
+ 354               		.globl	dirscan
+ 355               		.type	dirscan, @function
+ 356               	dirscan:
+ 357 035a 4E56 0000 		link.w %fp,#0
+ 358 035e 48E7 3F3C 		movm.l #0x3f3c,-(%sp)
+ 359 0362 2A6E 000C 		move.l 12(%fp),%a5
+ 360 0366 3239 0000 		move.w gbls+18,%d1
+ 360      0000 
+68K GAS  dskutil.s 			page 8
+
+
+ 361 036c 3001      		move.w %d1,%d0
+ 362 036e 4840      		swap %d0
+ 363 0370 3039 0000 		mov.w gbls+20,%d0
+ 363      0000 
+ 364 0376 2640      		move.l %d0,%a3
+ 365 0378 7C00      		moveq #0,%d6
+ 366 037a 3C2E 0012 		move.w 18(%fp),%d6
+ 367 037e 0806 0000 		btst #0,%d6
+ 368 0382 6604      		jbne .L55
+ 369 0384 4244      		clr.w %d4
+ 370 0386 6008      		jbra .L57
+ 371               	.L55:
+ 372 0388 3839 0000 		move.w gbls+22,%d4
+ 372      0000 
+ 373 038e 5244      		addq.w #1,%d4
+ 374               	.L57:
+ 375 0390 387C 00FF 		move.w #255,%a4
+ 376 0394 6000 00F8 		jbra .L58
+ 377               	.L76:
+ 378 0398 4E90      		jbsr (%a0)
+ 379 039a 1480      		move.b %d0,(%a2)
+ 380 039c 6000 00B2 		jbra .L62
+ 381               	.L77:
+ 382 03a0 8379 0000 		or.w %d1,ro_dsk
+ 382      0000 
+ 383 03a6 6000 00A8 		jbra .L62
+ 384               	.L59:
+ 385 03aa B86B 0008 		cmp.w 8(%a3),%d4
+ 386 03ae 6200 010A 		jbhi .L60
+ 387 03b2 7E00      		moveq #0,%d7
+ 388 03b4 3E04      		move.w %d4,%d7
+ 389 03b6 7A03      		moveq #3,%d5
+ 390 03b8 CA87      		and.l %d7,%d5
+ 391 03ba 6600 0094 		jbne .L62
+ 392               	.L63:
+ 393               	.L78:
+ 394 03be 3404      		move.w %d4,%d2
+ 395 03c0 E44A      		lsr.w #2,%d2
+ 396 03c2 7600      		moveq #0,%d3
+ 397 03c4 3602      		move.w %d2,%d3
+ 398 03c6 2F03      		move.l %d3,-(%sp)
+ 399 03c8 6100 FF64 		jbsr dir_rd
+ 400 03cc 588F      		addq.l #4,%sp
+ 401 03ce B46B 000C 		cmp.w 12(%a3),%d2
+ 402 03d2 647C      		jbcc .L62
+ 403 03d4 3239 0000 		move.w gbls+10,%d1
+ 403      0000 
+ 404 03da 3001      		move.w %d1,%d0
+ 405 03dc 4840      		swap %d0
+ 406 03de 3039 0000 		mov.w gbls+12,%d0
+ 406      0000 
+ 407 03e4 2040      		move.l %d0,%a0
+ 408 03e6 3228 0012 		move.w 18(%a0),%d1
+ 409 03ea 3001      		move.w %d1,%d0
+ 410 03ec 4840      		swap %d0
+ 411 03ee 3028 0014 		mov.w 20(%a0),%d0
+ 412 03f2 2440      		move.l %d0,%a2
+68K GAS  dskutil.s 			page 9
+
+
+ 413 03f4 D5C3      		add.l %d3,%a2
+ 414 03f6 41FA FC08 		lea dchksum,%a0
+ 415 03fa 0806 0002 		btst #2,%d6
+ 416 03fe 6698      		jbne .L76
+ 417 0400 1412      		move.b (%a2),%d2
+ 418 0402 4E90      		jbsr (%a0)
+ 419 0404 B002      		cmp.b %d2,%d0
+ 420 0406 6748      		jbeq .L62
+ 421 0408 3079 0000 		move.w gbls+10,%a0
+ 421      0000 
+ 422 040e 3008      		move.w %a0,%d0
+ 423 0410 4840      		swap %d0
+ 424 0412 3039 0000 		mov.w gbls+12,%d0
+ 424      0000 
+ 425 0418 2040      		move.l %d0,%a0
+ 426 041a 316B 0008 		move.w 8(%a3),4(%a0)
+ 426      0004 
+ 427 0420 7400      		moveq #0,%d2
+ 428 0422 1439 0000 		move.b gbls+6,%d2
+ 428      0000 
+ 429 0428 7001      		moveq #1,%d0
+ 430 042a 2200      		move.l %d0,%d1
+ 431 042c E5A9      		lsl.l %d2,%d1
+ 432 042e 3001      		move.w %d1,%d0
+ 433 0430 C079 0000 		and.w crit_dsk,%d0
+ 433      0000 
+ 434 0436 6600 FF68 		jbne .L77
+ 435 043a 4641      		not.w %d1
+ 436 043c C379 0000 		and.w %d1,log_dsk
+ 436      0000 
+ 437 0442 2F02      		move.l %d2,-(%sp)
+ 438 0444 4EB9 0000 		jbsr seldsk
+ 438      0000 
+ 439 044a 588F      		addq.l #4,%sp
+ 440 044c 6000 FF70 		jbra .L78
+ 441               	.L62:
+ 442 0450 33C4 0000 		move.w %d4,gbls+22
+ 442      0000 
+ 443 0456 2F07      		move.l %d7,-(%sp)
+ 444 0458 3039 0000 		move.w gbls+14,%d0
+ 444      0000 
+ 445 045e 3200      		move.w %d0,%d1
+ 446 0460 4841      		swap %d1
+ 447 0462 3239 0000 		mov.w gbls+16,%d1
+ 447      0000 
+ 448 0468 7003      		moveq #3,%d0
+ 449 046a C084      		and.l %d4,%d0
+ 450 046c EB88      		lsl.l #5,%d0
+ 451 046e 2041      		move.l %d1,%a0
+ 452 0470 4870 0800 		pea (%a0,%d0.l)
+ 453 0474 2F0D      		move.l %a5,-(%sp)
+ 454 0476 206E 0008 		move.l 8(%fp),%a0
+ 455 047a 4E90      		jbsr (%a0)
+ 456 047c 4FEF 000C 		lea (12,%sp),%sp
+ 457 0480 4A00      		tst.b %d0
+ 458 0482 6708      		jbeq .L70
+ 459 0484 0806 0001 		btst #1,%d6
+68K GAS  dskutil.s 			page 10
+
+
+ 460 0488 6734      		jbeq .L72
+ 461 048a 99CC      		sub.l %a4,%a4
+ 462               	.L70:
+ 463 048c 5244      		addq.w #1,%d4
+ 464               	.L58:
+ 465 048e 0806 0003 		btst #3,%d6
+ 466 0492 6600 FF16 		jbne .L59
+ 467 0496 7200      		moveq #0,%d1
+ 468 0498 3204      		move.w %d4,%d1
+ 469 049a 3079 0000 		move.w gbls+10,%a0
+ 469      0000 
+ 470 04a0 3008      		move.w %a0,%d0
+ 471 04a2 4840      		swap %d0
+ 472 04a4 3039 0000 		mov.w gbls+12,%d0
+ 472      0000 
+ 473 04aa 2040      		move.l %d0,%a0
+ 474 04ac 7000      		moveq #0,%d0
+ 475 04ae 3028 0004 		move.w 4(%a0),%d0
+ 476 04b2 5280      		addq.l #1,%d0
+ 477 04b4 B081      		cmp.l %d1,%d0
+ 478 04b6 6C00 FEF2 		jbge .L59
+ 479               	.L60:
+ 480 04ba 7A00      		moveq #0,%d5
+ 481 04bc 3A0C      		move.w %a4,%d5
+ 482               	.L72:
+ 483 04be 2005      		move.l %d5,%d0
+ 484 04c0 4CEE 3CFC 		movm.l -40(%fp),#0x3cfc
+ 484      FFD8 
+ 485 04c6 4E5E      		unlk %fp
+ 486 04c8 4E75      		rts
+ 487               		.size	dirscan, .-dirscan
+ 488               		.comm	chainp,4,4
+ 489               		.ident	"GCC: (GNU) 4.1.1"
+68K GAS  dskutil.s 			page 11
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 dskutil.c
+                            *ABS*:00000001 RETAIL
+                            *ABS*:000109a0 M68000
+           dskutil.s:7      .text:00000000 dchksum
+           dskutil.s:35     .text:00000040 setaloc
+           dskutil.s:80     .text:000000aa clraloc
+           dskutil.s:126    .text:00000116 chkaloc
+           dskutil.s:160    .text:0000016c getaloc
+           dskutil.s:217    .text:000001e4 rdwrt
+           dskutil.s:291    .text:000002ac dir_wr
+           dskutil.s:338    .text:0000032e dir_rd
+           dskutil.s:356    .text:0000035a dirscan
+                            *COM*:00000004 chainp
+
+UNDEFINED SYMBOLS
+gbls
+ro_dsk
+error
+do_phio
+crit_dsk
+log_dsk
+seldsk

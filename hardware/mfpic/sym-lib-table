@@ -1,4 +1,4 @@
 (sym_lib_table
   (version 0)
-  (lib (name "babyM68K-rescue")(type "Legacy")(uri "${KIPRJMOD}/babyM68K-rescue.lib")(options "")(descr ""))
+  (lib (name "PIC-007-rescue")(type "Legacy")(uri "${KIPRJMOD}/PIC-007-rescue.lib")(options "")(descr ""))
 )

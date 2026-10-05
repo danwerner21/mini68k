@@ -1,0 +1,139 @@
+eeschema (2011-03-30 BZR 2932)-stable  >> Creation date: 5/27/2014 1:46:44 AM
+
+#Cmp ( order = Reference )
+| C0         22uF        ; or 33uF or 47uF (electrolytic)
+| C1-C32     0.1uF       ; monolithic / ceramic   32 pieces
+| C40        1.0uF       ;             
+| C41-C44    1.0uF       ; only if MAX232 is used	4 pieces
+| J1         CONN_2      ;
+| J2         CONN_3      ;             
+| J3         CONN_3      ; CONN_2 or CONN_3  (external battery option)           
+| J4         CONN_2      ; (backplane battery option)            
+| P1         CONN_5X2    ;             
+| P2         CONN_10X2   ;             
+| P3         CONN_13X2   ;             
+| P4         CONN_20X2   ; right angle IDE connector for CF card adapter  
+| P5         CONN_4X2    ;             
+| P6         CONN_4X2    ;             
+| P20        C96ABC      ; DIN 41612 male right angle 96-positions loaded            
+| R1-R3      4700        ; 3 x 4K7 1/4w            
+| RP1        2200        ; 10-pin bussed SIP            
+| RP2        47K         ; 10-pin bussed SIP            
+| SC1        0.22F       ; 0.22 FARAD super-cap (supercap vs. battery option)            
+| U1         74LS240     ;             
+| U2         74LS08      ;             
+| U3         NS32202     ; provided with Board ($0.50 component)            
+| U4         74LS08      ;             
+| U5         74LS244     ;             
+| U6         74LS244     ;             
+| U7         DS1302      ; timekeeper / nvram            
+| U8         74LS244     ;             
+| U9         74LS688     ;             
+| U10        74LS02      ;             
+| U11        74LS04      ;             
+| U12        74LS125     ;             
+| U13        74LS139     ;             
+| U14        74LS245     ;             
+| U15        74LS157     ;             
+| U16        74LS273     ;             
+| U17        74LS153     ;             
+| U18        74LS153     ;             
+| U19        74LS153     ;             
+| U20        74LS244     ;             
+| U21        74LS175     ;             
+| U22        82C55       ;             
+| U27        74LS32      ;             
+| U30        16C550FN    ; (44-pin PLCC) or 16C750FN    
+| U31        DIL14       ; 1.8432mhz oscillator full or half can           
+| U32        MAX232      ; (option) plus C41-44 above + R1,2,3           
+| U33        MAX235      ; (option) don't use C41-44 or R1,2,3             
+| X1         CRYSTAL     ; 6pf 32.768khz “tuning fork” (10pf not as accurate)            
+#End Cmp
+
+#Cmp ( order = Value )       Socket:   
+| 0.1uF        C1        ;             
+| 0.1uF        C2        ;             
+| 0.1uF        C3        ;             
+| 0.1uF        C4        ;             
+| 0.1uF        C5        ;             
+| 0.1uF        C6        ;             
+| 0.1uF        C7        ;             
+| 0.1uF        C8        ;             
+| 0.1uF        C9        ;             
+| 0.1uF        C10       ;             
+| 0.1uF        C11       ;             
+| 0.1uF        C12       ;             
+| 0.1uF        C13       ;             
+| 0.1uF        C14       ;             
+| 0.1uF        C15       ;             
+| 0.1uF        C16       ;             
+| 0.1uF        C17       ;             
+| 0.1uF        C18       ;             
+| 0.1uF        C19       ;             
+| 0.1uF        C20       ;             
+| 0.1uF        C21       ;             
+| 0.1uF        C22       ;             
+| 0.1uF        C23       ;             
+| 0.1uF        C24       ;             
+| 0.1uF        C25       ;             
+| 0.1uF        C26       ;             
+| 0.1uF        C27       ;             
+| 0.1uF        C28       ;             
+| 0.1uF        C29       ;             
+| 0.1uF        C30       ;             
+| 0.1uF        C31       ;             
+| 0.1uF        C32       ;             
+| 0.22F        SC1       ;             
+| 1.0uF        c40       ;             
+| 1.0uF        C41       ;             
+| 1.0uF        C42       ;             
+| 1.0uF        C43       ;             
+| 1.0uF        C44       ;             
+| 16C550FN     U30       ; PLCC-44            
+| 2200         RP1       ; SIP-10            
+| 22uF         C0        ;             
+| 4700         R1        ;             
+| 4700         R2        ;             
+| 4700         R3        ;             
+| 47K          RP2       ; SIP-10            
+| 74LS02       U10       ; DIP-14            
+| 74LS04       U11       ; DIP-14            
+| 74LS08       U2        ; DIP-14            
+| 74LS08       U4        ; DIP-14            
+| 74LS125      U12       ; DIP-14            
+| 74LS139      U13       ; DIP-16            
+| 74LS153      U17       ; DIP-16            
+| 74LS153      U18       ; DIP-16            
+| 74LS153      U19       ; DIP-16      
+| 74LS157      U15       ; DIP-16      
+| 74LS175      U21       ; DIP-16      
+| 74LS240      U1        ; DIP-20      
+| 74LS244      U5        ; DIP-20      
+| 74LS244      U6        ; DIP-20            
+| 74LS244      U8        ; DIP-20            
+| 74LS244      U20       ; DIP-20            
+| 74LS245      U14       ; DIP-20            
+| 74LS273      U16       ; DIP-20            
+| 74LS32       U27       ; DIP-14            
+| 74LS688      U9        ; DIP-20            
+| 82C55        U22       ; DIP-600-40            
+| C96ABC       P20       ;             
+| CONN_10X2    P2        ;             
+| CONN_13X2    P3        ;             
+| CONN_2       J1        ;             
+| CONN_2       J4        ;             
+| CONN_20X2    P4        ;             
+| CONN_3       J2        ;             
+| CONN_3       J3        ;             
+| CONN_4X2     P5        ;             
+| CONN_4X2     P6        ;             
+| CONN_5X2     P1        ;             
+| CRYSTAL      X1        ;             
+| DIL14        U31       ; DIP-14            
+| DS1302       U7        ; DIP-8            
+| MAX232       U32       ;    DIP-16 or:           
+| MAX235       U33       ;    DIP-600-24            
+| NS32202      U3        ; DIP-600-40
+#End Cmp
+
+#End List

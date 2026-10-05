@@ -1,0 +1,39 @@
+68K GAS  0cpm68k.s 			page 1
+
+
+   1               	/* 0cpm68k.s -- header for a CP/M-68 *.68K file */
+   2               	
+   3               	
+   4               		.globl	__text_size
+   5               		.globl	__data_size
+   6               		.globl	__bss_size
+   7               		.globl	_start
+   8               	
+   9               		.text
+  10               	
+  11               	h0	=	.
+  12 0000 601A      		.word	0x601a
+  13 0002 0000 0000 		.long	__text_size - lh0
+  14 0006 0000 0000 		.long	__data_size
+  15 000a 0000 0000 		.long	__bss_size
+  16 000e 0000 0000 		.long	0				/* symbol table size */
+  17 0012 0000 0000 		.long	0				/* stack size */
+  18 0016 0000 0000 		.long	_start			/* entry point */
+  19 001a FFFF      		.word	0xffff			/* relocation bits suppressed flag */
+  20               	lh0	=	. - h0
+  21               	
+  22               		.end
+68K GAS  0cpm68k.s 			page 2
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000001 RETAIL
+                            *ABS*:000109a0 M68000
+           0cpm68k.s:11     .text:00000000 h0
+                            *ABS*:0000001c lh0
+
+UNDEFINED SYMBOLS
+__text_size
+__data_size
+__bss_size
+_start

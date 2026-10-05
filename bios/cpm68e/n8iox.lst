@@ -1,0 +1,219 @@
+68K GAS  n8iox.s 			page 1
+
+
+   1               	#  n8iox.s
+   2               	#	Support routines for 'n8io.c'
+   3               	#
+   4               	/**********************************************************************
+   5               		Copyright (C) 2012 John R. Coffman.
+   6               		Licensed for hobbyist use on the N8VEM mini-M68000 CPU board.
+   7               	***********************************************************************
+   8               	
+   9               	    This program is free software: you can redistribute it and/or modify
+  10               	    it under the terms of the GNU General Public License as published by
+  11               	    the Free Software Foundation, either version 3 of the License, or
+  12               	    (at your option) any later version.
+  13               	
+  14               	    This program is distributed in the hope that it will be useful,
+  15               	    but WITHOUT ANY WARRANTY; without even the implied warranty of
+  16               	    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  17               	    GNU General Public License for more details.
+  18               	
+  19               	    You should have received a copy of the GNU General Public License
+  20               	    in the file COPYING in the distribution directory along with this
+  21               	    program.  If not, see <http://www.gnu.org/licenses/>.
+  22               	
+  23               	**********************************************************************/
+  24               	.include "biostrap.s"
+   1               	#  biostrap.s
+   2               	/*
+   3               		Copyright (C) 2011 John R. Coffman.
+   4               		Licensed for hobbyist use on the N8VEM baby M68k CPU board.
+   5               	***********************************************************************
+   6               	
+   7               	    This program is free software: you can redistribute it and/or modify
+   8               	    it under the terms of the GNU General Public License as published by
+   9               	    the Free Software Foundation, either version 3 of the License, or
+  10               	    (at your option) any later version.
+  11               	
+  12               	    This program is distributed in the hope that it will be useful,
+  13               	    but WITHOUT ANY WARRANTY; without even the implied warranty of
+  14               	    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  15               	    GNU General Public License for more details.
+  16               	
+  17               	    You should have received a copy of the GNU General Public License
+  18               	    in the file COPYING in the distribution directory along with this
+  19               	    program.  If not, see <http://www.gnu.org/licenses/>.
+  20               	
+  21               	**********************************************************************/
+  22               	#
+  23               	#	Definitions of the  Baby M68000 CPU  BIOS trap calls
+  24               	#
+  25               	#
+  26               	bios		=	8		/* trap #8 used for all BIOS calls */
+  27               	BIOS		=	8		/* make case insensitive */
+  28               	
+  29               	
+  30               	#  General usage:
+  31               	#
+  32               	#	move.l	param1,%d1
+  33               	#	move.l	param2,%d2
+68K GAS  n8iox.s 			page 2
+
+
+  34               	#	move	address,%a0
+  35               	#
+  36               	#	move.b	#<bioscall>,%d0		/* BIOS call number in low byte of D0 */
+  37               	#	trap	#BIOS
+  38               	#
+  39               	#	Carry Clear means no error		<some calls only>
+  40               	#	Carry Set means an error occurred	<some calls only>
+  41               	#	Error code usually returned in D0
+  42               	#	Returned values in D1,D2,... A0,...	<see call description>
+  43               	#
+  44               	#
+  45               	#
+  46               	#
+  47               	#
+  48               	#		   D0 function
+  49               	#		      code
+  50               	#
+  51               	sioput		=	2	/* D1 = character to put out */
+  52               	siostr		=	3	/* A0 = string ptr, D1 = termination char */
+  53               					/* returns D0 = number of chars put out */
+  54               	sioget		=	4	/* D1 = returned character (waits) */
+  55               	siotst		=	5	/* D0 = 0, no character available  */
+  56               					/* D0 = 1..n, number of characters waiting */
+  57               	
+  58               	cpuhma		=	6	/* OBSOLETE!!! USE fn 8, D1=0; 
+  59               					   old:  return HMA in D0 -- 0x00200000 on max. system */
+  60               	cpustop		=	7	/* stop execution */
+  61               	hma_alloc	=	8	/* allocate D1 bytes of highest memory; return HMA (new) in D0 */
+  62               	
+  63               	/* IDE disk drivers */		/* D1 = disk # for all of the following:   */
+  64               	disk_reset	=	10	/* D1 = disk # -- may reset entire controller */
+  65               	disk_info	=	11	/* D1;  A0 = 512 byte buffer for disk ID */
+  66               	disk_read	=	12	/* D1;  A0 = buffer; D2 = LBA sector; D3 = sector count */
+  67               	disk_write	=	13	/* ditto */
+  68               	disk_verify	=	14	/* D1; D2 = LBA sector; D3 = sector count */
+  69               	/* Floppies only:   */
+  70               	disk_format	=	15	/* D1; A0 = interleave info/track */
+  71               	/*
+  72               	   Disk numbers are 0,1 for floppies; 2..7 for IDE disks
+  73               	 */
+  74               	
+  75               	day_time	=	20	/* D1 = return option */
+  76               	
+  77               	
+  78               	# biostrap.s -- end of file
+  79               	
+  25               	#######################################################################
+  26               	
+  27               		.globl	_read_sector	/* (drive, lba, memaddr) */
+  28               		.globl	_write_sector	/* (drive, lba, memaddr) */
+  29               		.globl	_disk_reset	/* (drive) */
+  30               		.globl	_disk_info	/* (drive, memaddr) IDE disks only */
+  31               		.globl	_halloc		/* high memory allocation */
+  32               		.globl	_get_hma	/* compatibility call */
+  33               		.globl	heap		/* ULONG pointer to end of BSS */
+  34               	
+  35               		.data
+68K GAS  n8iox.s 			page 3
+
+
+  36               		.globl	_end
+  37 0000 0000 0000 	heap:	.long	_end
+  38               	
+  39               		.text
+  40               	
+  41               	_read_sector:
+  42 0000 4E56 0000 		link	%a6,#0
+  43 0004 48E7 3000 		movem.l	%d2-%d3,-(%sp)
+  44 0008 222E 0008 		move.l	8(%a6),%d1	/* drive */
+  45 000c 242E 000C 		move.l	12(%a6),%d2	/* lba */
+  46 0010 7601      		move.l	#1,%d3		/* sector count = 1 */
+  47 0012 206E 0010 		move.l	16(%a6),%a0	/* memory address */
+  48 0016 700C      		move.l	#disk_read,%d0	/* function code */
+  49 0018 4E48      		trap	#bios
+  50 001a 4CDF 000C 		movem.l	(%sp)+,%d2-%d3
+  51 001e 4E5E      		unlk	%a6
+  52 0020 4E75      		rts
+  53               	
+  54               	_write_sector:
+  55 0022 4E56 0000 		link	%a6,#0
+  56 0026 48E7 3000 		movem.l	%d2-%d3,-(%sp)
+  57 002a 222E 0008 		move.l	8(%a6),%d1	/* drive */
+  58 002e 242E 000C 		move.l	12(%a6),%d2	/* lba */
+  59 0032 7601      		move.l	#1,%d3		/* sector count = 1 */
+  60 0034 206E 0010 		move.l	16(%a6),%a0	/* memory address */
+  61 0038 700D      		move.l	#disk_write,%d0	/* function code */
+  62 003a 4E48      		trap	#bios
+  63 003c 4CDF 000C 		movem.l	(%sp)+,%d2-%d3
+  64 0040 4E5E      		unlk	%a6
+  65 0042 4E75      		rts
+  66               	
+  67               	_disk_reset:
+  68 0044 4E56 0000 		link	%a6,#0
+  69 0048 222E 0008 		move.l	8(%a6),%d1	/* drive */
+  70 004c 700A      		move.l	#disk_reset,%d0	/* function code */
+  71 004e 4E48      		trap	#bios
+  72 0050 4E5E      		unlk	%a6
+  73 0052 4E75      		rts
+  74               	
+  75               	_disk_info:
+  76 0054 4E56 0000 		link	%a6,#0
+  77 0058 222E 0008 		move.l	8(%a6),%d1	/* drive */
+  78 005c 206E 000C 		move.l	12(%a6),%a0	/* memory address */
+  79 0060 700B      		move.l	#disk_info,%d0	/* function code */
+  80 0062 4E48      		trap	#bios
+  81 0064 4E5E      		unlk	%a6
+  82 0066 4E75      		rts
+  83               	
+  84               	
+  85               	_get_hma:
+  86 0068 4281      		clr.l	%d1
+  87 006a 6004      		br.s	hma_call
+  88               	_halloc:
+  89 006c 222F 0004 		move.l	4(%sp),%d1
+  90               	hma_call:
+  91 0070 7008      		move.l	#hma_alloc,%d0
+  92 0072 4E48      		trap	#bios
+68K GAS  n8iox.s 			page 4
+
+
+  93 0074 4E75      		rts
+  94               	
+  95               		.end
+68K GAS  n8iox.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000001 RETAIL
+                            *ABS*:000109a0 M68000
+          biostrap.s:26     *ABS*:00000008 bios
+          biostrap.s:27     *ABS*:00000008 BIOS
+          biostrap.s:51     *ABS*:00000002 sioput
+          biostrap.s:52     *ABS*:00000003 siostr
+          biostrap.s:54     *ABS*:00000004 sioget
+          biostrap.s:55     *ABS*:00000005 siotst
+          biostrap.s:58     *ABS*:00000006 cpuhma
+          biostrap.s:60     *ABS*:00000007 cpustop
+          biostrap.s:61     *ABS*:00000008 hma_alloc
+          biostrap.s:64     *ABS*:0000000a disk_reset
+          biostrap.s:65     *ABS*:0000000b disk_info
+          biostrap.s:66     *ABS*:0000000c disk_read
+          biostrap.s:67     *ABS*:0000000d disk_write
+          biostrap.s:68     *ABS*:0000000e disk_verify
+          biostrap.s:70     *ABS*:0000000f disk_format
+          biostrap.s:75     *ABS*:00000014 day_time
+             n8iox.s:41     .text:00000000 _read_sector
+             n8iox.s:54     .text:00000022 _write_sector
+             n8iox.s:67     .text:00000044 _disk_reset
+             n8iox.s:75     .text:00000054 _disk_info
+             n8iox.s:88     .text:0000006c _halloc
+             n8iox.s:85     .text:00000068 _get_hma
+             n8iox.s:37     .data:00000000 heap
+             n8iox.s:90     .text:00000070 hma_call
+
+UNDEFINED SYMBOLS
+_end

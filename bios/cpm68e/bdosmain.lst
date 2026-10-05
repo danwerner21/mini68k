@@ -1,0 +1,611 @@
+68K GAS  bdosmain.s 			page 1
+
+
+   1               	#NO_APP
+   2               		.file	"bdosmain.c"
+   3               		.text
+   4               		.align	2
+   5               		.globl	tmp_sel
+   6               		.type	tmp_sel, @function
+   7               	tmp_sel:
+   8 0000 4E56 0000 		link.w %fp,#0
+   9 0004 2F0B      		move.l %a3,-(%sp)
+  10 0006 2F0A      		move.l %a2,-(%sp)
+  11 0008 246E 0008 		move.l 8(%fp),%a2
+  12 000c 322A 0002 		move.w 2(%a2),%d1
+  13 0010 3001      		move.w %d1,%d0
+  14 0012 4840      		swap %d0
+  15 0014 302A 0004 		mov.w 4(%a2),%d0
+  16 0018 2640      		move.l %d0,%a3
+  17 001a 1013      		move.b (%a3),%d0
+  18 001c 1480      		move.b %d0,(%a2)
+  19 001e 670A      		jbeq .L2
+  20 0020 5300      		subq.b #1,%d0
+  21 0022 0280 0000 		and.l #255,%d0
+  21      00FF 
+  22 0028 6008      		jbra .L4
+  23               	.L2:
+  24 002a 7000      		moveq #0,%d0
+  25 002c 1039 0000 		move.b gbls+7,%d0
+  25      0000 
+  26               	.L4:
+  27 0032 2F00      		move.l %d0,-(%sp)
+  28 0034 4EB9 0000 		jbsr seldsk
+  28      0000 
+  29 003a 16B9 0000 		move.b gbls+8,(%a3)
+  29      0000 
+  30 0040 157C 0001 		move.b #1,1(%a2)
+  30      0001 
+  31 0046 588F      		addq.l #4,%sp
+  32 0048 246E FFF8 		move.l -8(%fp),%a2
+  33 004c 266E FFFC 		move.l -4(%fp),%a3
+  34 0050 4E5E      		unlk %fp
+  35 0052 4E75      		rts
+  36               		.size	tmp_sel, .-tmp_sel
+  37               		.align	2
+  38               		.globl	__bdos
+  39               		.type	__bdos, @function
+  40               	__bdos:
+  41 0054 4E56 FFF8 		link.w %fp,#-8
+  42 0058 2F0A      		move.l %a2,-(%sp)
+  43 005a 2F02      		move.l %d2,-(%sp)
+  44 005c 246E 0010 		move.l 16(%fp),%a2
+  45 0060 322E 000A 		move.w 10(%fp),%d1
+  46 0064 342E 000E 		move.w 14(%fp),%d2
+  47 0068 422E FFFB 		clr.b -5(%fp)
+  48 006c 200A      		move.l %a2,%d0
+  49 006e 4240      		clr.w %d0
+  50 0070 4840      		swap %d0
+  51 0072 3D40 FFFC 		move.w %d0,-4(%fp)
+  52 0076 3D4A FFFE 		move.w %a2,-2(%fp)
+68K GAS  bdosmain.s 			page 2
+
+
+  53 007a 0C41 003F 		cmp.w #63,%d1
+  54 007e 6200 009A 		jbhi .L7
+  55 0082 7000      		moveq #0,%d0
+  56 0084 3001      		move.w %d1,%d0
+  57 0086 D080      		add.l %d0,%d0
+  58               		.set .LI52,.+2
+  59 0088 303B 0806 		move.w .L52-.LI52.b(%pc,%d0.l),%d0
+  60 008c 4EFB 0002 		jmp %pc@(2,%d0:w)
+  61               		.align	2
+  62               		.swbeg	&64
+  63               	.L52:
+  64 0090 0092      		.word .L8-.L52
+  65 0092 009C      		.word .L9-.L52
+  66 0094 00AC      		.word .L10-.L52
+  67 0096 00BC      		.word .L11-.L52
+  68 0098 00C2      		.word .L12-.L52
+  69 009a 00CE      		.word .L13-.L52
+  70 009c 00E6      		.word .L14-.L52
+  71 009e 00FC      		.word .L15-.L52
+  72 00a0 0108      		.word .L16-.L52
+  73 00a2 0112      		.word .L17-.L52
+  74 00a4 011E      		.word .L18-.L52
+  75 00a6 012A      		.word .L19-.L52
+  76 00a8 0080      		.word .L20-.L52
+  77 00aa 0136      		.word .L21-.L52
+  78 00ac 0158      		.word .L22-.L52
+  79 00ae 016E      		.word .L23-.L52
+  80 00b0 018C      		.word .L24-.L52
+  81 00b2 01A0      		.word .L25-.L52
+  82 00b4 01BA      		.word .L26-.L52
+  83 00b6 01EC      		.word .L27-.L52
+  84 00b8 0204      		.word .L28-.L52
+  85 00ba 0212      		.word .L29-.L52
+  86 00bc 0220      		.word .L30-.L52
+  87 00be 0246      		.word .L31-.L52
+  88 00c0 025C      		.word .L32-.L52
+  89 00c2 0268      		.word .L33-.L52
+  90 00c4 0274      		.word .L34-.L52
+  91 00c6 008A      		.word .L7-.L52
+  92 00c8 028C      		.word .L35-.L52
+  93 00ca 02A0      		.word .L36-.L52
+  94 00cc 02AC      		.word .L37-.L52
+  95 00ce 02CA      		.word .L38-.L52
+  96 00d0 0310      		.word .L39-.L52
+  97 00d2 032C      		.word .L40-.L52
+  98 00d4 033E      		.word .L41-.L52
+  99 00d6 034C      		.word .L42-.L52
+ 100 00d8 0360      		.word .L43-.L52
+ 101 00da 0374      		.word .L44-.L52
+ 102 00dc 008A      		.word .L7-.L52
+ 103 00de 008A      		.word .L7-.L52
+ 104 00e0 038E      		.word .L45-.L52
+ 105 00e2 008A      		.word .L7-.L52
+ 106 00e4 008A      		.word .L7-.L52
+ 107 00e6 008A      		.word .L7-.L52
+ 108 00e8 008A      		.word .L7-.L52
+ 109 00ea 008A      		.word .L7-.L52
+68K GAS  bdosmain.s 			page 3
+
+
+ 110 00ec 03AA      		.word .L46-.L52
+ 111 00ee 03B6      		.word .L47-.L52
+ 112 00f0 03D6      		.word .L48-.L52
+ 113 00f2 008A      		.word .L7-.L52
+ 114 00f4 008A      		.word .L7-.L52
+ 115 00f6 008A      		.word .L7-.L52
+ 116 00f8 008A      		.word .L7-.L52
+ 117 00fa 008A      		.word .L7-.L52
+ 118 00fc 008A      		.word .L7-.L52
+ 119 00fe 008A      		.word .L7-.L52
+ 120 0100 008A      		.word .L7-.L52
+ 121 0102 008A      		.word .L7-.L52
+ 122 0104 008A      		.word .L7-.L52
+ 123 0106 03DE      		.word .L49-.L52
+ 124 0108 008A      		.word .L7-.L52
+ 125 010a 0402      		.word .L50-.L52
+ 126 010c 008A      		.word .L7-.L52
+ 127 010e 0414      		.word .L51-.L52
+ 128               	.L20:
+ 129 0110 203C 0000 		move.l #8226,%d0
+ 129      2022 
+ 130 0116 6000 03A8 		jbra .L53
+ 131               	.L7:
+ 132 011a 7000      		moveq #0,%d0
+ 133 011c 4640      		not.w %d0
+ 134 011e 6000 03A0 		jbra .L53
+ 135               	.L8:
+ 136 0122 42A7      		clr.l -(%sp)
+ 137 0124 4EB9 0000 		jbsr warmboot
+ 137      0000 
+ 138 012a 588F      		addq.l #4,%sp
+ 139               	.L9:
+ 140 012c 4EB9 0000 		jbsr conin
+ 140      0000 
+ 141 0132 0280 0000 		and.l #255,%d0
+ 141      00FF 
+ 142 0138 6000 0386 		jbra .L53
+ 143               	.L10:
+ 144 013c 7000      		moveq #0,%d0
+ 145 013e 1002      		move.b %d2,%d0
+ 146 0140 2F00      		move.l %d0,-(%sp)
+ 147 0142 4EB9 0000 		jbsr tabout
+ 147      0000 
+ 148 0148 6000 0362 		jbra .L62
+ 149               	.L11:
+ 150 014c 4878 0007 		pea 7.w
+ 151 0150 603E      		jbra .L75
+ 152               	.L12:
+ 153 0152 7000      		moveq #0,%d0
+ 154 0154 1002      		move.b %d2,%d0
+ 155 0156 2F00      		move.l %d0,-(%sp)
+ 156 0158 4878 0006 		pea 6.w
+ 157 015c 600A      		jbra .L63
+ 158               	.L13:
+ 159 015e 7000      		moveq #0,%d0
+ 160 0160 1002      		move.b %d2,%d0
+ 161 0162 2F00      		move.l %d0,-(%sp)
+68K GAS  bdosmain.s 			page 4
+
+
+ 162 0164 4878 0005 		pea 5.w
+ 163               	.L63:
+ 164 0168 4EB9 0000 		jbsr _bios2
+ 164      0000 
+ 165               	.L64:
+ 166 016e 4240      		clr.w %d0
+ 167               	.L69:
+ 168 0170 508F      		addq.l #8,%sp
+ 169 0172 6000 033C 		jbra .L54
+ 170               	.L14:
+ 171 0176 3F02      		move.w %d2,-(%sp)
+ 172 0178 4267      		clr.w -(%sp)
+ 173 017a 4EB9 0000 		jbsr rawconio
+ 173      0000 
+ 174               	.L71:
+ 175 0180 0280 0000 		and.l #255,%d0
+ 175      00FF 
+ 176               	.L72:
+ 177 0186 588F      		addq.l #4,%sp
+ 178 0188 6000 0336 		jbra .L53
+ 179               	.L15:
+ 180 018c 4878 0013 		pea 19.w
+ 181               	.L75:
+ 182 0190 4EB9 0000 		jbsr _bios1
+ 182      0000 
+ 183 0196 60E8      		jbra .L71
+ 184               	.L16:
+ 185 0198 3F02      		move.w %d2,-(%sp)
+ 186 019a 4267      		clr.w -(%sp)
+ 187 019c 4878 0014 		pea 20.w
+ 188 01a0 60C6      		jbra .L63
+ 189               	.L17:
+ 190 01a2 2F0A      		move.l %a2,-(%sp)
+ 191 01a4 4EB9 0000 		jbsr prt_line
+ 191      0000 
+ 192 01aa 6000 0300 		jbra .L62
+ 193               	.L18:
+ 194 01ae 2F0A      		move.l %a2,-(%sp)
+ 195 01b0 4EB9 0000 		jbsr readline
+ 195      0000 
+ 196 01b6 6000 02F4 		jbra .L62
+ 197               	.L19:
+ 198 01ba 4EB9 0000 		jbsr constat
+ 198      0000 
+ 199 01c0 4880      		ext.w %d0
+ 200 01c2 6000 02F6 		jbra .L55
+ 201               	.L21:
+ 202 01c6 4279 0000 		clr.w log_dsk
+ 202      0000 
+ 203 01cc 4279 0000 		clr.w ro_dsk
+ 203      0000 
+ 204 01d2 4279 0000 		clr.w crit_dsk
+ 204      0000 
+ 205 01d8 50F9 0000 		st gbls+6
+ 205      0000 
+ 206 01de 4239 0000 		clr.b gbls+7
+ 206      0000 
+68K GAS  bdosmain.s 			page 5
+
+
+ 207 01e4 6000 0130 		jbra .L70
+ 208               	.L22:
+ 209 01e8 7000      		moveq #0,%d0
+ 210 01ea 1002      		move.b %d2,%d0
+ 211 01ec 2F00      		move.l %d0,-(%sp)
+ 212 01ee 4EB9 0000 		jbsr seldsk
+ 212      0000 
+ 213 01f4 13C2 0000 		move.b %d2,gbls+7
+ 213      0000 
+ 214 01fa 6000 02B0 		jbra .L62
+ 215               	.L23:
+ 216 01fe 486E FFFA 		pea -6(%fp)
+ 217 0202 6100 FDFC 		jbsr tmp_sel
+ 218 0206 422A 000C 		clr.b 12(%a2)
+ 219 020a 422A 000E 		clr.b 14(%a2)
+ 220 020e 42A7      		clr.l -(%sp)
+ 221 0210 2F0A      		move.l %a2,-(%sp)
+ 222 0212 4879 0000 		pea openfile
+ 222      0000 
+ 223 0218 6000 0136 		jbra .L74
+ 224               	.L24:
+ 225 021c 486E FFFA 		pea -6(%fp)
+ 226 0220 6100 FDDE 		jbsr tmp_sel
+ 227 0224 2F0A      		move.l %a2,-(%sp)
+ 228 0226 4EB9 0000 		jbsr close_fi
+ 228      0000 
+ 229 022c 6000 FF42 		jbra .L69
+ 230               	.L25:
+ 231 0230 200A      		move.l %a2,%d0
+ 232 0232 4240      		clr.w %d0
+ 233 0234 4840      		swap %d0
+ 234 0236 33C0 0000 		move.w %d0,gbls+28
+ 234      0000 
+ 235 023c 33CA 0000 		move.w %a2,gbls+30
+ 235      0000 
+ 236 0242 486E FFFA 		pea -6(%fp)
+ 237 0246 42A7      		clr.l -(%sp)
+ 238 0248 6026      		jbra .L73
+ 239               	.L26:
+ 240 024a 3239 0000 		move.w gbls+28,%d1
+ 240      0000 
+ 241 0250 3001      		move.w %d1,%d0
+ 242 0252 4840      		swap %d0
+ 243 0254 3039 0000 		mov.w gbls+30,%d0
+ 243      0000 
+ 244 025a 2440      		move.l %d0,%a2
+ 245 025c 4240      		clr.w %d0
+ 246 025e 4840      		swap %d0
+ 247 0260 3D40 FFFC 		move.w %d0,-4(%fp)
+ 248 0264 3D4A FFFE 		move.w %a2,-2(%fp)
+ 249 0268 486E FFFA 		pea -6(%fp)
+ 250 026c 4878 0001 		pea 1.w
+ 251               	.L73:
+ 252 0270 2F0A      		move.l %a2,-(%sp)
+ 253 0272 4EB9 0000 		jbsr search
+ 253      0000 
+ 254 0278 6000 011E 		jbra .L68
+68K GAS  bdosmain.s 			page 6
+
+
+ 255               	.L27:
+ 256 027c 486E FFFA 		pea -6(%fp)
+ 257 0280 6100 FD7E 		jbsr tmp_sel
+ 258 0284 4878 0002 		pea 2.w
+ 259 0288 2F0A      		move.l %a2,-(%sp)
+ 260 028a 4879 0000 		pea delete
+ 260      0000 
+ 261 0290 6000 00BE 		jbra .L74
+ 262               	.L28:
+ 263 0294 486E FFFA 		pea -6(%fp)
+ 264 0298 6100 FD66 		jbsr tmp_sel
+ 265 029c 42A7      		clr.l -(%sp)
+ 266 029e 6000 0128 		jbra .L76
+ 267               	.L29:
+ 268 02a2 486E FFFA 		pea -6(%fp)
+ 269 02a6 6100 FD58 		jbsr tmp_sel
+ 270 02aa 42A7      		clr.l -(%sp)
+ 271 02ac 6000 017C 		jbra .L65
+ 272               	.L30:
+ 273 02b0 486E FFFA 		pea -6(%fp)
+ 274 02b4 6100 FD4A 		jbsr tmp_sel
+ 275 02b8 422A 000C 		clr.b 12(%a2)
+ 276 02bc 422A 000D 		clr.b 13(%a2)
+ 277 02c0 422A 000E 		clr.b 14(%a2)
+ 278 02c4 422A 000F 		clr.b 15(%a2)
+ 279 02c8 4878 0008 		pea 8.w
+ 280 02cc 2F0A      		move.l %a2,-(%sp)
+ 281 02ce 4879 0000 		pea create
+ 281      0000 
+ 282 02d4 607A      		jbra .L74
+ 283               	.L31:
+ 284 02d6 486E FFFA 		pea -6(%fp)
+ 285 02da 6100 FD24 		jbsr tmp_sel
+ 286 02de 4878 0002 		pea 2.w
+ 287 02e2 2F0A      		move.l %a2,-(%sp)
+ 288 02e4 4879 0000 		pea rename
+ 288      0000 
+ 289 02ea 6064      		jbra .L74
+ 290               	.L32:
+ 291 02ec 7000      		moveq #0,%d0
+ 292 02ee 3039 0000 		move.w log_dsk,%d0
+ 292      0000 
+ 293 02f4 6000 01CA 		jbra .L53
+ 294               	.L33:
+ 295 02f8 7000      		moveq #0,%d0
+ 296 02fa 1039 0000 		move.b gbls+7,%d0
+ 296      0000 
+ 297 0300 6000 01BE 		jbra .L53
+ 298               	.L34:
+ 299 0304 200A      		move.l %a2,%d0
+ 300 0306 4240      		clr.w %d0
+ 301 0308 4840      		swap %d0
+ 302 030a 33C0 0000 		move.w %d0,gbls+24
+ 302      0000 
+ 303 0310 33CA 0000 		move.w %a2,gbls+26
+ 303      0000 
+ 304               	.L70:
+68K GAS  bdosmain.s 			page 7
+
+
+ 305 0316 4240      		clr.w %d0
+ 306 0318 6000 01A0 		jbra .L55
+ 307               	.L35:
+ 308 031c 7200      		moveq #0,%d1
+ 309 031e 1239 0000 		move.b gbls+7,%d1
+ 309      0000 
+ 310 0324 7001      		moveq #1,%d0
+ 311 0326 E3A8      		lsl.l %d1,%d0
+ 312 0328 8179 0000 		or.w %d0,ro_dsk
+ 312      0000 
+ 313 032e 60E6      		jbra .L70
+ 314               	.L36:
+ 315 0330 7000      		moveq #0,%d0
+ 316 0332 3039 0000 		move.w ro_dsk,%d0
+ 316      0000 
+ 317 0338 6000 0186 		jbra .L53
+ 318               	.L37:
+ 319 033c 486E FFFA 		pea -6(%fp)
+ 320 0340 6100 FCBE 		jbsr tmp_sel
+ 321 0344 4878 0002 		pea 2.w
+ 322 0348 2F0A      		move.l %a2,-(%sp)
+ 323 034a 4879 0000 		pea set_attr
+ 323      0000 
+ 324               	.L74:
+ 325 0350 4EB9 0000 		jbsr dirscan
+ 325      0000 
+ 326 0356 6000 00DC 		jbra .L67
+ 327               	.L38:
+ 328 035a 1039 0000 		move.b gbls+7,%d0
+ 328      0000 
+ 329 0360 B039 0000 		cmp.b gbls+6.l,%d0
+ 329      0000 
+ 330 0366 6710      		jbeq .L56
+ 331 0368 0280 0000 		and.l #255,%d0
+ 331      00FF 
+ 332 036e 2F00      		move.l %d0,-(%sp)
+ 333 0370 4EB9 0000 		jbsr seldsk
+ 333      0000 
+ 334 0376 588F      		addq.l #4,%sp
+ 335               	.L56:
+ 336 0378 4878 0010 		pea 16.w
+ 337 037c 2F0A      		move.l %a2,-(%sp)
+ 338 037e 3239 0000 		move.w gbls+18,%d1
+ 338      0000 
+ 339 0384 3001      		move.w %d1,%d0
+ 340 0386 4840      		swap %d0
+ 341 0388 3039 0000 		mov.w gbls+20,%d0
+ 341      0000 
+ 342 038e 2F00      		move.l %d0,-(%sp)
+ 343 0390 4EB9 0000 		jbsr move
+ 343      0000 
+ 344 0396 4240      		clr.w %d0
+ 345               	.L68:
+ 346 0398 4FEF 000C 		lea (12,%sp),%sp
+ 347 039c 6000 0112 		jbra .L54
+ 348               	.L39:
+ 349 03a0 7000      		moveq #0,%d0
+68K GAS  bdosmain.s 			page 8
+
+
+ 350 03a2 1002      		move.b %d2,%d0
+ 351 03a4 720F      		moveq #15,%d1
+ 352 03a6 B280      		cmp.l %d0,%d1
+ 353 03a8 6D06      		jblt .L58
+ 354 03aa 13C2 0000 		move.b %d2,gbls+8
+ 354      0000 
+ 355               	.L58:
+ 356 03b0 7000      		moveq #0,%d0
+ 357 03b2 1039 0000 		move.b gbls+8,%d0
+ 357      0000 
+ 358 03b8 6000 0106 		jbra .L53
+ 359               	.L40:
+ 360 03bc 486E FFFA 		pea -6(%fp)
+ 361 03c0 6100 FC3E 		jbsr tmp_sel
+ 362 03c4 4878 0001 		pea 1.w
+ 363               	.L76:
+ 364 03c8 4878 0001 		pea 1.w
+ 365 03cc 605E      		jbra .L66
+ 366               	.L41:
+ 367 03ce 486E FFFA 		pea -6(%fp)
+ 368 03d2 6100 FC2C 		jbsr tmp_sel
+ 369 03d6 4878 0001 		pea 1.w
+ 370 03da 604E      		jbra .L65
+ 371               	.L42:
+ 372 03dc 486E FFFA 		pea -6(%fp)
+ 373 03e0 6100 FC1E 		jbsr tmp_sel
+ 374 03e4 2F0A      		move.l %a2,-(%sp)
+ 375 03e6 4EB9 0000 		jbsr getsize
+ 375      0000 
+ 376 03ec 6000 FD80 		jbra .L64
+ 377               	.L43:
+ 378 03f0 486E FFFA 		pea -6(%fp)
+ 379 03f4 6100 FC0A 		jbsr tmp_sel
+ 380 03f8 2F0A      		move.l %a2,-(%sp)
+ 381 03fa 4EB9 0000 		jbsr setran
+ 381      0000 
+ 382 0400 6000 FD6C 		jbra .L64
+ 383               	.L44:
+ 384 0404 3002      		move.w %d2,%d0
+ 385 0406 4640      		not.w %d0
+ 386 0408 C179 0000 		and.w %d0,log_dsk
+ 386      0000 
+ 387 040e C179 0000 		and.w %d0,ro_dsk
+ 387      0000 
+ 388 0414 C179 0000 		and.w %d0,crit_dsk
+ 388      0000 
+ 389 041a 6000 FEFA 		jbra .L70
+ 390               	.L45:
+ 391 041e 486E FFFA 		pea -6(%fp)
+ 392 0422 6100 FBDC 		jbsr tmp_sel
+ 393 0426 4878 0002 		pea 2.w
+ 394               	.L65:
+ 395 042a 42A7      		clr.l -(%sp)
+ 396               	.L66:
+ 397 042c 2F0A      		move.l %a2,-(%sp)
+ 398 042e 4EB9 0000 		jbsr bdosrw
+ 398      0000 
+68K GAS  bdosmain.s 			page 9
+
+
+ 399               	.L67:
+ 400 0434 4FEF 0010 		lea (16,%sp),%sp
+ 401 0438 6076      		jbra .L54
+ 402               	.L46:
+ 403 043a 3F02      		move.w %d2,-(%sp)
+ 404 043c 4267      		clr.w -(%sp)
+ 405 043e 4EB9 0000 		jbsr free_sp
+ 405      0000 
+ 406 0444 6066      		jbra .L62
+ 407               	.L47:
+ 408 0446 3239 0000 		move.w gbls+24,%d1
+ 408      0000 
+ 409 044c 3001      		move.w %d1,%d0
+ 410 044e 4840      		swap %d0
+ 411 0450 3039 0000 		mov.w gbls+26,%d0
+ 411      0000 
+ 412 0456 23C0 0000 		move.l %d0,chainp
+ 412      0000 
+ 413 045c 42A7      		clr.l -(%sp)
+ 414 045e 4EB9 0000 		jbsr warmboot
+ 414      0000 
+ 415 0464 588F      		addq.l #4,%sp
+ 416               	.L48:
+ 417 0466 4EB9 0000 		jbsr flushit
+ 417      0000 
+ 418 046c 604C      		jbra .L55
+ 419               	.L49:
+ 420 046e 3239 0000 		move.w gbls+24,%d1
+ 420      0000 
+ 421 0474 3001      		move.w %d1,%d0
+ 422 0476 4840      		swap %d0
+ 423 0478 3039 0000 		mov.w gbls+26,%d0
+ 423      0000 
+ 424 047e 2F00      		move.l %d0,-(%sp)
+ 425 0480 2F0A      		move.l %a2,-(%sp)
+ 426 0482 4EB9 0000 		jbsr pgmld
+ 426      0000 
+ 427 0488 0280 0000 		and.l #65535,%d0
+ 427      FFFF 
+ 428 048e 508F      		addq.l #8,%sp
+ 429 0490 602E      		jbra .L53
+ 430               	.L50:
+ 431 0492 2F0A      		move.l %a2,-(%sp)
+ 432 0494 4EB9 0000 		jbsr setexc
+ 432      0000 
+ 433 049a 0280 0000 		and.l #65535,%d0
+ 433      FFFF 
+ 434 04a0 6000 FCE4 		jbra .L72
+ 435               	.L51:
+ 436 04a4 2F0A      		move.l %a2,-(%sp)
+ 437 04a6 4EB9 0000 		jbsr set_tpa
+ 437      0000 
+ 438               	.L62:
+ 439 04ac 4240      		clr.w %d0
+ 440 04ae 588F      		addq.l #4,%sp
+ 441               	.L54:
+ 442 04b0 4A2E FFFB 		tst.b -5(%fp)
+68K GAS  bdosmain.s 			page 10
+
+
+ 443 04b4 6704      		jbeq .L55
+ 444 04b6 14AE FFFA 		move.b -6(%fp),(%a2)
+ 445               	.L55:
+ 446 04ba 0280 0000 		and.l #65535,%d0
+ 446      FFFF 
+ 447               	.L53:
+ 448 04c0 242E FFF0 		move.l -16(%fp),%d2
+ 449 04c4 246E FFF4 		move.l -12(%fp),%a2
+ 450 04c8 4E5E      		unlk %fp
+ 451 04ca 4E75      		rts
+ 452               		.size	__bdos, .-__bdos
+ 453               		.comm	chainp,4,4
+ 454               		.comm	log_dsk,2,2
+ 455               		.comm	ro_dsk,2,2
+ 456               		.comm	crit_dsk,2,2
+ 457               		.comm	tpa_lp,4,4
+ 458               		.comm	tpa_lt,4,4
+ 459               		.comm	tpa_hp,4,4
+ 460               		.comm	tpa_ht,4,4
+ 461               		.comm	gbls,238,2
+ 462               		.ident	"GCC: (GNU) 4.1.1"
+68K GAS  bdosmain.s 			page 11
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 bdosmain.c
+                            *ABS*:00000001 RETAIL
+                            *ABS*:000109a0 M68000
+          bdosmain.s:7      .text:00000000 tmp_sel
+                            *COM*:000000ee gbls
+          bdosmain.s:40     .text:00000054 __bdos
+                            *COM*:00000002 log_dsk
+                            *COM*:00000002 ro_dsk
+                            *COM*:00000002 crit_dsk
+                            *COM*:00000004 chainp
+                            *COM*:00000004 tpa_lp
+                            *COM*:00000004 tpa_lt
+                            *COM*:00000004 tpa_hp
+                            *COM*:00000004 tpa_ht
+
+UNDEFINED SYMBOLS
+seldsk
+warmboot
+conin
+tabout
+_bios2
+rawconio
+_bios1
+prt_line
+readline
+constat
+openfile
+close_fi
+search
+delete
+create
+rename
+set_attr
+dirscan
+move
+getsize
+setran
+bdosrw
+free_sp
+flushit
+pgmld
+setexc
+set_tpa

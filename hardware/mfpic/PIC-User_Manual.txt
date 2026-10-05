@@ -1,0 +1,178 @@
+         		ECB Multifunction Board 1.0
+				User Manual
+
+
+Purpose
+=======
+
+The MF/PIC board is intended to provide multiple I/O functions for a future
+Motorola MC68000 CPU board.  It also supports vectored interrupts on the
+Z80 CPU boards, SBC v1 and v2.
+
+
+Interrupt Controller
+====================
+
+The interrupt controller is a National Semiconductor NS32202, which allows
+for up to 16 interrupt sources.  Details of the programming of this chip
+are left to the NS32202 data sheet.  The data sheet contains a very detailed
+flowchart on the initialization of this chip.
+
+The vector returned by the interrupt controller is modified as directed by
+the Configuration Register on the MF/PIC board.  The 5 high order bits of
+the CFG register are programmable to any values.  The low order 2 bits
+indicate a shift value for the returned interrupt vector.  The 80x86
+requires a shift of zero; the Z80 in IM 2 requires a shift of one; and the
+Z80 in IM 0 requires a shift of three.  Bit 2 of the CFG register selects
+between 8 and 16 interrupt vector values.  Normally, only 8 are used (bit 2
+equal to zero).  The NS interrupt controller is always programmed to use 16
+interrupts, and in this normal case, only the low order 8 are used.  The
+high order ones will normally always be masked.
+
+
+UART - serial I/O
+=================
+
+To save board space, the PLCC version of the TL16C550 or TL16C750 is used. 
+This is a familiar UART used on the SBC v1 and v2, SBC-188, &c.  The UART
+interrupt is normally connected to Interrupt Request 4, but may alternately
+use Interrupt Request 12, under control of the CFG register.
+
+The RS-232 inputs/outputs of the UART connect to an IBM PC 10-pin connector,
+which may, in turn, be cabled to a DB9 socket or plug.  The MF/PIC board may
+be stuffed with either a MAX232 or MAX235 interface chip.  The signals on
+the 10-pin connector may be selected to look like an RS-232 terminal or an
+RS-232 modem.  10 jumpers should always be present on the dual row
+personality connector.  When the jumpers are all aligned with the longer
+dimension of the board, the 10-pin connector looks like a terminal, and is
+the same pinout as the SBC v1 and SBC-188 boards.  When the jumpers are all
+aligned with the short dimension of the board, the 10-pin connector looks
+like a modem, and the use of a null-modem cable or adapter to connect to a
+terminal is no longer required.
+
+The MAX232 interface chip provides a connection that is familiar to users of
+the SBC v1 board.  The MAX235 stuffing option provides 5 RS-232 outputs and
+5 RS-232 inputs.  With this option, the DB9 connector may support all RS-232
+modem/terminal control signals.  Note that the modem signal, DCD is output
+on the OUT1 pin of the UART.  The UART is still programmed from the
+viewpoint of a terminal.
+
+
+Clock Chip and RAM
+==================
+
+The battery-backed clock chip and CMOS RAM is the familiar DS1302 from the
+SBC and SBC-188 boards.
+
+N.B.:  The MF/PIC clock chip is connected the same way as the SBC-188 clock
+chip.  This is DIFFERENT from the SBC v1 and v2 boards.  Note the different
+bit assignments, and differing signal polarities.
+
+
+	bit	   SBC-188 / MF/PIC      SBC v1, v2, HomeComputer
+
+	0		Data			--
+	1		Write			--
+	2		Clock			--
+	3		Reset			--
+	4		--			/Reset
+	5		--			/Write
+	6		--			Clock
+	7		--			Data
+
+
+Parallel Interface / IDE interface
+==================================
+
+The 82C55 may be used for two different purposes, either as a parallel
+interface compatible with the SBC and SBC-188, or directly as a combination
+of the PPI plus PPIDE mini-card to form an IDE interface (under software
+control).  The PPIDE has been found to be most useful in attaching Compact
+Flash cards, through a third-party adapter, to the ECB computers.  To this
+end, a recommended option is to install the 40-pin IDE connector as a right
+angle header, allowing the CF adapter to point parallel with the ECB card. 
+There is also the compatible 26-pin header for access to all 24 I/O pins on
+the 82C55.  This is the same connector as used on the SBC v2 and SBC-188.
+
+There is a jumper option, J3, for adding a power connection to both headers. 
+PPI26.pin25 and IDE40.pin20 are connected together.  J3 controls whether
+there is no connection (no jumper installed), which is the default for the
+IDE connector (but useful to power a CF card adapter), +5v applied to both
+pins (2-3 position), or GND applied to both pins (1-2 position), which is
+the SBC v1 connection.  Just remember that this jumper controls a pin on
+BOTH headers.  This is the same as the Home Computer.
+
+
+Board Device Code
+=================
+
+The devices on the MF/PIC board occupy 16 device codes on the ECB bus.  The
+high four bits of the 8-bit device code are jumper selectable.
+
+Four position header P5 controls the high 4 bits of the board device code. 
+Pins 1-2 control bit 7, 3-4 control bit 6, etc.  The jumpers short pull-up
+resistors to ground, so Open means a one, and Shorted means a zero.
+
+*** No default device jumpering has yet been assigned to this board. ***
+
+
+Individual Device Codes
+=======================
+
+If header P5 is jumpered to base device "x0h," then the devices on the
+board are addressable as:
+
+		UART:	x8h..xFh	serial I/O controller
+		PPI:	x4h..x7h	parallel i/f or IDE
+		RTC:	x3h		clock / CMOS RAM
+		CFG:	x2h		Configuration Register
+		PIC:	yyx0h		NS32202 interrupt controller
+
+The interrupt controller uses extended 16-bit device addressing to access
+the 32 internal registers, plus another bit to control the ST1 (status)
+input.
+
+
+Interrupt Controller Register Addressing
+========================================
+
+Rather than allow the NS32202 interrupt controller to hog 32 I/O device
+addresses on the ECB bus, the controller uses a single 8-bit device code on
+address bits 0..7, and addresses its internal registers using extended
+addressing on address bits 8..15.  This requires special programming of a Z80
+to handle this 16-bit extended addressing.  The instructions,
+
+		IN	A,(C)
+		OUT	(C),A
+
+actually place the entire BC register on the address lines (this is
+documented by Zilog).  Hence, to address the interrupt controller, register
+C is loaded with the PIC address of the MF/PIC board, which is "x0h", where
+x = the P5 jumper setting of the board.  Then the individual register number
+to be accessed is placed in the B register (0 to 31, 00h to 1Fh), and the
+register is read or written using one of the instructions above.
+
+A special case of Interrupt Controller addressing occurs on the End of
+Interrupt condition (EOI).  EOI is distinguished from Interrupt Acknowledge
+(INTA) on the 32000 processor by a processor status bit input to the interrupt
+controller when register 0 is read.  On the MF/PIC board ST1 is forced to
+zero during Interrupt Acknowledge, and must be programmed as one to signal
+EOI; viz.,
+
+		...
+	    EOI_sequence:
+		LD	BC,20x0H	; bit 13 = 1, h/w reg. 0, device x0h
+		IN	A,(C)		; signal EOI
+		POP	BC		; restore
+		POP	AF		; restore
+		EI			; turn interrupts back on
+		RET			; RETI is for Zilog devices
+
+For all other register addressing situations, bit 13 should be zero.
+
+
+
+
+(end)
+John Coffman
+rev. 1  2011-Mar-29

@@ -1,0 +1,590 @@
+68K GAS  exceptn.s 			page 1
+
+
+   1               	#************************************************
+   2               	#						*
+   3               	#	CP/M-68k Basic Disk Operating System 	*
+   4               	#		Exception Handling Module	*
+   5               	#						*
+   6               	#	Version 0.0 -- July    21, 1982		*
+   7               	#	Version 0.1 -- July    25, 1982		*
+   8               	#	Version 0.2 -- October  6, 1982		*
+   9               	#	Version 0.3 -- December 21, 1982	*
+  10               	#						*
+  11               	#	Modified 2/15/84 sw for 68010 support	*
+  12               	#		 3/31/2016 jrc 68030 support	*
+  13               	#						*
+  14               	#************************************************
+  15               	
+  16               	
+  17               		.globl	initexc
+  18               		.globl	tpa_lp
+  19               		.globl	tpa_hp
+  20               		.globl	gouser				/*sw RTE routine */
+  21               		.globl	retrobrew
+  22               	
+  23               	bgetseg = 18
+  24               	bsetexc	= 22		/* function call to set vector */
+  25               	buserr	= 2
+  26               	spurious = 24
+  27               	trap0	= 32
+  28               	trap2	= 34
+  29               	trap3	= 35
+  30               	
+  31               	pic_present	=	1		/* NS32202 icu present */
+  32               	
+  33               	excmask:
+  34               	.if RETAIL
+  35 0000 03        		.byte	0b00000011		/*  0..7  */
+  36 0001 00        		.byte	0b00000000		/*  8..15 */
+  37               	.else
+  38               	.if 1	/* for debug, send all to the debugger */
+  39               		.byte	0b00010011		/*  0..7  */	/* illegal */
+  40               		.byte	0b00000010		/*  8..15 */	/* trace */
+  41               	.else
+  42               		.byte	0b11111111	/* 0..7 */
+  43               		.byte	0b11111111	/* 8..15 */
+  44               	.endif
+  45               	.endif
+  46               	# reserve 8 vectors for the interrupt controller
+  47 0002 FF        		.byte	0b11111111		/* 16..23   used by Interrupt Controller */
+  48               	# reserve the NMI vector
+  49 0003 80        		.byte	0b10000000		/* 24..31   auto vectored interrupts (NMI is 31) */   
+  50               	# reserve trap calls 2, 3, & 8
+  51 0004 0C        		.byte	0b00001100		/* 32..39   TRAP calls are here */
+  52 0005 01        		.byte	0b00000001		/* 40..47   TRAP calls are here*/
+  53 0006 00        		.byte	0b00000000		/* 48..55 */
+  54 0007 00        		.byte	0b00000000		/* 56..63 */
+  55               	
+  56               	initexc:
+  57               	# Initialize Exception Vector Handlers
+68K GAS  exceptn.s 			page 2
+
+
+  58               	# It has 1 passed parameter: the address of the exception vector array
+  59 0008 4E56 0000 		link	%a6,#0
+  60 000c 48E7 3800 		movem.l	%d2-%d4,-(%sp)
+  61               	
+  62 0010 7016      		moveq.l	#bsetexc,%d0
+  63 0012 7202      		moveq.l	#buserr,%d1		/* start at BUS ERROR trap vector */
+  64 0014 243C 0000 		move.l	#exchndl,%d2
+  64      0000 
+  65 001a 41FA FFE4 		lea	excmask(%pc),%a0
+  66               	init1:
+  67 001e 2601      		move.l	%d1,%d3
+  68 0020 E64B      		lsr.w	#3,%d3			/* index into byte array */
+  69 0022 0330 3000 		btst.b	%d1,(%a0,%d3.w)		/* skip those marked */
+  70 0026 6600 000C 		bne	init2
+  71               	
+  72 002a 48E7 E000 		movem.l	%d0-%d2,-(%sp)
+  73 002e 4E43      		trap	#3		/* BIOS call to set exception vector */
+  74 0030 4CDF 0007 		movem.l	(%sp)+,%d0-%d2
+  75               	
+  76 0034 5281      	init2:	addq.l	#1,%d1
+  77 0036 5882      		add.l	#4,%d2
+  78               	.if 0
+  79               		cmpi	#spurious,%d1
+  80               		bne	init3
+  81               		move	#trap0,%d1
+  82               	init3:	cmpi	#trap2,%d1
+  83               		beq	init2		/* don't init trap 2 or trap 3 */
+  84               		cmpi	#trap3,%d1
+  85               		beq	init2
+  86               	.endif
+  87 0038 0C41 0030 		cmpi.w	#endvec,%d1
+  88 003c 6D00 FFE0 		blt	init1
+  89               	#				initialize the exception vector array
+  90               	
+  91 0040 7012      		moveq.l	#bgetseg,%d0
+  92 0042 4E43      		trap	#3		/* get the original TPA limits */
+  93 0044 2040      		movea.l	%d0,%a0
+  94 0046 4A58      		tst.w	(%a0)+
+  95 0048 2218      		move.l	(%a0)+,%d1	/* %d1 = original low TPA limit */
+  96 004a 2401      		move.l	%d1,%d2
+  97 004c D490      		add.l	(%a0),%d2		/* %d2 = original high TPA limit */
+  98 004e 2639 0000 		move.l	tpa_lp,%d3	/* %d3 = new low TPA limit */
+  98      0000 
+  99 0054 2839 0000 		move.l	tpa_hp,%d4	/* %d4 = new high TPA limit */
+  99      0000 
+ 100               	/*	moveq.l	#17,%d0	 jrc */
+ 101 005a 702F      		moveq.l #n_evec_adr/4-1,%d0	/* do all of them */
+ 102               	###	movea.l	4(%sp),%a0
+ 103 005c 206E 0008 		movea.l	8(%a6),%a0	/* get &excvec[0] argument */
+ 104 0060 23C8 0000 		move.l	%a0,evec_adr	/* save exception vector address */
+ 104      0000 
+ 105               	init4:
+ 106 0066 B290      		cmp.l	(%a0),%d1
+ 107 0068 6200 0014 		bhi	do_init		/* if old exception outside orig TPA, clear it */
+ 108 006c B490      		cmp.l	(%a0),%d2
+ 109 006e 6300 000E 		bls	do_init
+ 110               	# current exception array entry is in original TPA
+68K GAS  exceptn.s 			page 3
+
+
+ 111 0072 B690      		cmp.l	(%a0),%d3
+ 112 0074 6200 000A 		bhi	dontinit	/* if old exception in old TPA but outside new */
+ 113 0078 B890      		cmp.l	(%a0),%d4		/*	TPA, don't clear it */
+ 114 007a 6300 0004 		bls	dontinit
+ 115               	do_init:
+ 116 007e 4290      		clr.l	(%a0)
+ 117               	dontinit:
+ 118 0080 4A98      		tst.l	(%a0)+
+ 119 0082 51C8 FFE2 		dbf	%d0,init4
+ 120               	
+ 121 0086 4CDF 001C 		movem.l	(%sp)+,%d2-%d4
+ 122 008a 4E5E      		unlk	%a6
+ 123 008c 4E75      		rts
+ 124               	
+ 125               		.page
+68K GAS  exceptn.s 			page 4
+
+
+ 126               	exchndl:	/* .equ	*  */
+ 127               	# jrc .ifndef	M68010
+ 128               	.if	M68000<68010 /* jrc */
+ 129 008e 6100 00B6 		bsr.w	except		/*  2	Buserr */
+ 130               	excrtn0:
+ 131 0092 6100 00B2 		bsr.w	except		/*  3	Addressing error */
+ 132 0096 6100 00AE 		bsr.w	except		/*  4	Illegal Instruction */
+ 133               		.globl	m68000
+ 134               	m68000:
+ 135               	.else	/* jrc M68000>=68010  */
+ 136               	.if M68000==68010
+ 137               		.globl	m68010		/*	Note case difference! */
+ 138               	m68010:
+ 139               	.endif
+ 140               	.if M68000>=68020
+ 141               		.globl	m68020
+ 142               	m68020:
+ 143               	.endif
+ 144               		/*	For build process */
+ 145               		bsr.w	berr		/*  2	Buserr */
+ 146               	excrtn0:
+ 147               		bsr.w	berr		/*  3	Addressing error */
+ 148               		bsr.w	except		/*  4	Illegal Instruction */
+ 149               	.endif
+ 150 009a 6100 00AA 		bsr.w	except		/*  5 */
+ 151 009e 6100 00A6 		bsr.w	except		/*  6 */
+ 152 00a2 6100 00A2 		bsr.w	except		/*  7 */
+ 153               	# jrc .ifndef	M68010
+ 154               	.if	M68000<68010 /* jrc */
+ 155 00a6 6100 009E 		bsr.w	except		/*  8 */
+ 156               	.else				/* Privilege violation */
+ 157               		bsr.w	privviol	/*  8 */
+ 158               	.endif
+ 159 00aa 6100 009A 		bsr.w	except		/*  9 */
+ 160 00ae 6100 0096 		bsr.w	except		/* 10 */
+ 161 00b2 6100 0092 		bsr.w	except		/* 11 */
+ 162 00b6 6100 008E 		bsr.w	except		/* 12 */
+ 163 00ba 6100 008A 		bsr.w	except		/* 13 */
+ 164 00be 6100 0086 		bsr.w	except		/* 14 */
+ 165 00c2 6100 0082 		bsr.w	except		/* 15 */
+ 166 00c6 6100 007E 		bsr.w	except		/* 16 */
+ 167 00ca 6100 007A 		bsr.w	except		/* 17 */
+ 168 00ce 6100 0076 		bsr.w	except		/* 18 */
+ 169 00d2 6100 0072 		bsr.w	except		/* 19 */
+ 170 00d6 6100 006E 		bsr.w	except		/* 20 */
+ 171 00da 6100 006A 		bsr.w	except		/* 21 */
+ 172 00de 6100 0066 		bsr.w	except		/* 22 */
+ 173 00e2 6100 0062 		bsr.w	except		/* 23 */
+ 174 00e6 6100 005E 		bsr.w	except		/* 24 */
+ 175 00ea 6100 005A 		bsr.w	except		/* 25 */
+ 176 00ee 6100 0056 		bsr.w	except		/* 26 */
+ 177 00f2 6100 0052 		bsr.w	except		/* 27 */
+ 178 00f6 6100 004E 		bsr.w	except		/* 28 */
+ 179 00fa 6100 004A 		bsr.w	except		/* 29 */
+ 180 00fe 6100 0046 		bsr.w	except		/* 30 */
+ 181 0102 6100 0042 		bsr.w	except		/* 31 */
+ 182 0106 6100 003E 		bsr.w	except		/* 32 */
+68K GAS  exceptn.s 			page 5
+
+
+ 183 010a 6100 003A 		bsr.w	except		/* 33 */
+ 184 010e 6100 0036 		bsr.w	except		/* 34 */
+ 185 0112 6100 0032 		bsr.w	except		/* 35 */
+ 186 0116 6100 002E 		bsr.w	except		/* 36 */
+ 187 011a 6100 002A 		bsr.w	except		/* 37 */
+ 188 011e 6100 0026 		bsr.w	except		/* 38 */
+ 189 0122 6100 0022 		bsr.w	except		/* 39 */
+ 190 0126 6100 001E 		bsr.w	except		/* 40 */
+ 191 012a 6100 001A 		bsr.w	except		/* 41 */
+ 192 012e 6100 0016 		bsr.w	except		/* 42 */
+ 193 0132 6100 0012 		bsr.w	except		/* 43 */
+ 194 0136 6100 000E 		bsr.w	except		/* 44 */
+ 195 013a 6100 000A 		bsr.w	except		/* 45 */
+ 196 013e 6100 0006 		bsr.w	except		/* 46 */
+ 197 0142 6100 0002 		bsr.w	except		/* 47 */
+ 198               	.if 0
+ 199               		bsr.w	except		/* 48 */
+ 200               		bsr.w	except		/* 49 */
+ 201               		bsr.w	except		/* 50 */
+ 202               		bsr.w	except		/* 51 */
+ 203               		bsr.w	except		/* 52 */
+ 204               		bsr.w	except		/* 53 */
+ 205               		bsr.w	except		/* 54 */
+ 206               		bsr.w	except		/* 55 */
+ 207               		bsr.w	except		/* 56 */
+ 208               		bsr.w	except		/* 57 */
+ 209               		bsr.w	except		/* 58 */
+ 210               		bsr.w	except		/* 59 */
+ 211               		bsr.w	except		/* 60 */
+ 212               		bsr.w	except		/* 61 */
+ 213               		bsr.w	except		/* 62 */
+ 214               		bsr.w	except		/* 63 */
+ 215               	.endif
+ 216               	endvec		=	(. - exchndl)/4 + 2
+ 217               		.page
+68K GAS  exceptn.s 			page 6
+
+
+ 218               	# jrc .ifdef	M68010
+ 219               	.if M68000>=68010	/*  jrc  */
+ 220               	#
+ 221               	#	Here if the exception in question was a buserr/addressing error.
+ 222               	#	We reformat the stack to look like a 68000.
+ 223               	#
+ 224               	#	Entered with a standard 68010 exception stack frame with a return
+ 225               	#	address on top (at 0(%sp)).
+ 226               	#
+ 227               	berr:
+ 228               		move.l	0x0(%sp),0x2a(%sp)			/*	Move return address */
+ 229               		move.w	0x0c(%sp),0x2e(%sp)			/*	Move Status word */
+ 230               		andi.w	#7,0x2e(%sp)			/*	Clear all but FC0-2 */
+ 231               		move.l	0x0e(%sp),0x30(%sp)			/*	Copy Fault address */
+ 232               		move.w	0x1c(%sp),0x34(%sp)			/*	Move IR */
+ 233               		move.w	0x4(%sp),0x36(%sp)			/*	Move SR */
+ 234               		move.l	0x6(%sp),0x38(%sp)			/*	Move PC */
+ 235               		move.w	0x0a(%sp),0x3c(%sp)			/*	Move format word */
+ 236               		adda.l	#0x2a,%sp				/*	Make %sp -> new frame */
+ 237               		bra	except				/*	Merge */
+ 238               	#*****************************************************************************
+ 239               	#	Here we make up for a faux pas in the C compiler.  Change all        *
+ 240               	#	move from SR instructions (0x40CX) to move from CCR (0x42CX).          *
+ 241               	#	Precludes executing 68000 programs in ROM on a 68010.                *
+ 242               	#                                                                            *
+ 243               	#	Relies on the fact that the exception PC (Stack offset 0E below)     *
+ 244               	#	points to the instruction on an illegal instruction exception.       *
+ 245               	#*****************************************************************************
+ 246               	privviol:
+ 247               		movem.l	%d0/%a0,-(%sp)			/*	Save some regs */
+ 248               		move.l	0x0e(%sp),%a0			/*	%A0 -> Instruction */
+ 249               		move.w	(%a0),%d0				/*	%d0 =  Instruction */
+ 250               		andi.w	#0xFFC0,%d0			/*	Mask off <EA> field */
+ 251               		cmpi.w	#0x40C0,%d0			/*	Move from SR? */
+ 252               		bne	notsr				/*	No, handle normally */
+ 253               		ori.w	#0x0200,(%a0)			/*	Change to move from CCR */
+ 254               		movem.l	(%sp)+,%d0/%a0			/*	Restore regs */
+ 255               		tst.l	(%sp)+				/*	Pop return address */
+ 256               		rte					/*	Try it again */
+ 257               	notsr:	movem.l	(%sp)+,%d0/%a0			/*	Abandon hope, all ye .. */
+ 258               		.page
+ 259               	.endif
+ 260               	except:
+ 261 0146 4267      		clr.w	-(%sp)
+ 262 0148 48E7 8080 		movem.l	%a0/%d0,-(%sp)	/* 10 (11) words now on stack in following order */
+ 263               	#				 _______________________________
+ 264               	#				|____________%D0.L_______________|
+ 265               	#				|____________%A0.L_______________|
+ 266               	#				|____0000______|________________
+ 267               	#				|_______Handler Return__________|
+ 268               	#				If bus error, extra 2 longs are here
+ 269               	#				 ______________
+ 270               	#				|__Status Reg__|________________
+ 271               	#				|_____Exception Return__________|
+ 272               	#				|_(format word)|
+ 273 014c 202F 000A 		move.l	10(%sp),%d0	/* get return address from above array */
+ 274 0150 0480 0000 		sub.l	#excrtn0,%d0	/* %d0 now has 4 * (encoded excptn nmbr), where */
+68K GAS  exceptn.s 			page 7
+
+
+ 274      0000 
+ 275               	#				  encoded excptn nmbr is in [0..21,22..37]
+ 276               	#					      representing  [2..23,32..47]
+ 277 0156 0C40 0024 		cmpi	#36,%d0		/* if %d0/4 is in [0..9,22..29] then */
+ 278 015a 6F00 0016 		ble	chkredir	/*     the exception may be redirected */
+ 279 015e 0C40 0058 		cmpi	#88,%d0
+ 280 0162 6D00 0028 		blt	dfltexc
+ 281 0166 0C40 0074 		cmpi	#116,%d0
+ 282 016a 6E00 0020 		bgt	dfltexc
+ 283               	#				in range of redirected exceptions
+ 284 016e 0440 0030 		subi	#48,%d0		/* subtract 4*12 to normalize [0..9,22..29] */
+ 285               	#							into [0..9,10..17]
+ 286               	chkredir:
+ 287 0172 2079 0000 		movea.l	evec_adr,%a0
+ 287      0000 
+ 288 0178 D0C0      		adda	%d0,%a0		/* index into exception vector array */
+ 289 017a 4A90      		tst.l	(%a0)		/* if 00000000, then not redirected */
+ 290 017c 6600 0064 		bne	usrexc
+ 291               	#				not redirected, do default handler
+ 292               	supexc:				/* Here for supervisor state */
+ 293 0180 0C40 0028 		cmpi	#40,%d0
+ 294 0184 6D00 0006 		blt	dfltexc
+ 295 0188 0640 0030 		addi	#48,%d0		/* add 4*12 that was sub'd above */
+ 296               	dfltexc:
+ 297 018c DEFC 000E 		adda	#14,%sp		/* throw away 7 words that we added to stack */
+ 298 0190 E440      		asr	#2,%d0		/* divide %d0 by 4 */
+ 299               	#				now %d0 is in [0..21,22..37]
+ 300               	#				to represent [2..23,32..47]
+ 301 0192 0C40 0002 		cmpi	#2,%d0		/* bus or address error? */
+ 302 0196 6C00 0006 		bge	nobusexc
+ 303 019a 4CDF 0300 		movem.l	(%sp)+,%a0-%a1	/* if yes, throw away 4 words from stack */
+ 304               	nobusexc:
+ 305 019e 4A5F      		tst.w	(%sp)+		/* throw away stacked SR */
+ 306 01a0 0640 0002 		addi	#2,%d0
+ 307 01a4 0C40 0017 		cmpi	#23,%d0		/* get back real excptn nmbr in [2..23,32..47] */
+ 308 01a8 6F00 0006 		ble	lowexc
+ 309 01ac 0640 0008 		addi	#8,%d0
+ 310 01b0 3F00      	lowexc:	move	%d0,-(%sp)	/* save excptn nmbr */
+ 311 01b2 41F9 0000 		lea	excmsg1,%a0
+ 311      0000 
+ 312 01b8 6100 0098 		bsr	print		/* print default exception message */
+ 313 01bc 301F      		move	(%sp)+,%d0
+ 314 01be 6100 00BA 		bsr	prtbyte
+ 315 01c2 41F9 0000 		lea	excmsg2, %a0
+ 315      0000 
+ 316 01c8 6100 0088 		bsr	print
+ 317 01cc 201F      		move.l	(%sp)+,%d0
+ 318 01ce 6100 0096 		bsr	prtlong
+ 319 01d2 41F9 0000 		lea	excmsg3, %a0
+ 319      0000 
+ 320 01d8 6100 0078 		bsr	print
+ 321 01dc 4280      		clr.l	%d0
+ 322 01de 4E42      		trap	#2		/* warm boot */
+ 323 01e0 4E73      		rte
+ 324               	
+ 325               	usrexc:
+ 326               	# Call user exception handler
+68K GAS  exceptn.s 			page 8
+
+
+ 327               	# make sure exception information is on his stack
+ 328 01e2 0C40 0008 		cmpi	#8,%d0		/* address or bus error? */
+ 329 01e6 6D00 002E 		blt	addrexc		/* if yes, skip */
+ 330 01ea 082F 000D 		btst	#13,14(%sp)	/* exception occured in user state? */
+ 330      000E 
+ 331 01f0 6600 FF8E 		bne	supexc		/*sw if no, go to supervisor handler */
+ 332 01f4 2F50 000A 		move.l	(%a0),10(%sp)	/* put user handler address on our stack */
+ 333 01f8 4E68      		move.l	%usp,%a0		/* user stack pointer to %a0 */
+ 334 01fa 212F 0010 		move.l	16(%sp),-(%a0)	/* put exception return on user stack */
+ 335 01fe 312F 000E 		move.w	14(%sp),-(%a0)	/* put SR on user stack */
+ 336 0202 4E60      		move.l	%a0,%usp		/* update user stack pointer */
+ 337 0204 4CDF 0101 		movem.l	(%sp)+,%a0/%d0	/* restore regs */
+ 338 0208 2F6F 0002 		move.l	2(%sp),8(%sp)	/* move address of user handler to excptn rtn */
+ 338      0008 
+ 339               	# jrc .ifdef	M68010
+ 340               	.if M68000>=68010	/*  jrc  */
+ 341               		clr.w	12(%sp)		/*sw Clear out the format word */
+ 342               	.endif
+ 343 020e 5C4F      		addq	#6,%sp		/* clear junk from stack */
+ 344 0210 0257 7FFF 		andi	#0x7fff,(%sp)	/* clear trace bit */
+ 345 0214 4E73      		rte			/* go to user handler */
+ 346               	addrexc:
+ 347 0216 082F 000D 		btst	#13,22(%sp)	/* exception occured in user state? */
+ 347      0016 
+ 348 021c 6600 FF62 		bne	supexc		/*sw if no, go to supervisor handler */
+ 349 0220 2F50 000A 		move.l	(%a0),10(%sp)	/* put user handler address on our stack */
+ 350 0224 4E68      		move.l	%usp,%a0		/* user stack pointer to %a0 */
+ 351 0226 212F 0018 		move.l	24(%sp),-(%a0)	/* put exception return on user stack */
+ 352 022a 312F 0016 		move.w	22(%sp),-(%a0)	/* put SR on user stack */
+ 353 022e 212F 0012 		move.l	18(%sp),-(%a0)	/* put extra 2 longs on user stack */
+ 354 0232 212F 000E 		move.l	14(%sp),-(%a0)
+ 355 0236 4E60      		move.l	%a0,%usp		/* update user stack pointer */
+ 356 0238 4CDF 0101 		movem.l	(%sp)+,%a0/%d0	/* restore regs */
+ 357 023c 2F6F 0002 		move.l	2(%sp),16(%sp)	/* move address of user handler to excptn rtn */
+ 357      0010 
+ 358               	# jrc .ifdef	M68010
+ 359               	.if M68000>=68010	/*  jrc  */
+ 360               		clr.w	20(%sp)		/*sw Clear format word */
+ 361               	.endif
+ 362 0242 DEFC 000E 		adda	#14,%sp		/* clear junk from stack */
+ 363 0246 0257 7FFF 		andi	#0x7fff,(%sp)	/* clear trace bit */
+ 364 024a 4E73      		rte			/* go to user handler */
+ 365               	
+ 366               		.page
+68K GAS  exceptn.s 			page 9
+
+
+ 367               	#******************************************************************************
+ 368               	#
+ 369               	#	gouser routine.  This routine performs an RTE to go to the user program
+ 370               	#			 User EPA is passed in %A0.L.
+ 371               	#
+ 372               	#******************************************************************************
+ 373               	gouser:
+ 374               	# jrc .ifdef	M68010
+ 375               	.if M68000>=68010	/*  jrc  */
+ 376               		clr.w	-(%sp)			/*	Push format word */
+ 377               	.endif
+ 378 024c 2F08      		move.l	%a0,-(%sp)		/*	Push epa */
+ 379 024e 4267      		clr.w	-(%sp)			/*		  and SR */
+ 380 0250 4E73      		rte				/*	Do it.  Into user program. */
+ 381               	.page
+68K GAS  exceptn.s 			page 10
+
+
+ 382               	#
+ 383               	#  Subroutines
+ 384               	#
+ 385               	
+ 386               	print:
+ 387 0252 4281      		clr.l	%d1
+ 388 0254 1218      		move.b	(%a0)+, %d1
+ 389 0256 6700 000C 		beq	prtdone
+ 390 025a 303C 0002 		move	#2, %d0
+ 391 025e 4E42      		trap	#2
+ 392 0260 6000 FFF0 		bra	print
+ 393               	prtdone:
+ 394 0264 4E75      		rts
+ 395               	
+ 396               	prtlong:
+ 397               	#  Print %d0.l in hex format
+ 398 0266 3F00      		move	%d0,-(%sp)
+ 399 0268 4840      		swap	%d0
+ 400 026a 6100 0004 		bsr	prtword
+ 401 026e 301F      		move	(%sp)+,%d0
+ 402               	
+ 403               	prtword:
+ 404               	#  Print %d0.w in hex format
+ 405 0270 3F00      		move	%d0,-(%sp)
+ 406 0272 E048      		lsr	#8,%d0
+ 407 0274 6100 0004 		bsr	prtbyte
+ 408 0278 301F      		move	(%sp)+,%d0
+ 409               	
+ 410               	prtbyte:
+ 411               	#  Print %d0.b in hex format
+ 412 027a 3F00      		move	%d0,-(%sp)
+ 413 027c E848      		lsr	#4,%d0
+ 414 027e 6100 0004 		bsr	prtnib
+ 415 0282 301F      		move	(%sp)+,%d0
+ 416               	
+ 417               	prtnib:
+ 418 0284 0240 000F 		andi	#0xf,%d0
+ 419 0288 0C40 000A 		cmpi	#10,%d0
+ 420 028c 6D00 0006 		blt	lt10
+ 421 0290 0600 0007 		addi.b	#'A'-'9'-1,%d0
+ 422               	lt10:
+ 423 0294 0600 0030 		addi.b	#'0',%d0
+ 424 0298 3200      		move	%d0,%d1
+ 425 029a 303C 0002 		move	#2,%d0
+ 426 029e 4E42      		trap	#2
+ 427 02a0 4E75      		rts
+ 428               	
+ 429               	
+ 430               		.data
+ 431               	
+ 432               	excmsg1:
+ 433 0000 0D0A 0A45 		.asciz	"\r\n\nException 0x"
+ 433      7863 6570 
+ 433      7469 6F6E 
+ 433      2030 7800 
+ 434               	
+ 435               	excmsg2:
+68K GAS  exceptn.s 			page 11
+
+
+ 436 0010 2061 7420 		.asciz	" at user address 0x"
+ 436      7573 6572 
+ 436      2061 6464 
+ 436      7265 7373 
+ 436      2030 7800 
+ 437               	
+ 438               	excmsg3:
+ 439 0024 2E20 2041 		.asciz	".  Aborted."
+ 439      626F 7274 
+ 439      6564 2E00 
+ 440               	
+ 441               	retrobrew:	
+ 442 0030 2020 4372 		.ascii	"  Created for the RetroBrew "
+ 442      6561 7465 
+ 442      6420 666F 
+ 442      7220 7468 
+ 442      6520 5265 
+ 443               	.if M68000<68010
+ 444 004c 4D69 6E69 		.ascii	"Mini-M68k"
+ 444      2D4D 3638 
+ 444      6B
+ 445               	.else
+ 446               	.if M68000>=68020
+ 447               		.ascii	"KISS-68030"
+ 448               	.else
+ 449               		.ascii	"MC680xx ??"
+ 450               	.endif
+ 451               	.endif
+ 452 0055 2062 6F61 		.ascii	" board on "
+ 452      7264 206F 
+ 452      6E20 
+ 453               	.include "stamp.s"
+   1 005f 4D6F 6E20 	 .ascii "Mon May 16 17:17:57 PDT 2016"
+   1      4D61 7920 
+   1      3136 2031 
+   1      373A 3137 
+   1      3A35 3720 
+ 454               	##########################################################################
+ 455               	##########################################################################
+ 456               	##########################################################################
+ 457 007b 0D0A 0A   		.ascii	"\r\n\n"
+ 458 007e 00        		.byte	0
+ 459               	
+ 460               	
+ 461               		.bss
+ 462               	
+ 463               	evec_adr:
+ 464 0000 0000 0000 		.ds.l	48
+ 464      0000 0000 
+ 464      0000 0000 
+ 464      0000 0000 
+ 464      0000 0000 
+ 465               	n_evec_adr	=	. - evec_adr 	
+ 466               	
+ 467               		.end
+68K GAS  exceptn.s 			page 12
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000001 RETAIL
+                            *ABS*:000109a0 M68000
+           exceptn.s:56     .text:00000008 initexc
+           exceptn.s:373    .text:0000024c gouser
+           exceptn.s:441    .data:00000030 retrobrew
+           exceptn.s:23     *ABS*:00000012 bgetseg
+           exceptn.s:24     *ABS*:00000016 bsetexc
+           exceptn.s:25     *ABS*:00000002 buserr
+           exceptn.s:26     *ABS*:00000018 spurious
+           exceptn.s:27     *ABS*:00000020 trap0
+           exceptn.s:28     *ABS*:00000022 trap2
+           exceptn.s:29     *ABS*:00000023 trap3
+           exceptn.s:31     *ABS*:00000001 pic_present
+           exceptn.s:33     .text:00000000 excmask
+           exceptn.s:126    .text:0000008e exchndl
+           exceptn.s:66     .text:0000001e init1
+           exceptn.s:76     .text:00000034 init2
+                            *ABS*:00000030 endvec
+                            *ABS*:000000c0 n_evec_adr
+           exceptn.s:463    .bss:00000000 evec_adr
+           exceptn.s:105    .text:00000066 init4
+           exceptn.s:115    .text:0000007e do_init
+           exceptn.s:117    .text:00000080 dontinit
+           exceptn.s:260    .text:00000146 except
+           exceptn.s:130    .text:00000092 excrtn0
+           exceptn.s:134    .text:0000009a m68000
+           exceptn.s:286    .text:00000172 chkredir
+           exceptn.s:296    .text:0000018c dfltexc
+           exceptn.s:325    .text:000001e2 usrexc
+           exceptn.s:292    .text:00000180 supexc
+           exceptn.s:304    .text:0000019e nobusexc
+           exceptn.s:310    .text:000001b0 lowexc
+           exceptn.s:432    .data:00000000 excmsg1
+           exceptn.s:386    .text:00000252 print
+           exceptn.s:410    .text:0000027a prtbyte
+           exceptn.s:435    .data:00000010 excmsg2
+           exceptn.s:396    .text:00000266 prtlong
+           exceptn.s:438    .data:00000024 excmsg3
+           exceptn.s:346    .text:00000216 addrexc
+           exceptn.s:393    .text:00000264 prtdone
+           exceptn.s:403    .text:00000270 prtword
+           exceptn.s:417    .text:00000284 prtnib
+           exceptn.s:422    .text:00000294 lt10
+
+UNDEFINED SYMBOLS
+tpa_lp
+tpa_hp

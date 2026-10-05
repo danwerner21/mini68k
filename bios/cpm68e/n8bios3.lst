@@ -1,0 +1,338 @@
+68K GAS  n8bios3.s 			page 1
+
+
+   1               	#  n8bios3.s
+   2               	/**********************************************************************
+   3               		Codes beginning "N8*.*" are affected by this notice.
+   4               		Other codes are copyrighted by Digital Research Inc.
+   5               	***********************************************************************
+   6               		Copyright (C) 2012 John R. Coffman.
+   7               		Licensed for hobbyist use on the N8VEM mini-M68000 CPU board.
+   8               	***********************************************************************
+   9               	
+  10               	    This program is free software: you can redistribute it and/or modify
+  11               	    it under the terms of the GNU General Public License as published by
+  12               	    the Free Software Foundation, either version 3 of the License, or
+  13               	    (at your option) any later version.
+  14               	
+  15               	    This program is distributed in the hope that it will be useful,
+  16               	    but WITHOUT ANY WARRANTY; without even the implied warranty of
+  17               	    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  18               	    GNU General Public License for more details.
+  19               	
+  20               	    You should have received a copy of the GNU General Public License
+  21               	    in the file COPYING in the distribution directory along with this
+  22               	    program.  If not, see <http://www.gnu.org/licenses/>.
+  23               	
+  24               	**********************************************************************/
+  25               	
+  26               	/* entry points */
+  27               		.globl	_init
+  28               		.globl	bios3_trap_entry
+  29               		.globl	warm_boot
+  30               	
+  31               		.text
+  32               	_init:
+  33 0000 2C5F      		movea.l	(%sp)+,%a6		/* grab the return address */
+  34               	/* clearing the .BSS below will kill the return */
+  35               	
+  36               		/* any initialization goes here */
+  37               	addr_trap3	=   (32+3)*4
+  38 0002 21FC 0000 		move.l	#bios3_trap_entry,addr_trap3	/* install CP/M-68 BIOS on trap #3 */
+  38      0000 008C 
+  39               	
+  40               	/* clear the .BSS */
+  41 000a 207C 0000 		movea.l	#__bss_start,%a0
+  41      0000 
+  42 0010 223C 0000 		move.l	#_end,%d1
+  42      0000 
+  43 0016 9288      		sub.l	%a0,%d1
+  44 0018 E489      		lsr.l	#2,%d1
+  45 001a 6002      		br.s	zap1
+  46 001c 4298      	zap:	clr.l	(%a0)+
+  47 001e 51C9 FFFC 	zap1:	dbra	%d1,zap
+  48               	
+  49               	
+  50               	/* first part of the disk system initialization */
+  51 0022 4EB9 0000 		jsr	disk_system_init
+  51      0000 
+  52               	
+  53               	/* last part of disk initialization is to set up the RAMdisk */
+68K GAS  n8bios3.s 			page 2
+
+
+  54               	/* this must always be done last, after all the other disks/partitions */
+  55 0028 4EB9 0000 		jsr	init_ramdisk	/* in 'n8io.c' */
+  55      0000 
+  56               	
+  57 002e 207C 0000 		movea.l	#copyright,%a0
+  57      0000 
+  58 0034 4281      		clr.l	%d1		/* NUL terminator */
+  59 0036 7003      		moveq.l	#3,%d0		/* put string call */
+  60 0038 4E48      		trap	#8
+  61               		
+  62 003a 207C 0000 		movea.l	#retrobrew,%a0	/* moved to exceptn.s */
+  62      0000 
+  63 0040 4281      		clr.l	%d1		/* NUL terminator */
+  64 0042 7003      		moveq.l	#3,%d0		/* put string */
+  65 0044 4E48      		trap	#8
+  66               	
+  67 0046 303C 0005 		move.w	#0x0005,%d0	/* set user=0 and disk=5 */
+  68 004a 4ED6      		jmp	(%a6)		/* return */
+  69               	
+  70               	
+  71               	
+  72               	
+  73               	/*
+  74               	  CP/M bios calls [0-22]
+  75               	*/
+  76               	/************************************************************************
+  77               		enter with:
+  78               	
+  79               			D0.w		call number
+  80               			D1.w, D1.l	parameter 1
+  81               			D2.w, D2.l	parameter 2
+  82               	
+  83               		return with:
+  84               	
+  85               			possible code in D0.b,w,l
+  86               	
+  87               	************************************************************************/
+  88               	bios3_trap_entry:
+  89 004c 0C40 0017 		cmp.w	#n_cpm_vectors/4,%d0	
+  90 0050 6506      		blo.s	okay
+  91 0052 203C 0000 		move.l	#n_cpm_vectors/4,%d0	/* set to 23 -- undefined */
+  91      0017 
+  92               	okay:
+  93 0058 48E7 60C0 		movem.l	%d1-%d2/%a0-%a1,-(%sp)	/* register save */
+  94 005c E548      		lsl.w	#2,%d0			/* multiply by 4 */
+  95 005e 227B 000E 		move.l	cpm_vector(%pc,%d0.w),%a1
+  96               	.if !RETAIL
+  97               		lsr.w	#2,%d0			/* restore D0 */
+  98               	.endif
+  99 0062 4E91      		jsr	(%a1)			/* C-callable routine */
+ 100 0064 4CDF 0306 		movem.l	(%sp)+,%d1-%d2/%a0-%a1
+ 101 0068 4E73      		rte				/* return from exception */
+ 102               	
+ 103               	undefined:
+ 104               	.if !RETAIL
+ 105               		illegal
+ 106               	.endif
+68K GAS  n8bios3.s 			page 3
+
+
+ 107 006a 70FF      		move.l	#-1,%d0			/* give error return */
+ 108 006c 4E75      		rts
+ 109               	
+ 110               	cpm_vector:
+ 111 006e 0000 0000 		.long	cold_boot		/* 0 -- cold initialization */
+ 112 0072 0000 0000 		.long	warm_boot		/* 1 -- warm boot */
+ 113 0076 0000 0000 		.long	console_status		/* 2 -- console status */
+ 114 007a 0000 0000 		.long	console_read		/* 3 -- console read character (waits) */
+ 115 007e 0000 0000 		.long	console_write		/* 4 -- console put character */
+ 116 0082 0000 0000 		.long	list_output		/* 5 -- list device output */
+ 117 0086 0000 0000 		.long	aux_output		/* 6 -- auxiliary output */
+ 118 008a 0000 0000 		.long	aux_input		/* 7 -- auxiliary input */
+ 119 008e 0000 0000 		.long	disk_home		/* 8 -- home selected disk drive */
+ 120 0092 0000 0000 		.long	disk_drive_select	/* 9 -- select disk drive */
+ 121 0096 0000 0000 		.long	disk_set_track		/* 10 -  */
+ 122 009a 0000 0000 		.long	disk_set_sector		/* 11 -  */
+ 123 009e 0000 0000 		.long	disk_set_DMA_address	/* 12 -  */
+ 124 00a2 0000 0000 		.long	disk_read_sector	/* 13 -  */
+ 125 00a6 0000 0000 		.long	disk_write_sector	/* 14 -  */
+ 126 00aa 0000 0000 		.long	list_status		/* 15 - list ready status */
+ 127 00ae 0000 0000 		.long	sector_translate	/* 16 - sector translation */
+ 128 00b2 0000 0000 		.long	undefined		/* 17 - ??? alternate set DMA ??? */
+ 129 00b6 0000 0000 		.long	get_TPA_pointer		/* 18 - get TPA pointer */
+ 130 00ba 0000 0000 		.long	get_iobyte		/* 19 - get IObyte */
+ 131 00be 0000 0000 		.long	set_iobyte		/* 20 - set IObyte */
+ 132 00c2 0000 0000 		.long	disk_flush_buffers	/* 21 -  */
+ 133 00c6 0000 0000 		.long	set_trap_vector		/* 22 - set exception vector */
+ 134               	n_cpm_vectors	=	. - cpm_vector
+ 135 00ca 0000 0000 		.long	undefined		/* 23 - error vector */
+ 136               	
+ 137               	
+ 138               	/* function 0 */
+ 139               	cold_boot:
+ 140 00ce 4EF9 0000 		jmp	cpm		/* start from the beginning */
+ 140      0000 
+ 141               	
+ 142               	/* function 1 */
+ 143               	warm_boot:
+ 144 00d4 4FF9 0000 		lea	stack,%sp	/* set up the supervisor stack */
+ 144      0000 
+ 145               					/* _ccp will set the user stack pointer */
+ 146               	
+ 147 00da 4EB9 0000 		jsr	disk_flush_buffers
+ 147      0000 
+ 148               	  /* do a lot of init in here */
+ 149 00e0 4EF9 0000 		jmp	_ccp		/* execute CCP in supervisor state */
+ 149      0000 
+ 150               	
+ 151               	
+ 152               	/* function 2 */
+ 153               	console_status:
+ 154 00e6 7005      		move.l	#5,%d0
+ 155 00e8 4E48      		trap	#8
+ 156 00ea 4A40      		tst.w	%d0
+ 157 00ec 6700 0006 		beq.w	csret
+ 158 00f0 303C 00FF 		move.w	#0x00FF,%d0
+ 159               	csret:
+68K GAS  n8bios3.s 			page 4
+
+
+ 160 00f4 4E75      		rts
+ 161               	
+ 162               	/* function 3 */
+ 163               	console_read:
+ 164 00f6 7004      		move.l	#4,%d0
+ 165 00f8 4E48      		trap	#8
+ 166 00fa 4280      		clr.l	%d0		/* eliminate; D0 comes back = 0 */
+ 167 00fc 1001      		move.b	%d1,%d0
+ 168 00fe 4E75      		rts
+ 169               	
+ 170               	/* function 4 */
+ 171               	console_write:
+ 172 0100 7002      		move.l	#2,%d0
+ 173 0102 4E48      		trap	#8
+ 174 0104 4E75      		rts
+ 175               	
+ 176               	/* function 5 */
+ 177               	list_output:
+ 178 0106 4E75      		rts
+ 179               	
+ 180               	/* function 6 */
+ 181               	aux_output:
+ 182 0108 3001      		move.w	%d1,%d0		/* return same character in D0 */
+ 183 010a 4E75      		rts
+ 184               	
+ 185               	/* function 7 */
+ 186               	aux_input:
+ 187 010c 701A      		move.l	#0x1A,%d0	/* Ctrl-Z == End-of-File */
+ 188 010e 4E75      		rts
+ 189               	
+ 190               	.if 0
+ 191               	/* function 9 -- made into a C-call */
+ 192               	drive_select:
+ 193               	/* 	D0.b is drive number
+ 194               		D1.b is logged in flag
+ 195               	
+ 196               	    Returns:
+ 197               		D0.l	address of drive's DPH
+ 198               			(Null if error)			*/
+ 199               		clr.l	%d0
+ 200               		rts
+ 201               	.endif
+ 202               	
+ 203               	/* function 15 */
+ 204               	list_status:
+ 205 0110 203C 0000 		move.l	#0xFF,%d0		/* FF == ready, 00 == not ready */
+ 205      00FF 
+ 206 0116 4E75      		rts
+ 207               	
+ 208               	/* function 16 - logical CP/M sector to physical CP/M sector mapping */
+ 209               	sector_translate:
+ 210 0118 3001      		move.w	%d1,%d0		/* no sector translation */
+ 211 011a 4E75      		rts
+ 212               	
+ 213               	
+ 214               		.data
+ 215 0000 00        	ioword:	.byte	0
+68K GAS  n8bios3.s 			page 5
+
+
+ 216 0001 94        	iobyte:	.byte	0b10010100	/* 2=LPT:, 1=PTP:, 1=PTR:, 0=TTY: */
+ 217               	
+ 218               	tpa_start	=	0x1000	/* start TPA */
+ 219               	
+ 220               	tpa_stuff:
+ 221 0002 0001      		.word	1		/* one entry only */
+ 222 0004 0000 1000 		.long	tpa_start
+ 223 0008 0000 0000 		.long	cpm - tpa_start	/* length */
+ 224               	
+ 225               		.text
+ 226               	/* function 18 	*/
+ 227               	get_TPA_pointer:
+ 228 011c 203C 0000 		move.l	#tpa_stuff,%d0
+ 228      0000 
+ 229 0122 4E75      		rts
+ 230               	
+ 231               	/* function 19  */
+ 232               	get_iobyte:
+ 233 0124 3039 0000 		move.w	ioword,%d0
+ 233      0000 
+ 234 012a 4E75      		rts
+ 235               	
+ 236               	/* function 20  */
+ 237               	set_iobyte:
+ 238 012c 13C0 0000 		move.b	%d0,iobyte
+ 238      0000 
+ 239 0132 4E75      		rts
+ 240               	
+ 241               	/* function 22   */
+ 242               	set_trap_vector:
+ 243 0134 0C41 0040 		cmp.w	#64,%d1		/* up to 64 trap vectors */
+ 244 0138 6400 FF30 		bcc	undefined
+ 245 013c D241      		add.w	%d1,%d1		/* multiply by 4 */
+ 246 013e D241      		add.w	%d1,%d1
+ 247 0140 48C1      		ext.l	%d1		/* sign extend to 32 bits */
+ 248 0142 2241      		move.l	%d1,%a1		/* address the trap vector */
+ 249 0144 2011      		move.l	(%a1),%d0	/* return old vector */
+ 250 0146 2282      		move.l	%d2,(%a1)	/* set new vector */
+ 251 0148 4E75      		rts
+ 252               	
+ 253               	
+ 254               		.end
+68K GAS  n8bios3.s 			page 6
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000001 RETAIL
+                            *ABS*:000109a0 M68000
+           n8bios3.s:32     .text:00000000 _init
+           n8bios3.s:88     .text:0000004c bios3_trap_entry
+           n8bios3.s:143    .text:000000d4 warm_boot
+           n8bios3.s:37     *ABS*:0000008c addr_trap3
+           n8bios3.s:47     .text:0000001e zap1
+           n8bios3.s:46     .text:0000001c zap
+                            *ABS*:0000005c n_cpm_vectors
+           n8bios3.s:92     .text:00000058 okay
+           n8bios3.s:110    .text:0000006e cpm_vector
+           n8bios3.s:103    .text:0000006a undefined
+           n8bios3.s:139    .text:000000ce cold_boot
+           n8bios3.s:153    .text:000000e6 console_status
+           n8bios3.s:163    .text:000000f6 console_read
+           n8bios3.s:171    .text:00000100 console_write
+           n8bios3.s:177    .text:00000106 list_output
+           n8bios3.s:181    .text:00000108 aux_output
+           n8bios3.s:186    .text:0000010c aux_input
+           n8bios3.s:204    .text:00000110 list_status
+           n8bios3.s:209    .text:00000118 sector_translate
+           n8bios3.s:227    .text:0000011c get_TPA_pointer
+           n8bios3.s:232    .text:00000124 get_iobyte
+           n8bios3.s:237    .text:0000012c set_iobyte
+           n8bios3.s:242    .text:00000134 set_trap_vector
+           n8bios3.s:159    .text:000000f4 csret
+           n8bios3.s:215    .data:00000000 ioword
+           n8bios3.s:216    .data:00000001 iobyte
+           n8bios3.s:218    *ABS*:00001000 tpa_start
+           n8bios3.s:220    .data:00000002 tpa_stuff
+
+UNDEFINED SYMBOLS
+__bss_start
+_end
+disk_system_init
+init_ramdisk
+copyright
+retrobrew
+disk_home
+disk_drive_select
+disk_set_track
+disk_set_sector
+disk_set_DMA_address
+disk_read_sector
+disk_write_sector
+disk_flush_buffers
+cpm
+stack
+_ccp

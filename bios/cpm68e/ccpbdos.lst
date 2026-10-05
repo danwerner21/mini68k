@@ -1,0 +1,38 @@
+68K GAS  ccpbdos.s 			page 1
+
+
+   1               	#************************************************************************
+   2               	#									*
+   3               	#			INTERFACE MODULE BETWEEN			*
+   4               	#			    CCP and THE BDOS				*
+   5               	#									*
+   6               	#									*
+   7               	#	    THIS IS THE DUAL PROCESSOR,ROMABLE CP/M-68K SYSTEM		*
+   8               	#	    ==================================================		*
+   9               	#									*
+  10               	#       (C) Copyright Digital Research 1983 all rights reserved    	*
+  11               	#									*
+  12               	#************************************************************************
+  13               	
+  14               	.globl  bdos
+  15               	bdos:
+  16               	.if 0
+  17               		        move.w 4(%sp),%d0
+  18               			move.l 6(%sp),%d1
+  19               	.else
+  20 0000 302F 0006 			move.w	6(%sp),%d0
+  21 0004 222F 0008 			move.l	8(%sp),%d1
+  22               	.endif
+  23 0008 4E42      			trap #2
+  24 000a 4E75      			rts
+  25               	
+  26               			.end
+68K GAS  ccpbdos.s 			page 2
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000001 RETAIL
+                            *ABS*:000109a0 M68000
+           ccpbdos.s:15     .text:00000000 bdos
+
+NO UNDEFINED SYMBOLS

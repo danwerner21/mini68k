@@ -1,0 +1,521 @@
+Archive member included because of file (symbol)
+
+cpmlib.a(ccpload.o)           ccpif.o (load68k)
+cpmlib.a(ccp.o)               cpmlib.a(ccpload.o) (tail)
+cpmlib.a(bdosif.o)            ccpif.o (_bios1)
+cpmlib.a(bdosmisc.o)          ccpif.o (bdosinit)
+cpmlib.a(dskutil.o)           cpmlib.a(bdosmisc.o) (dir_rd)
+cpmlib.a(fileio.o)            cpmlib.a(bdosmisc.o) (set_attr)
+cpmlib.a(bdosrw.o)            cpmlib.a(fileio.o) (calcext)
+cpmlib.a(bdosmain.o)          cpmlib.a(fileio.o) (tmp_sel)
+cpmlib.a(iosys.o)             cpmlib.a(dskutil.o) (do_phio)
+cpmlib.a(pgmld.o)             cpmlib.a(bdosmain.o) (pgmld)
+cpmlib.a(filetyps.o)          ccpif.o (load_tbl)
+cpmlib.a(stack.o)             ccpif.o (stack)
+cpmlib.a(n8bios3.o)           ccpif.o (_init)
+cpmlib.a(n8io.o)              cpmlib.a(n8bios3.o) (disk_drive_select)
+cpmlib.a(n8iox.o)             cpmlib.a(n8io.o) (_read_sector)
+cpmlib.a(cprintf.o)           cpmlib.a(n8io.o) (cprintf)
+cpmlib.a(ccpbdos.o)           cpmlib.a(ccp.o) (bdos)
+cpmlib.a(conbdos.o)           cpmlib.a(bdosmisc.o) (conout)
+/usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+                              cpmlib.a(cprintf.o) (strlen)
+/usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+                              cpmlib.a(n8io.o) (__udivsi3)
+/usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+                              cpmlib.a(n8io.o) (__divsi3)
+/usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+                              cpmlib.a(cprintf.o) (__umodsi3)
+/usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+                              /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o) (__mulsi3)
+
+Allocating common symbols
+Common symbol       size              file
+
+cur_disk            0x2               cpmlib.a(ccp.o)
+alv_rom_400k        0x1d              cpmlib.a(n8io.o)
+load_try            0x1               cpmlib.a(ccp.o)
+dma                 0x83              cpmlib.a(ccp.o)
+gbls                0xee              cpmlib.a(bdosmain.o)
+content             0x48              cpmlib.a(n8io.o)
+subcom              0x81              cpmlib.a(ccp.o)
+errno               0x4               cpmlib.a(n8io.o)
+autorom             0x1               cpmlib.a(ccp.o)
+DMA_address         0x4               cpmlib.a(n8io.o)
+crit_dsk            0x2               cpmlib.a(bdosmain.o)
+sub_user            0x2               cpmlib.a(ccp.o)
+sub_index           0x2               cpmlib.a(ccp.o)
+hma                 0x4               cpmlib.a(n8io.o)
+chain_sub           0x1               cpmlib.a(ccp.o)
+tpa_lp              0x4               cpmlib.a(bdosmain.o)
+cmdfcb              0x24              cpmlib.a(ccpload.o)
+parm                0x78              cpmlib.a(ccp.o)
+user                0x2               cpmlib.a(ccp.o)
+chainp              0x4               cpmlib.a(ccp.o)
+dirflag             0x1               cpmlib.a(ccp.o)
+tpa_lt              0x4               cpmlib.a(bdosmain.o)
+tail                0x4               cpmlib.a(ccp.o)
+subprompt           0x1               cpmlib.a(ccp.o)
+log_dsk             0x2               cpmlib.a(bdosmain.o)
+common_dir_buffer   0x80              cpmlib.a(n8io.o)
+buffer              0x1800            cpmlib.a(n8io.o)
+current_track       0x2               cpmlib.a(n8io.o)
+subfcb              0x24              cpmlib.a(ccpload.o)
+lru                 0xc               cpmlib.a(n8io.o)
+first_sub           0x1               cpmlib.a(ccp.o)
+index               0x2               cpmlib.a(ccp.o)
+tpa_hp              0x4               cpmlib.a(bdosmain.o)
+end_of_file         0x1               cpmlib.a(ccp.o)
+tpa_ht              0x4               cpmlib.a(bdosmain.o)
+ro_dsk              0x2               cpmlib.a(bdosmain.o)
+alv_RAM_1M          0x40              cpmlib.a(n8io.o)
+glb_index           0x4               cpmlib.a(ccp.o)
+subdma              0x80              cpmlib.a(ccp.o)
+save_sub            0x81              cpmlib.a(ccp.o)
+current_sector      0x2               cpmlib.a(n8io.o)
+user_ptr            0x4               cpmlib.a(ccp.o)
+
+Discarded input sections
+
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_frame   0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_loc     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_pubnames
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_str     0x00000000        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+ .debug_line    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+ .debug_info    0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+ .debug_abbrev  0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+ .debug_aranges
+                0x00000000        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+
+.text           0x000effe4     0x5fc8
+                0x000effe4                __text_start = .
+ *(.text .stub .text.* .gnu.linkonce.t.*)
+ .text          0x000effe4       0x1c 0cpm68k.o
+ .text          0x000f0000       0xde ccpif.o
+                0x000f0000                cpm
+                0x000f000c                copyright
+                0x000f0000                _start
+                0x000f00ce                _ccp
+ *fill*         0x000f00de        0x2 00
+ .text          0x000f00e0      0x30a except10.o
+                0x000f0392                gouser
+                0x000f016e                m68010
+                0x000f00e8                initexc
+ *fill*         0x000f03ea        0x2 00
+ .text          0x000f03ec       0xfa cpmlib.a(ccpload.o)
+                0x000f03ec                load68k
+ *fill*         0x000f04e6        0x2 00
+ .text          0x000f04e8     0x1c64 cpmlib.a(ccp.o)
+                0x000f0f9c                decode
+                0x000f04fe                ccp_strcmp
+                0x000f06da                delim
+                0x000f19d0                era_cmd
+                0x000f18f6                too_many
+                0x000f10ea                get_cmd
+                0x000f08e0                fill_fcb
+                0x000f160e                ren_cmd
+                0x000f1e02                execute_cmd
+                0x000f10be                cr_lf
+                0x000f1aea                type_cmd
+                0x000f131e                translate
+                0x000f0708                true_char
+                0x000f0744                find_colon
+                0x000f0530                copy_cmd
+                0x000f0792                dollar
+                0x000f1256                comments
+                0x000f0766                sub_read
+                0x000f0a96                cmd_file
+                0x000f18ac                chk_colon
+                0x000f05f6                scan_cmd
+                0x000f04e8                cpy
+                0x000f159e                echo_cmd
+                0x000f192c                user_cmd
+                0x000f11be                prompt
+                0x000f1bfc                dir_cmd
+                0x000f14c8                submit_cmd
+                0x000f0586                check_cmd
+                0x000f1f4c                ccp_main
+                0x000f062c                get_parms
+ .text          0x000f214c       0x86 cpmlib.a(bdosif.o)
+                0x000f214c                _trap2hnd
+                0x000f218c                _bios6
+                0x000f21b0                bswap
+                0x000f21a8                swap
+                0x000f218c                _bios4
+                0x000f21bc                udiv
+                0x000f218c                _bios3
+                0x000f218c                _bios1
+                0x000f218c                _bios2
+                0x000f218c                _bios5
+ *fill*         0x000f21d2        0x2 00
+ .text          0x000f21d4      0x4b0 cpmlib.a(bdosmisc.o)
+                0x000f2390                ro_err
+                0x000f2484                ext_err
+                0x000f2302                warmboot
+                0x000f22c8                prt_err
+                0x000f21d4                setexc
+                0x000f25c4                bdosinit
+                0x000f2540                error
+                0x000f2256                set_tpa
+                0x000f2526                abrt_err
+ .text          0x000f2684      0x4ca cpmlib.a(dskutil.o)
+                0x000f279a                chkaloc
+                0x000f272e                clraloc
+                0x000f2930                dir_wr
+                0x000f29b2                dir_rd
+                0x000f27f0                getaloc
+                0x000f2684                dchksum
+                0x000f26c4                setaloc
+                0x000f2868                rdwrt
+                0x000f29de                dirscan
+ *fill*         0x000f2b4e        0x2 00
+ .text          0x000f2b50      0x9a2 cpmlib.a(fileio.o)
+                0x000f310c                flushit
+                0x000f3302                free_sp
+                0x000f2c66                alltrue
+                0x000f3456                alloc
+                0x000f2f3e                delete
+                0x000f2c02                openfile
+                0x000f33ac                search
+                0x000f317c                seldsk
+                0x000f2d5e                getsize
+                0x000f2ed0                rename
+                0x000f2b50                move
+                0x000f2e44                create
+                0x000f3146                close_fi
+                0x000f2c70                matchit
+                0x000f2cb6                setran
+                0x000f2b6c                match
+                0x000f2dee                set_attr
+                0x000f2cfc                fsize
+                0x000f2c8c                extsize
+                0x000f2ffa                close
+ *fill*         0x000f34f2        0x2 00
+ .text          0x000f34f4      0x520 cpmlib.a(bdosrw.o)
+                0x000f36f0                do_io
+                0x000f3750                setblk
+                0x000f35a4                get_rc
+                0x000f353c                calcext
+                0x000f3798                blknum
+                0x000f34f4                blkindx
+                0x000f37cc                bdosrw
+                0x000f35da                new_ext
+ .text          0x000f3a14      0x4cc cpmlib.a(bdosmain.o)
+                0x000f3a14                tmp_sel
+                0x000f3a68                __bdos
+ .text          0x000f3ee0      0x16a cpmlib.a(iosys.o)
+                0x000f3ee0                do_phio
+ *fill*         0x000f404a        0x2 00
+ .text          0x000f404c      0x528 cpmlib.a(pgmld.o)
+                0x000f404c                pgmld
+ .text          0x000f4574       0x52 cpmlib.a(filetyps.o)
+                0x000f4574                init_tbl
+ *fill*         0x000f45c6        0x2 00
+ .text          0x000f45c8        0x0 cpmlib.a(stack.o)
+ .text          0x000f45c8      0x14a cpmlib.a(n8bios3.o)
+                0x000f4614                bios3_trap_entry
+                0x000f45c8                _init
+                0x000f469c                warm_boot
+ *fill*         0x000f4712        0x2 00
+ .text          0x000f4714      0xb4a cpmlib.a(n8io.o)
+                0x000f47da                disk_set_sector
+                0x000f49f6                disk_write_sector
+                0x000f4848                purge_to_disk
+                0x000f473c                cpm_memcpy
+                0x000f4c94                init_ramdisk
+                0x000f4760                disk_drive_select
+                0x000f47a0                lru_update
+                0x000f47ec                disk_set_DMA_address
+                0x000f4dfa                make_dph
+                0x000f4822                disk_home
+                0x000f48f0                get_into_memory
+                0x000f4714                cpm_memset
+                0x000f47c8                disk_set_track
+                0x000f4f92                disk_system_init
+                0x000f4da6                cpm_malloc
+                0x000f48bc                disk_flush_buffers
+                0x000f47fe                log2
+                0x000f4b92                disk_read_sector
+ *fill*         0x000f525e        0x2 00
+ .text          0x000f5260       0x76 cpmlib.a(n8iox.o)
+                0x000f52cc                _halloc
+                0x000f52c8                _get_hma
+                0x000f5260                _read_sector
+                0x000f5282                _write_sector
+                0x000f52b4                _disk_info
+                0x000f52a4                _disk_reset
+ *fill*         0x000f52d6        0x2 00
+ .text          0x000f52d8      0x2d6 cpmlib.a(cprintf.o)
+                0x000f531a                cprintf
+                0x000f52d8                putch
+ *fill*         0x000f55ae        0x2 00
+ .text          0x000f55b0        0xc cpmlib.a(ccpbdos.o)
+                0x000f55b0                bdos
+ .text          0x000f55bc      0x52c cpmlib.a(conbdos.o)
+                0x000f581c                conin
+                0x000f56fa                conout
+                0x000f58fe                readline
+                0x000f564e                conbrk
+                0x000f5892                prt_line
+                0x000f55bc                getch
+                0x000f5aa4                rawconio
+                0x000f58be                cookdout
+                0x000f5a7c                constat
+                0x000f5762                backsp
+                0x000f57e0                newline
+                0x000f585a                tabout
+ .text          0x000f5ae8       0x1a /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+                0x000f5ae8                strlen
+ *fill*         0x000f5b02        0x2 00
+ .text          0x000f5b04       0x5c /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+                0x000f5b04                __udivsi3
+ .text          0x000f5b60       0x2e /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+                0x000f5b60                __divsi3
+ *fill*         0x000f5b8e        0x2 00
+ .text          0x000f5b90       0x2e /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+                0x000f5b90                __umodsi3
+ *fill*         0x000f5bbe        0x2 00
+ .text          0x000f5bc0       0x22 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+                0x000f5bc0                __mulsi3
+                0x000f5be2                _etext = .
+ *(.rodata .rodata.* .gnu.linkonce.r.*)
+ .rodata.str1.1
+                0x000f5be2       0x26 cpmlib.a(ccp.o)
+ .rodata        0x000f5c08      0x17f cpmlib.a(ccp.o)
+                0x000f5cf8                msg13
+                0x000f5c34                msg3
+                0x000f5c6d                msg6
+                0x000f5d52                lderr3
+                0x000f5caa                msg9
+                0x000f5ce0                msg12
+                0x000f5c08                msg
+                0x000f5cba                msg10
+                0x000f5c22                msg2
+                0x000f5c58                msg5
+                0x000f5d73                lderror
+                0x000f5c8d                msg8
+                0x000f5c76                msg7
+                0x000f5ccb                msg11
+                0x000f5c46                msg4
+                0x000f5d36                lderr2
+                0x000f5d0e                lderr1
+ .rodata.str1.1
+                0x000f5d87      0x124 cpmlib.a(bdosmisc.o)
+ .rodata.str1.1
+                0x000f5eab       0xbc cpmlib.a(n8io.o)
+ *fill*         0x000f5f67        0x1 00
+ .rodata        0x000f5f68       0x30 cpmlib.a(n8io.o)
+                0x000f5f68                dpb_rom_400k
+                0x000f5f78                dpb_flpy_144m
+                0x000f5f88                dpb_flpy_720k
+ .rodata        0x000f5f98       0x11 cpmlib.a(cprintf.o)
+                0x000f5f98                nstring
+ *(.rodata1)
+                0x000f5fac                . = ((. + 0x3) & 0xfffffffc)
+ *fill*         0x000f5fa9        0x3 00
+                0x000f5fac                __text_end = .
+                0x00005fc8                __text_size = SIZEOF (.text)
+
+.rwdata         0x000f5fac      0x23c
+                0x000f5fac                __data_start = .
+ *(.data)
+ .data          0x000f5fac        0x0 0cpm68k.o
+ .data          0x000f5fac        0x0 ccpif.o
+ .data          0x000f5fac       0x80 except10.o
+                0x000f5fdc                retrobrew
+ .data          0x000f602c        0x0 cpmlib.a(ccpload.o)
+ .data          0x000f602c       0x40 cpmlib.a(ccp.o)
+                0x000f605c                del
+                0x000f602c                cmd_tbl
+ .data          0x000f606c        0x0 cpmlib.a(bdosif.o)
+ .data          0x000f606c        0x4 cpmlib.a(bdosmisc.o)
+                0x000f606c                warning
+ .data          0x000f6070        0x0 cpmlib.a(dskutil.o)
+ .data          0x000f6070        0x0 cpmlib.a(fileio.o)
+ .data          0x000f6070        0x0 cpmlib.a(bdosrw.o)
+ .data          0x000f6070        0x0 cpmlib.a(bdosmain.o)
+ .data          0x000f6070        0x0 cpmlib.a(iosys.o)
+ .data          0x000f6070        0x0 cpmlib.a(pgmld.o)
+ .data          0x000f6070       0x10 cpmlib.a(filetyps.o)
+ .data          0x000f6080        0x0 cpmlib.a(stack.o)
+ .data          0x000f6080        0xc cpmlib.a(n8bios3.o)
+ .data          0x000f608c      0x156 cpmlib.a(n8io.o)
+                0x000f608c                dpb_RAM_1M
+                0x000f609c                dph_rom_400k
+                0x000f60d0                partition
+                0x000f61d0                RAM_partition
+                0x000f60b6                dph_RAM_1M
+                0x000f61e0                current_drive
+ *fill*         0x000f61e2        0x2 00
+ .data          0x000f61e4        0x4 cpmlib.a(n8iox.o)
+                0x000f61e4                heap
+ .data          0x000f61e8        0x0 cpmlib.a(cprintf.o)
+ .data          0x000f61e8        0x0 cpmlib.a(ccpbdos.o)
+ .data          0x000f61e8        0x0 cpmlib.a(conbdos.o)
+ .data          0x000f61e8        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .data          0x000f61e8        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+ .data          0x000f61e8        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+ .data          0x000f61e8        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+ .data          0x000f61e8        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+                0x000f61e8                . = ((. + 0x3) & 0xfffffffc)
+                0x000f61e8                __data_end = .
+                0x0000023c                __data_size = SIZEOF (.rwdata)
+
+.bss            0x000f61e8     0x2f80
+                0x000f61e8                __bss_start = .
+ *(COMMON)
+ COMMON         0x000f61e8       0x48 cpmlib.a(ccpload.o)
+                0x000f61e8                cmdfcb
+                0x000f620c                subfcb
+ COMMON         0x000f6230      0x2a8 cpmlib.a(ccp.o)
+                0x000f6230                cur_disk
+                0x000f6232                load_try
+                0x000f6233                dma
+                0x000f62b6                subcom
+                0x000f6337                autorom
+                0x000f6338                sub_user
+                0x000f633a                sub_index
+                0x000f633c                chain_sub
+                0x000f633d                parm
+                0x000f63b6                user
+                0x000f63b8                chainp
+                0x000f63bc                dirflag
+                0x000f63c0                tail
+                0x000f63c4                subprompt
+                0x000f63c5                first_sub
+                0x000f63c6                index
+                0x000f63c8                end_of_file
+                0x000f63cc                glb_index
+                0x000f63d0                subdma
+                0x000f6450                save_sub
+                0x000f64d4                user_ptr
+ COMMON         0x000f64d8      0x106 cpmlib.a(bdosmain.o)
+                0x000f64d8                gbls
+                0x000f65c6                crit_dsk
+                0x000f65c8                tpa_lp
+                0x000f65cc                tpa_lt
+                0x000f65d0                log_dsk
+                0x000f65d4                tpa_hp
+                0x000f65d8                tpa_ht
+                0x000f65dc                ro_dsk
+ *fill*         0x000f65de        0x2 00
+ COMMON         0x000f65e0     0x1944 cpmlib.a(n8io.o)
+                0x000f65e0                alv_rom_400k
+                0x000f65fe                content
+                0x000f6648                errno
+                0x000f664c                DMA_address
+                0x000f6650                hma
+                0x000f6654                common_dir_buffer
+                0x000f66d4                buffer
+                0x000f7ed4                current_track
+                0x000f7ed6                lru
+                0x000f7ee2                alv_RAM_1M
+                0x000f7f22                current_sector
+ *(.bss)
+ .bss           0x000f7f24        0x0 0cpm68k.o
+ .bss           0x000f7f24       0xee ccpif.o
+                0x000f7faa                submit
+                0x000f7fae                patch
+                0x000f7f25                usercmd
+                0x000f7fac                morecmds
+                0x000f7f24                autost
+ *fill*         0x000f8012        0x2 00
+ .bss           0x000f8014       0xc0 except10.o
+ .bss           0x000f80d4       0x20 cpmlib.a(ccpload.o)
+                0x000f80ea                TPAB
+                0x000f80e8                flags
+ .bss           0x000f80f4        0x0 cpmlib.a(ccp.o)
+ .bss           0x000f80f4        0x0 cpmlib.a(bdosif.o)
+ .bss           0x000f80f4        0x0 cpmlib.a(bdosmisc.o)
+ .bss           0x000f80f4        0x0 cpmlib.a(dskutil.o)
+ .bss           0x000f80f4        0x0 cpmlib.a(fileio.o)
+ .bss           0x000f80f4        0x0 cpmlib.a(bdosrw.o)
+ .bss           0x000f80f4        0x0 cpmlib.a(bdosmain.o)
+ .bss           0x000f80f4        0x1 cpmlib.a(iosys.o)
+ *fill*         0x000f80f5        0x3 00
+ .bss           0x000f80f8       0x44 cpmlib.a(pgmld.o)
+ .bss           0x000f813c       0x28 cpmlib.a(filetyps.o)
+                0x000f813c                load_tbl
+ .bss           0x000f8164     0x1002 cpmlib.a(stack.o)
+                0x000f9164                stack
+ *fill*         0x000f9166        0x2 00
+ .bss           0x000f9168        0x0 cpmlib.a(n8bios3.o)
+ .bss           0x000f9168        0x0 cpmlib.a(n8io.o)
+ .bss           0x000f9168        0x0 cpmlib.a(n8iox.o)
+ .bss           0x000f9168        0x0 cpmlib.a(cprintf.o)
+ .bss           0x000f9168        0x0 cpmlib.a(ccpbdos.o)
+ .bss           0x000f9168        0x0 cpmlib.a(conbdos.o)
+ .bss           0x000f9168        0x0 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+ .bss           0x000f9168        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_udivsi3.o)
+ .bss           0x000f9168        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_divsi3.o)
+ .bss           0x000f9168        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_umodsi3.o)
+ .bss           0x000f9168        0x0 /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a(_mulsi3.o)
+                0x000f9168                . = ((. + 0x3) & 0xfffffffc)
+                0x000f9168                __bss_end = .
+                0x00002f80                __bss_size = SIZEOF (.bss)
+                0x000f9168                _end = .
+LOAD 0cpm68k.o
+LOAD ccpif.o
+LOAD except10.o
+LOAD cpmlib.a
+LOAD /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a
+LOAD /usr/cross/m68k-elf/lib/gcc/m68k-elf/4.1.1/m68000/libgcc.a
+OUTPUT(jcpm.sys binary)
+
+.comment        0x00000000       0xc6
+ .comment       0x00000000       0x12 cpmlib.a(ccp.o)
+ .comment       0x00000012       0x12 cpmlib.a(bdosmisc.o)
+ .comment       0x00000024       0x12 cpmlib.a(dskutil.o)
+ .comment       0x00000036       0x12 cpmlib.a(fileio.o)
+ .comment       0x00000048       0x12 cpmlib.a(bdosrw.o)
+ .comment       0x0000005a       0x12 cpmlib.a(bdosmain.o)
+ .comment       0x0000006c       0x12 cpmlib.a(iosys.o)
+ .comment       0x0000007e       0x12 cpmlib.a(n8io.o)
+ .comment       0x00000090       0x12 cpmlib.a(cprintf.o)
+ .comment       0x000000a2       0x12 cpmlib.a(conbdos.o)
+ .comment       0x000000b4       0x12 /usr/cross/m68k-elf/m68k-elf/lib/m68000/libc.a(strlen.o)
+
+.debug_abbrev
+
+.debug_info
+
+.debug_line
+
+.debug_frame
+
+.debug_loc
+
+.debug_pubnames
+
+.debug_aranges
+
+.debug_str
